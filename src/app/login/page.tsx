@@ -17,26 +17,28 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          kataSandi,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, kataSandi }),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.message || 'Gagal untuk login.');
-      } else {
-        router.push('/dashboard');
-        router.refresh();
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Gagal login.');
       }
-    } catch (err) {
-      setError('Tidak dapat terhubung ke server. Coba lagi nanti.');
+      
+      const role = data.user.peran;
+
+      if (role === 'Warga') {
+        router.push('/warga/dashboard');
+      } else {
+        router.push('/');
+      }
+
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setIsLoading(false);
     }
