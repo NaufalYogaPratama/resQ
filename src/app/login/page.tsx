@@ -33,9 +33,14 @@ export default function LoginPage() {
 
       if (role === 'Warga') {
         router.push('/warga/dashboard');
+      } else if (role === 'Relawan') { 
+        router.push('/relawan/dashboard');
+      } else if (role === 'Admin') { 
+        router.push('/admin/dashboard');
       } else {
         router.push('/');
       }
+
 
     } catch (err: any) {
       setError(err.message);

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { AlertTriangle, BookOpen, Map, Package } from 'lucide-react';
 import { verifyAuth } from '@/lib/auth'; 
 import { redirect } from 'next/navigation';
+import WeatherWidget from "@/components/WeatherWidget";
 
 export default async function DashboardWargaPage() {
   const user = verifyAuth(); 
@@ -14,10 +15,15 @@ export default async function DashboardWargaPage() {
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <div className="px-4 py-6 sm:px-0">
         <div className="mb-8">
-          {/* PERBAIKI: Gunakan 'user.nama' sesuai payload JWT Anda, bukan 'user.name' */}
+   
           <h1 className="text-3xl font-bold text-gray-900">Selamat Datang, {user.nama}!</h1>
           <p className="mt-1 text-md text-gray-600">Anda berada di dashboard Warga. Mari bersama kita jaga lingkungan tetap aman.</p>
         </div>
+
+       
+      <div className="mb-6">
+        <WeatherWidget />
+      </div>
 
         <div className="bg-white shadow-lg rounded-xl p-6 border border-gray-200 mb-6">
           <div className="flex items-center mb-4">
