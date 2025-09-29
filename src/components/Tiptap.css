@@ -1,0 +1,13 @@
+.tiptap button {
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s;
+}
+.tiptap button:hover {
+    background-color: #f3f4f6; /* gray-100 */
+}
+
+.tiptap button.is-active {
+    background-color: #dbeafe; /* blue-100 */
+    color: #1d4ed8; /* blue-700 */
+}
