@@ -12,14 +12,17 @@
     "@tiptap/pm": "^3.6.2",
     "@tiptap/react": "^3.6.2",
     "@tiptap/starter-kit": "^3.6.2",
+    "@types/leaflet": "^1.9.20",
     "bcryptjs": "^3.0.2",
     "jsonwebtoken": "^9.0.2",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.544.0",
     "mongoose": "^8.18.2",
     "next": "15.5.4",
     "next-auth": "^4.24.11",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-leaflet": "^5.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
