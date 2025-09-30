@@ -53,21 +53,23 @@ export default function MapComponent({ userRole }: MapComponentProps) {
   const [reports, setReports] = useState<ReportType[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Semua');
+  const [isSubmitting, setIsSubmitting] = useState<string | null>(null);
+
+  const fetchReports = async () => {
+    try {
+      const res = await fetch('/api/reports');
+      const data = await res.json();
+      if (data.success) {
+        setReports(data.data);
+      }
+    } catch (error) {
+      console.error("Gagal mengambil data laporan:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const res = await fetch('/api/reports');
-        const data = await res.json();
-        if (data.success) {
-          setReports(data.data);
-        }
-      } catch (error) {
-        console.error("Gagal mengambil data laporan:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchReports();
   }, []);
 
@@ -75,7 +77,31 @@ export default function MapComponent({ userRole }: MapComponentProps) {
     if (!confirm('Apakah Anda yakin ingin menangani laporan ini?')) {
       return;
     }
-    alert(`Fitur klaim untuk laporan ID: ${reportId} belum diimplementasikan di API.`);
+
+    setIsSubmitting(reportId);
+    try {
+      const res = await fetch(`/api/reports/${reportId}/claim`, {
+        method: 'PUT',
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Gagal mengklaim laporan.');
+      }
+
+      alert('Laporan berhasil diklaim!');
+      setReports(currentReports => 
+        currentReports.map(report => 
+          report._id === reportId ? { ...report, status: 'Ditangani' } : report
+        )
+      );
+
+    } catch (err: any) {
+      alert(`Error: ${err.message}`);
+    } finally {
+      setIsSubmitting(null);
+    }
   };
 
   const filteredReports = selectedCategory === 'Semua' 
@@ -123,9 +149,10 @@ export default function MapComponent({ userRole }: MapComponentProps) {
               {userRole === 'Relawan' && report.status === 'Menunggu' && (
                 <button
                   onClick={() => handleClaim(report._id)}
-                  className="w-full mt-3 bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all"
+                  disabled={isSubmitting === report._id}
+                  className="w-full mt-3 bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all disabled:bg-gray-400"
                 >
-                  Klaim Bantuan
+                  {isSubmitting === report._id ? 'Memproses...' : 'Klaim Bantuan'}
                 </button>
               )}
             </Popup>
@@ -134,6 +161,7 @@ export default function MapComponent({ userRole }: MapComponentProps) {
       </MapContainer>
 
       <style jsx global>{`
+        /* ... (styling pin tetap sama) ... */
         .marker-pin {
           width: 20px;
           height: 20px;
