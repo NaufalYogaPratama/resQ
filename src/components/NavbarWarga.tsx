@@ -73,7 +73,7 @@ export default function NavbarWarga({ user }: { user: UserData }) {
                     <p className="text-sm font-semibold text-gray-800 truncate">{user?.name}</p>
                     <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                   </div>
-                  <Link href="/warga/profil" onClick={() => setIsProfileOpen(false)} className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <Link href="/profil" onClick={() => setIsProfileOpen(false)} className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                     <User className="w-4 h-4 mr-2" /> Profil Saya
                   </Link>
                   <button onClick={handleLogout} className="flex items-center w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
