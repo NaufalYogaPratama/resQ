@@ -13,13 +13,11 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
-// Tipe data untuk props komponen utama
 interface LocationPickerProps {
   onLocationSelect: (lat: number, lng: number) => void;
 }
 
-// --- PERBAIKAN DI SINI ---
-// Beri tipe data untuk props komponen internal 'LocationFinder'
+
 function LocationFinder({ onLocationSelect }: { onLocationSelect: (lat: number, lng: number) => void }) {
   const map = useMapEvents({
     click(e) {
@@ -29,7 +27,7 @@ function LocationFinder({ onLocationSelect }: { onLocationSelect: (lat: number, 
   });
   return null;
 }
-// --- AKHIR PERBAIKAN ---
+
 
 export default function LocationPicker({ onLocationSelect }: LocationPickerProps) {
   const [position, setPosition] = useState<L.LatLngExpression>([-6.9929, 110.4232]); 
