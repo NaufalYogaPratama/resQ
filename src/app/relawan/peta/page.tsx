@@ -1,9 +1,10 @@
-import MapLoader from '@/components/MapLoader'; 
+import { verifyAuth } from '@/lib/auth';
+import MapLoader from '@/components/MapLoader';
 
-export default function PetaResponsPage() {
+export default function PetaWargaPage() {
+  const user = verifyAuth();
+
   return (
-    <div>
-      <MapLoader />
-    </div>
+    <MapLoader userRole={user?.peran} />
   );
 }
