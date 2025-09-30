@@ -12,7 +12,7 @@ export async function GET() {
   await dbConnect();
   try {
     const activeReports = await Report.find({ status: { $in: ['Menunggu', 'Ditangani'] } })
-      .populate('pelapor', 'namaLengkap')
+      .populate('pelapor', 'namaLengkap _id')
       .sort({ createdAt: -1 });
 
     return NextResponse.json({ success: true, data: activeReports });

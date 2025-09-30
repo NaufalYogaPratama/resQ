@@ -4,10 +4,11 @@ import dynamic from 'next/dynamic';
 import { useMemo } from 'react';
 
 interface MapLoaderProps {
+  userId: string | undefined;
   userRole: 'Warga' | 'Relawan' | 'Admin' | undefined;
 }
 
-export default function MapLoader({ userRole }: MapLoaderProps) {
+export default function MapLoader({ userId, userRole }: MapLoaderProps) {
   const Map = useMemo(() => dynamic(
     () => import('@/components/MapComponent'), 
     { 
@@ -16,5 +17,5 @@ export default function MapLoader({ userRole }: MapLoaderProps) {
     }
   ), []);
 
-  return <Map userRole={userRole} />;
+  return <Map userId={userId} userRole={userRole} />;
 }

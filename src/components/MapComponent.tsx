@@ -15,11 +15,13 @@ interface ReportType {
     alamat?: string;
   };
   pelapor: {
+    _id: string;
     namaLengkap: string;
   };
 }
 
 interface MapComponentProps {
+  userId: string | undefined;
   userRole: 'Warga' | 'Relawan' | 'Admin' | undefined;
 }
 
@@ -49,7 +51,7 @@ const getIconByStatus = (status: ReportType['status']) => {
 
 const CATEGORIES = ['Semua', 'Medis', 'Evakuasi', 'Kerusakan Properti', 'Lainnya'];
 
-export default function MapComponent({ userRole }: MapComponentProps) {
+export default function MapComponent({ userId, userRole }: MapComponentProps) {
   const [reports, setReports] = useState<ReportType[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Semua');
@@ -97,6 +99,32 @@ export default function MapComponent({ userRole }: MapComponentProps) {
         )
       );
 
+    } catch (err: any) {
+      alert(`Error: ${err.message}`);
+    } finally {
+      setIsSubmitting(null);
+    }
+  };
+
+  const handleComplete = async (reportId: string) => {
+    if (!confirm('Apakah Anda yakin bantuan telah selesai diterima?')) {
+      return;
+    }
+    setIsSubmitting(reportId);
+    try {
+      const res = await fetch(`/api/reports/${reportId}/complete`, {
+        method: 'PUT',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || 'Gagal menyelesaikan laporan.');
+      }
+      alert('Terima kasih atas konfirmasinya! Laporan telah diselesaikan.');
+      setReports(currentReports =>
+        currentReports.map(report =>
+          report._id === reportId ? { ...report, status: 'Selesai' } : report
+        )
+      );
     } catch (err: any) {
       alert(`Error: ${err.message}`);
     } finally {
@@ -153,6 +181,16 @@ export default function MapComponent({ userRole }: MapComponentProps) {
                   className="w-full mt-3 bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-all disabled:bg-gray-400"
                 >
                   {isSubmitting === report._id ? 'Memproses...' : 'Klaim Bantuan'}
+                </button>
+              )}
+
+              {report.pelapor._id === userId && report.status === 'Ditangani' && (
+                <button
+                  onClick={() => handleComplete(report._id)}
+                  disabled={isSubmitting === report._id}
+                  className="w-full mt-3 bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-all disabled:bg-gray-400"
+                >
+                  {isSubmitting === report._id ? 'Memproses...' : 'Tandai Selesai'}
                 </button>
               )}
             </Popup>

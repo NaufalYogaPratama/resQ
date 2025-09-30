@@ -29,6 +29,10 @@ const UserSchema = new mongoose.Schema({
     enum: ['Warga', 'Relawan', 'Admin'],
     default: 'Warga',
   },
+  poin: {
+    type: Number,
+    default: 0,
+  },
 }, {
   timestamps: true,
 });

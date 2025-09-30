@@ -29,5 +29,4 @@ const ResourceSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-// Nama model tetap 'Resource'
-export default mongoose.models.Resource || mongoose.model('Resource', ResourceSchema);f
+export default mongoose.models.Resource || mongoose.model('Resource', ResourceSchema);

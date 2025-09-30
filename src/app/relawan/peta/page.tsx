@@ -5,6 +5,6 @@ export default function PetaWargaPage() {
   const user = verifyAuth();
 
   return (
-    <MapLoader userRole={user?.peran} />
+    <MapLoader userId={user?.id} userRole={user?.peran} />
   );
 }
