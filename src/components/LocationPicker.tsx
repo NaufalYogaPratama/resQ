@@ -1,12 +1,14 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents, Circle, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Circle, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
+import 'leaflet-geosearch/dist/geosearch.css';
+import { Search } from "lucide-react";
 
-
+// FIX untuk ikon default Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
@@ -14,6 +16,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
 
+// --- INTERFACE & TIPE DATA ---
 interface InitialPos {
   lat: number;
   lng: number;
@@ -25,6 +28,11 @@ interface LocationPickerProps {
   initialPosition: InitialPos | null;
 }
 
+interface MapActionProps {
+    onLocationSelect: (lat: number, lng: number) => void;
+}
+
+// --- KOMPONEN INTERNAL UNTUK EVENT PETA ---
 function MapClickHandler({ onClick }: { onClick: (lat: number, lng: number) => void }) {
   useMapEvents({
     click(e) {
@@ -34,88 +42,74 @@ function MapClickHandler({ onClick }: { onClick: (lat: number, lng: number) => v
   return null;
 }
 
-function SetMapRef({ mapRef }: { mapRef: React.MutableRefObject<L.Map | null> }) {
-  const map = useMap();
-  useEffect(() => {
-    mapRef.current = map;
-    return () => {
-      mapRef.current = null;
-    };
-  }, [map, mapRef]);
-  return null;
+function SearchControl({ onLocationSelect }: MapActionProps) {
+    const map = useMap();
+    useEffect(() => {
+        const provider = new OpenStreetMapProvider();
+        const searchControl = new (GeoSearchControl as any)({
+            provider, style: 'bar', showMarker: false, showPopup: false, autoClose: true, keepResult: true,
+        });
+        map.addControl(searchControl);
+        const onResult = (e: any) => onLocationSelect(e.location.y, e.location.x);
+        map.on('geosearch/showlocation', onResult);
+        return () => {
+            map.removeControl(searchControl);
+            map.off('geosearch/showlocation', onResult);
+        };
+    }, [map, onLocationSelect]);
+    return null;
 }
 
+// --- KOMPONEN UTAMA LocationPicker ---
 export default function LocationPicker({ onLocationSelect, initialPosition }: LocationPickerProps) {
   const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(
     initialPosition ? [initialPosition.lat, initialPosition.lng] : null
   );
   const [accuracy, setAccuracy] = useState<number | undefined>(initialPosition?.accuracy);
-
   const mapRef = useRef<L.Map | null>(null);
   const defaultCenter: [number, number] = [-6.9929, 110.4232];
 
-
+  // Cek jika props initialPosition berubah dan update state internal
   useEffect(() => {
     if (initialPosition) {
       const newPos: [number, number] = [initialPosition.lat, initialPosition.lng];
-      setMarkerPosition((prev) => {
-        if (!prev || prev[0] !== newPos[0] || prev[1] !== newPos[1]) {
-          return newPos;
+      if (!markerPosition || markerPosition[0] !== newPos[0] || markerPosition[1] !== newPos[1]) {
+        setMarkerPosition(newPos);
+        setAccuracy(initialPosition.accuracy);
+        if (mapRef.current) {
+          mapRef.current.flyTo(newPos, 15);
         }
-        return prev;
-      });
-      setAccuracy(initialPosition.accuracy);
-
-      // Jika map sudah ready, centering
-      if (mapRef.current) {
-        mapRef.current.flyTo(newPos, 15, { duration: 0.6 });
       }
     }
-  }, [initialPosition]);
+  }, [initialPosition, markerPosition]);
 
-  const handleMapClick = (lat: number, lng: number) => {
-    setMarkerPosition([lat, lng]);
-    setAccuracy(undefined);
-    onLocationSelect(lat, lng);
-    if (mapRef.current) mapRef.current.flyTo([lat, lng], 15);
+  const handleLocationUpdate = (lat: number, lng: number, acc?: number) => {
+      setMarkerPosition([lat, lng]);
+      setAccuracy(acc);
+      onLocationSelect(lat, lng, acc);
   };
-
+  
   const handleMarkerDragEnd = (e: L.DragEndEvent) => {
-    const marker = e.target;
-    const pos = marker.getLatLng();
-    setMarkerPosition([pos.lat, pos.lng]);
-    setAccuracy(undefined);
-    onLocationSelect(pos.lat, pos.lng);
-  };
-
-  const handleRecenterClick = () => {
-    if (markerPosition && mapRef.current) {
-      mapRef.current.flyTo(markerPosition, 15);
-    } else if (mapRef.current) {
-      mapRef.current.flyTo(defaultCenter, 13);
-    }
+    const pos = e.target.getLatLng();
+    handleLocationUpdate(pos.lat, pos.lng);
   };
 
   return (
-    <div className="h-64 rounded-lg overflow-hidden z-0 border relative">
+    <div className="h-80 rounded-lg overflow-hidden z-0 border border-slate-300 relative">
       <MapContainer
         center={markerPosition ?? defaultCenter}
         zoom={markerPosition ? 15 : 13}
         style={{ height: "100%", width: "100%" }}
-        scrollWheelZoom={true}
+        ref={mapRef}
         zoomControl={true}
-        touchZoom={true}
       >
-
-        <SetMapRef mapRef={mapRef} />
-
+        {/* DIUBAH: Kembali ke Tile Peta Terang */}
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-
-        <MapClickHandler onClick={handleMapClick} />
-
+        <MapClickHandler onClick={handleLocationUpdate} />
+        <SearchControl onLocationSelect={handleLocationUpdate} />
         {markerPosition && (
           <>
             <Marker
@@ -129,15 +123,46 @@ export default function LocationPicker({ onLocationSelect, initialPosition }: Lo
           </>
         )}
       </MapContainer>
-
-      <button
-        type="button"
-        onClick={handleRecenterClick}
-        className="absolute right-2 bottom-2 bg-white p-2 rounded shadow text-sm"
-        title="Pusatkan ke marker"
-      >
-        Pusatkan
-      </button>
+      
+      {/* DIUBAH: CSS untuk Bar Pencarian di Tema Terang */}
+      <style jsx global>{`
+        .leaflet-control-geosearch .bar {
+          background-color: white !important;
+          border: 1px solid #d1d5db !important; /* gray-300 */
+          border-radius: 8px;
+          box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+        .leaflet-control-geosearch .bar form input {
+          background-color: transparent !important;
+          color: black !important; /* Warna teks input jadi hitam */
+          border: none !important;
+          padding: 0 12px !important;
+          height: 40px !important;
+        }
+        .leaflet-control-geosearch .bar form input::placeholder {
+          color: #6b7280 !important; /* text-gray-500 */
+        }
+        .leaflet-control-geosearch a.glass {
+            border-left: 1px solid #d1d5db !important;
+            border-radius: 0 8px 8px 0;
+            height: 40px !important;
+        }
+        .leaflet-control-geosearch a.glass:hover {
+            background: #f3f4f6 !important; /* bg-gray-100 */
+        }
+        .leaflet-control-geosearch .results {
+            background-color: white;
+            border: 1px solid #d1d5db;
+        }
+        .leaflet-control-geosearch .results > * {
+            color: #1f2937; /* text-gray-800 */
+        }
+        .leaflet-control-geosearch .results > *:hover {
+            background-color: #f59e0b; /* bg-amber-500 */
+            color: black;
+        }
+      `}</style>
     </div>
   );
 }
+
