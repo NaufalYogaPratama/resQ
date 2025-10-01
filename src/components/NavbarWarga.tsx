@@ -41,11 +41,13 @@ export default function NavbarWarga({ user }: { user: UserData }) {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#111827] border-b border-slate-700">
+    <nav className="sticky top-0 z-50 bg-indigo-900 border-b border-indigo-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center space-x-6">
-            <Link href="/warga/dashboard" className="text-3xl font-bold text-white">ResQ</Link>
+            <Link href="/warga/dashboard" className="text-3xl font-bold text-white">
+              ResQ
+            </Link>
             {/* Navigasi Desktop */}
             <div className="hidden md:flex items-center space-x-1">
               {navLinks.map((link) => (
@@ -54,8 +56,8 @@ export default function NavbarWarga({ user }: { user: UserData }) {
                   href={link.href} 
                   className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     pathname === link.href 
-                    ? 'bg-amber-500 text-black' 
-                    : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                    ? 'bg-indigo-500 text-white' 
+                    : 'text-indigo-100 hover:bg-indigo-800 hover:text-white'
                   }`}
                 >
                   <link.icon className="w-4 h-4 mr-2" />
@@ -67,26 +69,39 @@ export default function NavbarWarga({ user }: { user: UserData }) {
 
           {/* Aksi di Kanan */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/warga/lapor" className="flex items-center bg-amber-500 text-black px-4 py-2 rounded-md text-sm font-semibold hover:bg-amber-400 transition-colors shadow-sm">
+            <Link 
+              href="/warga/lapor" 
+              className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-indigo-400 transition-colors shadow-sm"
+            >
               <Siren className="w-4 h-4 mr-2" />
               Lapor Darurat
             </Link>
             
             <div className="relative">
-              <button onClick={() => setIsProfileOpen(!isProfileOpen)} className="flex items-center justify-center w-10 h-10 bg-slate-700 rounded-full text-slate-300 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-amber-500">
+              <button 
+                onClick={() => setIsProfileOpen(!isProfileOpen)} 
+                className="flex items-center justify-center w-10 h-10 bg-indigo-800 rounded-full text-indigo-100 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-900 focus:ring-indigo-400"
+              >
                 <User className="w-5 h-5" />
               </button>
               
               {isProfileOpen && (
-                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 bg-slate-800 ring-1 ring-slate-700 z-50">
-                  <div className="px-4 py-3 border-b border-slate-700">
+                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 bg-indigo-900 ring-1 ring-indigo-700 z-50">
+                  <div className="px-4 py-3 border-b border-indigo-700">
                     <p className="text-sm font-semibold text-white truncate">{user?.nama}</p>
-                    <p className="text-xs text-slate-400 truncate">{user?.email}</p>
+                    <p className="text-xs text-indigo-300 truncate">{user?.email}</p>
                   </div>
-                  <Link href="/warga/profil" onClick={() => setIsProfileOpen(false)} className="flex items-center w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">
+                  <Link 
+                    href="/warga/profil" 
+                    onClick={() => setIsProfileOpen(false)} 
+                    className="flex items-center w-full text-left px-4 py-2 text-sm text-indigo-100 hover:bg-indigo-800"
+                  >
                     <User className="w-4 h-4 mr-2" /> Profil Saya
                   </Link>
-                  <button onClick={handleLogout} className="flex items-center w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10">
+                  <button 
+                    onClick={handleLogout} 
+                    className="flex items-center w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10"
+                  >
                     <LogOut className="w-4 h-4 mr-2" /> Keluar
                   </button>
                 </div>

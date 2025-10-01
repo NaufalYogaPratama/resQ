@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import dbConnect from '@/lib/dbConnect';
 import Article from '@/models/Article';
@@ -41,12 +42,12 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
   }
 
   return (
-    <div className="bg-slate-900 min-h-screen text-white font-sans">
+    <div className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen text-slate-800 font-sans">
       <div className="max-w-4xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
         
         {/* Tombol Kembali */}
         <div className="mb-8" data-aos="fade-in">
-          <Link href="/warga/edukasi" className="inline-flex items-center text-amber-400 hover:text-amber-300 transition-colors group font-semibold">
+          <Link href="/warga/edukasi" className="inline-flex items-center text-indigo-600 hover:text-indigo-500 transition-colors group font-semibold">
             <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
             Kembali ke Semua Artikel
           </Link>
@@ -55,11 +56,11 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
         <article>
           {/* Header Artikel */}
           <header className="mb-8" data-aos="fade-up">
-            <span className="text-sm font-semibold bg-amber-500/10 text-amber-300 px-3 py-1 rounded-full">{article.kategori}</span>
-            <h1 className="text-3xl md:text-5xl font-extrabold text-white mt-4 leading-tight">
+            <span className="text-sm font-semibold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">{article.kategori}</span>
+            <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mt-4 leading-tight">
               {article.judul}
             </h1>
-            <div className="flex flex-wrap items-center text-sm text-slate-400 mt-6 space-x-4">
+            <div className="flex flex-wrap items-center text-sm text-slate-600 mt-6 space-x-4">
               <div className="flex items-center">
                 <User className="w-4 h-4 mr-2" />
                 <span>Oleh: <strong>{article.penulis.namaLengkap}</strong></span>
@@ -77,7 +78,7 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
               <img 
                 src={article.gambarUrl} 
                 alt={`Gambar untuk ${article.judul}`} 
-                className="w-full h-auto max-h-[500px] object-cover rounded-xl shadow-lg border border-white/10"
+                className="w-full h-auto max-h-[500px] object-cover rounded-xl shadow-md border border-slate-200"
               />
             </figure>
           )}
@@ -85,8 +86,7 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
           {/* Isi Konten Artikel */}
           <div 
             data-aos="fade-up" data-aos-delay="200"
-            // 'prose-invert' adalah kelas dari Tailwind Typography untuk dark mode
-            className="prose prose-lg max-w-none prose-invert prose-p:text-slate-300 prose-headings:text-white prose-strong:text-amber-300 prose-a:text-amber-400"
+            className="prose prose-lg max-w-none prose-p:text-slate-700 prose-headings:text-slate-900 prose-strong:text-indigo-700 prose-a:text-indigo-600"
             dangerouslySetInnerHTML={{ __html: article.isiKonten }} 
           />
         </article>

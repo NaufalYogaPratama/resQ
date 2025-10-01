@@ -1,19 +1,25 @@
-import { verifyAuth } from '@/lib/auth';
-import MapLoader from '@/components/MapLoader'; 
-import { redirect } from 'next/navigation';
+"use client";
 
-export default function PetaWargaPage() {
-  const user = verifyAuth();
+import dynamic from 'next/dynamic';
+import { useMemo } from 'react';
 
-  // Pengaman tambahan jika user mencoba akses langsung
-  if (!user) {
-    redirect('/login');
-  }
+interface MapLoaderProps {
+  userId: string | undefined;
+  userRole: 'Warga' | 'Relawan' | 'Admin' | undefined;
+}
 
-  return (
-    <div>
-      {/* Meneruskan ID dan Peran pengguna ke komponen peta */}
-      <MapLoader userId={user?.id} userRole={user?.peran} />
-    </div>
-  );
+export default function MapLoader({ userId, userRole }: MapLoaderProps) {
+  const Map = useMemo(() => dynamic(
+    () => import('@/components/MapComponent'), 
+    { 
+      ssr: false,
+      loading: () => (
+        <div className="flex justify-center items-center h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-purple-900">
+          <p className="text-gray-400">Memuat peta interaktif...</p>
+        </div>
+      )
+    }
+  ), []);
+
+  return <Map userId={userId} userRole={userRole} />;
 }

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -115,18 +116,18 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
   );
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen bg-slate-900"><p className="text-slate-400">Memuat data laporan...</p></div>;
+    return <div className="flex justify-center items-center h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-purple-900"><p className="text-gray-400">Memuat data laporan...</p></div>;
   }
 
   return (
     <div className="relative h-[calc(100vh-80px)]"> {/* Sesuaikan tinggi dengan tinggi navbar */}
       {/* Panel Filter dengan Glassmorphism */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-slate-800/50 backdrop-blur-md p-2 rounded-lg shadow-lg border border-white/10">
-        <label className="text-sm mr-2 text-slate-300">Filter Kategori:</label>
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-white/10 backdrop-blur-md p-2 rounded-lg shadow-lg border border-white/20">
+        <label className="text-sm mr-2 text-gray-300">Filter Kategori:</label>
         <select 
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="p-2 border border-white/20 rounded-md bg-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-amber-400"
+          className="p-2 border border-white/20 rounded-md bg-indigo-900/30 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
         >
           {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
         </select>
@@ -136,11 +137,12 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
         center={[-6.9929, 110.4232]}
         zoom={13} 
         style={{ height: '100%', width: '100%' }}
+        className="rounded-2xl overflow-hidden shadow-lg"
       >
-        {/* Menggunakan Tile Peta Dark Mode */}
+        {/* Mengganti ke TileLayer OpenStreetMap untuk tema terang */}
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
 
         {filteredReports.map((report) => (
@@ -160,7 +162,7 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
                   <button
                     onClick={() => handleClaim(report._id)}
                     disabled={isSubmitting === report._id}
-                    className="w-full mt-3 bg-amber-500 text-black text-sm font-semibold py-2 px-4 rounded-lg hover:bg-amber-400 disabled:bg-slate-600"
+                    className="w-full mt-3 bg-indigo-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-indigo-500 disabled:bg-gray-600"
                   >
                     {isSubmitting === report._id ? 'Memproses...' : 'Klaim Bantuan'}
                   </button>
@@ -170,7 +172,7 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
                   <button
                     onClick={() => handleComplete(report._id)}
                     disabled={isSubmitting === report._id}
-                    className="w-full mt-3 bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 disabled:bg-slate-600"
+                    className="w-full mt-3 bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 disabled:bg-gray-600"
                   >
                     {isSubmitting === report._id ? 'Memproses...' : 'Tandai Selesai'}
                   </button>
@@ -186,7 +188,7 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
           width: 20px;
           height: 20px;
           border-radius: 50% 50% 50% 0;
-          border: 2px solid white;
+          border: 2px solid rgba(255, 255, 255, 0.5);
           box-shadow: 0 0 5px rgba(0,0,0,0.5);
           position: absolute;
           transform: rotate(-45deg);
@@ -194,17 +196,17 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
           top: 50%;
           margin: -10px 0 0 -10px;
         }
-        /* Styling untuk popup dark mode */
         .leaflet-popup-content-wrapper {
           background-color: #1e293b; /* bg-slate-800 */
           color: #e2e8f0; /* text-slate-200 */
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 0.5rem;
         }
         .leaflet-popup-tip {
           background-color: #1e293b;
         }
         .leaflet-popup-content strong {
-          color: #fbbf24; /* text-amber-400 */
+          color: #93c5fd; /* text-indigo-300 */
         }
         .leaflet-popup-content small {
           color: #94a3b8; /* text-slate-400 */

@@ -50,19 +50,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#0b0f14] p-4">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white/5 border border-white/10 rounded-2xl shadow-lg backdrop-blur-lg">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-purple-900 p-4">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white/5 border border-white/10 rounded-2xl shadow-xl backdrop-blur-lg">
         
+        {/* Logo / Judul */}
         <div className="text-center">
             <Link href="/" className="text-4xl font-bold text-white mb-2 inline-block">
               ResQ
             </Link>
-            <p className="text-slate-300">Masuk untuk melanjutkan</p>
+            <p className="text-indigo-200">Masuk untuk melanjutkan</p>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="email" className="block text-sm font-medium text-indigo-200">
               Alamat Email
             </label>
             <input
@@ -70,14 +72,14 @@ export default function LoginPage() {
               name="email"
               type="email"
               required
-              className="w-full px-4 py-3 mt-1 bg-white/5 border border-white/20 rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-400"
+              className="w-full px-4 py-3 mt-1 bg-white/5 border border-white/20 rounded-lg shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           
           <div>
-            <label htmlFor="kataSandi" className="block text-sm font-medium text-slate-300">
+            <label htmlFor="kataSandi" className="block text-sm font-medium text-indigo-200">
               Kata Sandi
             </label>
             <input
@@ -85,28 +87,31 @@ export default function LoginPage() {
               name="kataSandi"
               type="password"
               required
-              className="w-full px-4 py-3 mt-1 bg-white/5 border border-white/20 rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-400"
+              className="w-full px-4 py-3 mt-1 bg-white/5 border border-white/20 rounded-lg shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
               value={kataSandi}
               onChange={(e) => setKataSandi(e.target.value)}
             />
           </div>
 
+          {/* Error */}
           {error && <p className="text-sm text-red-400 text-center font-semibold">{error}</p>}
 
+          {/* Tombol Login */}
           <div>
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full px-4 py-3 font-semibold text-black bg-amber-500 rounded-md hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-amber-500 disabled:bg-amber-400/50"
+              className="w-full px-4 py-3 font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-900 focus:ring-indigo-400 disabled:bg-indigo-600/50 shadow-md"
             >
               {isLoading ? 'Memproses...' : 'Masuk'}
             </button>
           </div>
         </form>
 
-        <p className="text-center text-sm text-slate-400">
+        {/* Link Register */}
+        <p className="text-center text-sm text-indigo-200">
             Belum punya akun?{' '}
-            <Link href="/register" className="font-semibold text-amber-400 hover:underline">
+            <Link href="/register" className="font-semibold text-indigo-400 hover:underline">
                 Daftar di sini
             </Link>
         </p>
