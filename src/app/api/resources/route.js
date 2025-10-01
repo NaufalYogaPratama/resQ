@@ -3,8 +3,30 @@ import Resource from "@/models/Resource";
 import SystemSetting from "@/models/SystemSetting";
 import { verifyAuth } from "@/lib/auth";
 import { NextResponse } from "next/server";
+// import cloudinary from 'cloudinary'; // Dinonaktifkan sementara
 
-// MENGAMBIL DAFTAR SUMBER DAYA (DENGAN LOGIKA KEAMANAN)
+// --- SEMUA KODE CLOUDINARY DINONAKTIFKAN SEMENTARA ---
+/*
+// Konfigurasi Cloudinary
+cloudinary.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Helper untuk upload gambar
+async function uploadImage(file) {
+    const fileBuffer = await file.arrayBuffer();
+    const mime = file.type;
+    const encoding = 'base64';
+    const base64Data = Buffer.from(fileBuffer).toString('base64');
+    const fileUri = 'data:' + mime + ';' + encoding + ',' + base64Data;
+    const result = await cloudinary.v2.uploader.upload(fileUri, { folder: 'resq_resources' });
+    return result;
+}
+*/
+
+// FUNGSI GET: MENGAMBIL DAFTAR SUMBER DAYA (Fungsi ini tidak berubah dan akan berjalan)
 export async function GET() {
   const user = verifyAuth();
   if (!user) {
@@ -16,13 +38,11 @@ export async function GET() {
     const settings = await SystemSetting.findOne({});
     const isEmergency = settings ? settings.modeDarurat : false;
 
-    // JIKA MODE DARURAT & USER ADALAH ADMIN/RELAWAN, TAMPILKAN SEMUA
     if (isEmergency && ['Admin', 'Relawan'].includes(user.peran)) {
       const allResources = await Resource.find({}).populate('pemilik', 'namaLengkap noWa');
       return NextResponse.json({ success: true, data: allResources });
     }
     
-    // JIKA TIDAK, SEMUA USER HANYA BISA MELIHAT MILIKNYA SENDIRI
     const userResources = await Resource.find({ pemilik: user.id });
     return NextResponse.json({ success: true, data: userResources });
 
@@ -31,7 +51,7 @@ export async function GET() {
   }
 }
 
-// MEMBUAT SUMBER DAYA BARU
+// FUNGSI POST: MEMBUAT SUMBER DAYA BARU (Diset ulang untuk menangani teks saja)
 export async function POST(request) {
   const user = verifyAuth();
   if (!user) {
@@ -40,10 +60,14 @@ export async function POST(request) {
 
   await dbConnect();
   try {
+    // Diubah kembali ke request.json() karena tidak ada file
     const body = await request.json();
     const newResource = await Resource.create({
       ...body,
       pemilik: user.id,
+      // Field gambar dikosongkan
+      gambarUrl: null,
+      gambarPublicId: null,
     });
     return NextResponse.json({ success: true, data: newResource }, { status: 201 });
   } catch (error) {
