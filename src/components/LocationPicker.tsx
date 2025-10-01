@@ -51,20 +51,16 @@ const SearchControl = ({ onLocationSelect }: LocationPickerProps) => {
   return null;
 };
 
-// --- KOMPONEN BARU UNTUK MENANGANI KLIK ---
+// Komponen untuk menangani klik
 const MapClickHandler = ({ onLocationSelect }: LocationPickerProps) => {
   const map = useMapEvents({
     click(e) {
-      // Panggil fungsi onLocationSelect saat peta diklik
       onLocationSelect(e.latlng.lat, e.latlng.lng);
-      // Pindahkan peta ke lokasi yang diklik
       map.flyTo(e.latlng, map.getZoom());
     },
   });
   return null;
 };
-// --- AKHIR KOMPONEN BARU ---
-
 
 export default function LocationPicker({ onLocationSelect }: LocationPickerProps) {
   const [position, setPosition] = useState<L.LatLngExpression>([-6.9929, 110.4232]);
@@ -76,56 +72,53 @@ export default function LocationPicker({ onLocationSelect }: LocationPickerProps
   };
   
   return (
-    <div className="h-80 rounded-lg overflow-hidden z-0 border border-white/20 relative">
+    <div className="h-80 rounded-lg overflow-hidden z-0 border border-gray-300 relative">
       <MapContainer center={position} zoom={15} style={{ height: '100%', width: '100%' }}>
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <Marker position={position} />
         <SearchControl onLocationSelect={handleLocationSelect} />
-        {/* Tambahkan komponen MapClickHandler di sini */}
         <MapClickHandler onLocationSelect={handleLocationSelect} />
       </MapContainer>
       
-      {/* CSS Diperbarui Total untuk Tema Gelap */}
       <style jsx global>{`
         .leaflet-control-geosearch .bar {
-          background-color: #1e293b !important; /* bg-slate-800 */
-          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+          background-color: #ffffff !important; /* bg-white */
+          border: 1px solid #d1d5db !important; /* border-gray-300 */
           border-radius: 8px;
         }
         .leaflet-control-geosearch .bar form input {
           background-color: transparent !important;
-          color: white !important; /* PENTING: Warna teks input jadi putih */
+          color: #1f2937 !important; /* text-gray-800 */
           border: none !important;
           padding: 0 12px !important;
           height: 40px !important;
         }
         .leaflet-control-geosearch .bar form input::placeholder {
-          color: #94a3b8 !important; /* text-slate-400 */
+          color: #6b7280 !important; /* text-gray-500 */
         }
         .leaflet-control-geosearch a.glass {
-            border-left: 1px solid rgba(255, 255, 255, 0.2) !important;
-            border-radius: 0 8px 8px 0;
-            height: 40px !important;
+          border-left: 1px solid #d1d5db !important; /* border-gray-300 */
+          border-radius: 0 8px 8px 0;
+          height: 40px !important;
         }
         .leaflet-control-geosearch a.glass:hover {
-            background: #334155 !important; /* bg-slate-700 */
+          background: #e5e7eb !important; /* bg-gray-200 */
         }
         .leaflet-control-geosearch .results {
-            background-color: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+          background-color: #ffffff;
+          border: 1px solid #d1d5db;
         }
         .leaflet-control-geosearch .results > * {
-            color: #e2e8f0;
+          color: #1f2937;
         }
         .leaflet-control-geosearch .results > *:hover {
-            background-color: #fbbf24;
-            color: black;
+          background-color: #eef2ff; /* bg-indigo-100 */
+          color: #1e40af; /* text-indigo-700 */
         }
       `}</style>
     </div>
   );
 }
-

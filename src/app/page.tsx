@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect } from "react";
@@ -7,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShieldCheck, Users, Map, BookOpen, HandHeart, MessageCircle, ArrowRight } from "lucide-react";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import Threads from "@/components/Threads";
 
 export default function HomePage() {
   useEffect(() => {
@@ -60,21 +60,21 @@ export default function HomePage() {
   return (
     <div className="bg-white text-slate-800 font-sans">
       {/* --- Navbar --- */}
-      <nav className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-md">
+      <nav className="sticky top-0 z-50 bg-indigo-900 border-b border-indigo-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-3">
-              <div className="text-3xl font-bold text-indigo-700">
+              <div className="text-3xl font-bold text-white">
                 ResQ
               </div>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#fitur" className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors">Fitur</a>
-              <a href="#tentang" className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors">Tentang</a>
-              <a href="#cara-kerja" className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors">Cara Kerja</a>
+              <a href="#fitur" className="text-white hover:text-gray-200 font-medium transition-colors">Fitur</a>
+              <a href="#tentang" className="text-white hover:text-gray-200 font-medium transition-colors">Tentang</a>
+              <a href="#cara-kerja" className="text-white hover:text-gray-200 font-medium transition-colors">Cara Kerja</a>
             </div>
             <div className="hidden md:flex items-center space-x-3">
-              <Link href="/login" className="text-indigo-600 px-5 py-2 rounded-lg font-semibold hover:bg-indigo-50 transition-colors">
+              <Link href="/login" className="text-white px-5 py-2 rounded-lg font-semibold hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
                 Masuk
               </Link>
               <Link href="/register" className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition-all">
@@ -88,7 +88,13 @@ export default function HomePage() {
       <main>
         {/* --- Hero Section --- */}
         <section className="relative min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 overflow-hidden">
-          <div className="absolute inset-0">
+          <div className="absolute inset-0 w-full h-full">
+            <Threads
+              amplitude={1}
+              distance={0}
+              enableMouseInteraction={true}
+              style={{ opacity: 0.3, zIndex: -1 }}
+            />
             <img
               src="https://cdn.antaranews.com/cache/800x533/2021/02/06/banjir-kota-lama.jpg"
               alt="Komunitas bergotong royong"
