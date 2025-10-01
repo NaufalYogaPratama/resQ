@@ -1,7 +1,7 @@
-
 import Link from 'next/link';
 import dbConnect from '@/lib/dbConnect';
 import Article from '@/models/Article';
+import User from '@/models/User';
 import { BookOpen } from 'lucide-react';
 
 // Definisikan tipe data untuk sebuah artikel
@@ -21,6 +21,7 @@ interface ArticleType {
 // Fungsi untuk mengambil data langsung di server
 async function getArticles(): Promise<ArticleType[]> {
   await dbConnect();
+  // Baris ini sekarang akan berfungsi karena model User sudah di-import
   const articles = await Article.find({}).sort({ createdAt: -1 }).populate('penulis', 'namaLengkap');
   return JSON.parse(JSON.stringify(articles));
 }
@@ -29,10 +30,10 @@ export default async function EdukasiPage() {
   const articles: ArticleType[] = await getArticles();
 
   return (
-    <div className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen text-slate-800 p-4 sm:p-8 font-sans">
+    <div className="bg-gradient-to-br from-slate-50 via-white to-indigo-50 min-h-screen text-slate-800 p-4 sm:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
         <div data-aos="fade-down">
-          <h1 className="text-4xl font-bold flex items-center">
+          <h1 className="text-4xl font-bold flex items-center text-slate-900">
             <BookOpen className="w-10 h-10 mr-4 text-indigo-600"/>
             Pusat Edukasi Kesiapsiagaan
           </h1>
@@ -43,7 +44,7 @@ export default async function EdukasiPage() {
           {articles.length > 0 ? (
             articles.map((article: ArticleType, index: number) => (
               <div key={article._id} data-aos="fade-up" data-aos-delay={index * 100}>
-                <Link href={`/warga/edukasi/${article._id}`} className="block bg-white border border-slate-200 rounded-2xl shadow-md overflow-hidden h-full group transition-all duration-300 hover:shadow-lg">
+                <Link href={`/warga/edukasi/${article._id}`} className="block bg-white border border-slate-200 rounded-2xl shadow-md overflow-hidden h-full group transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                   {article.gambarUrl && <img src={article.gambarUrl} alt={article.judul} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"/>}
                   <div className="p-6">
                     <span className="text-sm bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-semibold">{article.kategori}</span>

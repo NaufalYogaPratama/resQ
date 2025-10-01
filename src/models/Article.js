@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+import '@/models/User';
+
 const ArticleSchema = new mongoose.Schema({
   judul: { 
     type: String,
