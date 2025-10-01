@@ -13,7 +13,12 @@ export default function MapLoader({ userId, userRole }: MapLoaderProps) {
     () => import('@/components/MapComponent'), 
     { 
       ssr: false,
-      loading: () => <div className="flex justify-center items-center h-screen"><p>Memuat peta...</p></div>
+      // Diperbarui agar sesuai tema gelap
+      loading: () => (
+        <div className="flex justify-center items-center h-screen bg-slate-900">
+          <p className="text-slate-400">Memuat peta interaktif...</p>
+        </div>
+      )
     }
   ), []);
 
