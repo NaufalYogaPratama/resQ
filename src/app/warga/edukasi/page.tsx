@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import dbConnect from '@/lib/dbConnect';
 import Article from '@/models/Article';
+import { BookOpen } from 'lucide-react';
 
 // Definisikan tipe data untuk sebuah artikel
 interface ArticleType {
@@ -27,37 +28,42 @@ export default async function EdukasiPage() {
   const articles: ArticleType[] = await getArticles();
 
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div className="px-4 py-6 sm:px-0">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Pusat Edukasi Kesiapsiagaan</h1>
+    <div className="bg-slate-900 min-h-screen text-white p-4 sm:p-8 font-sans">
+      <div className="max-w-7xl mx-auto">
+        <div data-aos="fade-down">
+          <h1 className="text-4xl font-bold flex items-center">
+            <BookOpen className="w-10 h-10 mr-4 text-amber-400"/>
+            Pusat Edukasi Kesiapsiagaan
+          </h1>
+          <p className="mt-2 text-lg text-slate-400">Tingkatkan pengetahuan Anda untuk membangun komunitas yang lebih tangguh.</p>
+        </div>
         
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {articles.length > 0 ? (
-            articles.map((article: ArticleType) => (
-              <div key={article._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow flex flex-col">
-                {article.gambarUrl && <img src={article.gambarUrl} alt={article.judul} className="w-full h-48 object-cover"/>}
-                <div className="p-6 flex flex-col flex-grow">
-                  <span className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded-full self-start">{article.kategori}</span>
-                  <h2 className="mt-4 text-xl font-bold text-gray-800 flex-grow">{article.judul}</h2>
-                  
-                  {/* --- INI BAGIAN YANG DIPERBAIKI --- */}
-                  <div 
-                    className="mt-2 text-gray-600 line-clamp-3 prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: article.isiKonten }}
-                  />
-                  
-                  <div className="mt-4 pt-4 border-t">
-                    <p className="text-xs text-gray-500">Penulis: {article.penulis.namaLengkap}</p>
-                    <p className="text-xs text-gray-500">Diterbitkan: {new Date(article.createdAt).toLocaleDateString('id-ID')}</p>
-                    <Link href={`/warga/edukasi/${article._id}`} className="text-blue-600 hover:underline mt-2 inline-block font-semibold">
-                      Baca Selengkapnya →
-                    </Link>
+            articles.map((article: ArticleType, index: number) => (
+              <div key={article._id} data-aos="fade-up" data-aos-delay={index * 100}>
+                <Link href={`/warga/edukasi/${article._id}`} className="block bg-white/5 border border-white/10 rounded-2xl shadow-lg backdrop-blur-lg overflow-hidden h-full group transition-all duration-300 hover:border-amber-400/50">
+                  {article.gambarUrl && <img src={article.gambarUrl} alt={article.judul} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"/>}
+                  <div className="p-6">
+                    <span className="text-sm bg-amber-500/10 text-amber-300 px-3 py-1 rounded-full font-semibold">{article.kategori}</span>
+                    <h2 className="mt-4 text-xl font-bold text-white group-hover:text-amber-400 transition-colors">{article.judul}</h2>
+                    <div 
+                      className="mt-2 text-slate-400 line-clamp-3 text-sm prose prose-sm prose-invert max-w-none"
+                      dangerouslySetInnerHTML={{ __html: article.isiKonten }}
+                    />
+                    <div className="mt-4 pt-4 border-t border-white/10 text-xs text-slate-500">
+                      <span>Oleh {article.penulis.namaLengkap}</span>
+                      <span className="mx-2">•</span>
+                      <span>{new Date(article.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    </div>
                   </div>
-                </div>
+                </Link>
               </div>
             ))
           ) : (
-            <p className="text-gray-600">Belum ada artikel edukasi yang tersedia.</p>
+            <div className="col-span-full text-center py-20 bg-white/5 border border-dashed border-white/20 rounded-xl">
+              <p className="text-slate-400">Belum ada artikel edukasi yang tersedia.</p>
+            </div>
           )}
         </div>
       </div>

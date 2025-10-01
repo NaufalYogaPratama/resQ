@@ -105,6 +105,13 @@ export default function HomePage() {
               }
             </p>
             <div className="mt-8 flex justify-center gap-4">
+       
+       
+       
+       
+       
+       
+       
               <Link
                 href="/register"
                 className="bg-amber-500 text-black px-8 py-3 rounded-md text-lg font-semibold hover:bg-amber-400 transition-transform hover:scale-105"
