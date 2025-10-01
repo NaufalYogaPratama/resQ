@@ -150,37 +150,41 @@ export default function HomePage() {
       </nav>
 
       <main>
-        <section className="relative bg-gradient-to-br from-slate-50 via-white to-blue-50 text-slate-900 overflow-hidden">
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-30 pb-32">
+      <section className="relative bg-gradient-to-br from-slate-50 via-white to-blue-50 text-slate-900 overflow-hidden">
+        {/* Hero Content */}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-30 pb-32">
             <div className="grid lg:grid-cols-2 gap-20 items-center">
-              <div className="text-left" data-aos="fade-right">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight mb-6">
-                  Teknologi Menghubungkan <span className="text-[#4B5EAA]">Warga Menggerakkan.</span>
-                </h1>
-                <p className="text-lg md:text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl">
-                  Saat bencana, waktu adalah segalanya. ResQ mengubah niat baik menjadi aksi bersama—cepat, terarah, dan berdampak.
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  <Link
-                    href="/register"
-                    className="inline-flex items-center gap-2 bg-[#4B5EAA] text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-[#3A4D89] shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
-                  >
-                    Bergabung Jadi Relawan
-                    <ArrowRight className="w-5 h-5" />
-                  </Link>
+                {/* Left Content (UPDATED) */}
+                <div className="text-left" data-aos="fade-right">
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-5">
+                        Teknologi Menghubungkan <span className="text-[#4B5EAA]">Warga Menggerakkan.</span>
+                    </h1>
+                    <p className="text-lg text-slate-600 mb-8 leading-relaxed max-w-xl">
+                        Saat bencana, waktu adalah segalanya. ResQ mengubah niat baik menjadi aksi bersama—cepat, terarah, dan berdampak.
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                        <Link
+                            href="/register"
+                            className="inline-flex items-center gap-2 bg-[#4B5EAA] text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-[#3A4D89] shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
+                        >
+                            Bergabung Jadi Relawan
+                            <ArrowRight className="w-5 h-5" />
+                        </Link>
+                    </div>
                 </div>
-              </div>
-              <div className="hidden lg:block">
-                <HeroImageGallery />
-              </div>
+
+                {/* Right Illustration */}
+                <div className="hidden lg:block">
+                    <HeroImageGallery />
+                </div>
             </div>
-          </div>
-          <div className="absolute bottom-0 left-0 w-full h-24 sm:h-32 md:h-40" style={{ transform: 'translateY(1px)' }}>
+        </div>
+        <div className="absolute bottom-0 left-0 w-full h-24 sm:h-32 md:h-40" style={{ transform: 'translateY(1px)' }}>
             <svg viewBox="0 0 1440 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" preserveAspectRatio="none">
-              <path d="M0 64C240 160 480 160 720 160C960 160 1200 160 1440 64V160H0V64Z" fill="white"/>
+                <path d="M0 64C240 160 480 160 720 160C960 160 1200 160 1440 64V160H0V64Z" fill="white"/>
             </svg>
-          </div>
-        </section>
+        </div>
+    </section>
 
         <section id="fitur" className="py-24 bg-white -mt-20 relative z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

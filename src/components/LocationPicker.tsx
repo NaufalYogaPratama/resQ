@@ -1,124 +1,143 @@
+
 "use client";
 
-import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
-import 'leaflet-geosearch/dist/geosearch.css';
+import { useState, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, Marker, useMapEvents, Circle, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
-// FIX untuk ikon default Leaflet
+
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
 
-interface LocationPickerProps {
-  onLocationSelect: (lat: number, lng: number) => void;
+interface InitialPos {
+  lat: number;
+  lng: number;
+  accuracy?: number;
 }
 
-// Komponen untuk menangani kontrol pencarian
-const SearchControl = ({ onLocationSelect }: LocationPickerProps) => {
-  const map = useMap();
+interface LocationPickerProps {
+  onLocationSelect: (lat: number, lng: number, accuracy?: number) => void;
+  initialPosition: InitialPos | null;
+}
 
-  useEffect(() => {
-    const provider = new OpenStreetMapProvider();
-
-    const searchControl = new (GeoSearchControl as any)({
-      provider: provider,
-      style: 'bar',
-      showMarker: false, 
-      showPopup: false,
-      autoClose: true,
-      keepResult: true,
-    });
-
-    map.addControl(searchControl);
-
-    const onLocationFound = (e: any) => {
-      onLocationSelect(e.location.y, e.location.x);
-    };
-    map.on('geosearch/showlocation', onLocationFound);
-
-    return () => {
-        map.removeControl(searchControl);
-        map.off('geosearch/showlocation', onLocationFound);
-    };
-  }, [map, onLocationSelect]);
-
-  return null;
-};
-
-// Komponen untuk menangani klik
-const MapClickHandler = ({ onLocationSelect }: LocationPickerProps) => {
-  const map = useMapEvents({
+function MapClickHandler({ onClick }: { onClick: (lat: number, lng: number) => void }) {
+  useMapEvents({
     click(e) {
-      onLocationSelect(e.latlng.lat, e.latlng.lng);
-      map.flyTo(e.latlng, map.getZoom());
+      onClick(e.latlng.lat, e.latlng.lng);
     },
   });
   return null;
-};
+}
 
-export default function LocationPicker({ onLocationSelect }: LocationPickerProps) {
-  const [position, setPosition] = useState<L.LatLngExpression>([-6.9929, 110.4232]);
+function SetMapRef({ mapRef }: { mapRef: React.MutableRefObject<L.Map | null> }) {
+  const map = useMap();
+  useEffect(() => {
+    mapRef.current = map;
+    return () => {
+      mapRef.current = null;
+    };
+  }, [map, mapRef]);
+  return null;
+}
 
-  const handleLocationSelect = (lat: number, lng: number) => {
-    const newPos: L.LatLngExpression = [lat, lng];
-    setPosition(newPos);
+export default function LocationPicker({ onLocationSelect, initialPosition }: LocationPickerProps) {
+  const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(
+    initialPosition ? [initialPosition.lat, initialPosition.lng] : null
+  );
+  const [accuracy, setAccuracy] = useState<number | undefined>(initialPosition?.accuracy);
+
+  const mapRef = useRef<L.Map | null>(null);
+  const defaultCenter: [number, number] = [-6.9929, 110.4232];
+
+
+  useEffect(() => {
+    if (initialPosition) {
+      const newPos: [number, number] = [initialPosition.lat, initialPosition.lng];
+      setMarkerPosition((prev) => {
+        if (!prev || prev[0] !== newPos[0] || prev[1] !== newPos[1]) {
+          return newPos;
+        }
+        return prev;
+      });
+      setAccuracy(initialPosition.accuracy);
+
+      // Jika map sudah ready, centering
+      if (mapRef.current) {
+        mapRef.current.flyTo(newPos, 15, { duration: 0.6 });
+      }
+    }
+  }, [initialPosition]);
+
+  const handleMapClick = (lat: number, lng: number) => {
+    setMarkerPosition([lat, lng]);
+    setAccuracy(undefined);
     onLocationSelect(lat, lng);
+    if (mapRef.current) mapRef.current.flyTo([lat, lng], 15);
   };
-  
+
+  const handleMarkerDragEnd = (e: L.DragEndEvent) => {
+    const marker = e.target;
+    const pos = marker.getLatLng();
+    setMarkerPosition([pos.lat, pos.lng]);
+    setAccuracy(undefined);
+    onLocationSelect(pos.lat, pos.lng);
+  };
+
+  const handleRecenterClick = () => {
+    if (markerPosition && mapRef.current) {
+      mapRef.current.flyTo(markerPosition, 15);
+    } else if (mapRef.current) {
+      mapRef.current.flyTo(defaultCenter, 13);
+    }
+  };
+
   return (
-    <div className="h-80 rounded-lg overflow-hidden z-0 border border-gray-300 relative">
-      <MapContainer center={position} zoom={15} style={{ height: '100%', width: '100%' }}>
+    <div className="h-64 rounded-lg overflow-hidden z-0 border relative">
+      <MapContainer
+        center={markerPosition ?? defaultCenter}
+        zoom={markerPosition ? 15 : 13}
+        style={{ height: "100%", width: "100%" }}
+        scrollWheelZoom={true}
+        zoomControl={true}
+        touchZoom={true}
+      >
+
+        <SetMapRef mapRef={mapRef} />
+
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <Marker position={position} />
-        <SearchControl onLocationSelect={handleLocationSelect} />
-        <MapClickHandler onLocationSelect={handleLocationSelect} />
+
+        <MapClickHandler onClick={handleMapClick} />
+
+        {markerPosition && (
+          <>
+            <Marker
+              position={markerPosition}
+              draggable={true}
+              eventHandlers={{ dragend: handleMarkerDragEnd }}
+            />
+            {typeof accuracy === "number" && accuracy > 0 && (
+              <Circle center={markerPosition} radius={accuracy} />
+            )}
+          </>
+        )}
       </MapContainer>
-      
-      <style jsx global>{`
-        .leaflet-control-geosearch .bar {
-          background-color: #ffffff !important; /* bg-white */
-          border: 1px solid #d1d5db !important; /* border-gray-300 */
-          border-radius: 8px;
-        }
-        .leaflet-control-geosearch .bar form input {
-          background-color: transparent !important;
-          color: #1f2937 !important; /* text-gray-800 */
-          border: none !important;
-          padding: 0 12px !important;
-          height: 40px !important;
-        }
-        .leaflet-control-geosearch .bar form input::placeholder {
-          color: #6b7280 !important; /* text-gray-500 */
-        }
-        .leaflet-control-geosearch a.glass {
-          border-left: 1px solid #d1d5db !important; /* border-gray-300 */
-          border-radius: 0 8px 8px 0;
-          height: 40px !important;
-        }
-        .leaflet-control-geosearch a.glass:hover {
-          background: #e5e7eb !important; /* bg-gray-200 */
-        }
-        .leaflet-control-geosearch .results {
-          background-color: #ffffff;
-          border: 1px solid #d1d5db;
-        }
-        .leaflet-control-geosearch .results > * {
-          color: #1f2937;
-        }
-        .leaflet-control-geosearch .results > *:hover {
-          background-color: #eef2ff; /* bg-indigo-100 */
-          color: #1e40af; /* text-indigo-700 */
-        }
-      `}</style>
+
+      <button
+        type="button"
+        onClick={handleRecenterClick}
+        className="absolute right-2 bottom-2 bg-white p-2 rounded shadow text-sm"
+        title="Pusatkan ke marker"
+      >
+        Pusatkan
+      </button>
     </div>
   );
 }
