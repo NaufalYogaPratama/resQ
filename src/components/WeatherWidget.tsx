@@ -66,7 +66,6 @@ export default function WeatherWidget() {
 
   return (
     <div className={`p-6 rounded-lg shadow-md ${alert ? (alert.level === 'Siaga' ? 'bg-red-100 border-red-500' : 'bg-yellow-100 border-yellow-500') : 'bg-white border-transparent'} border`}>
-      {/* Judul: Tambahkan text-gray-800 */}
       <h3 className="font-bold text-lg mb-4 text-gray-800">Cuaca Saat Ini - {location.name}</h3>
       <div className="flex items-center justify-between">
         <div>
