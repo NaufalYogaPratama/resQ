@@ -1,15 +1,65 @@
 import Link from 'next/link';
-import { AlertTriangle, BookOpen, Map, Package, List } from 'lucide-react';
+import { AlertTriangle, BookOpen, Map, Package, List, Megaphone, Trophy } from 'lucide-react';
 import { verifyAuth } from '@/lib/auth'; 
 import { redirect } from 'next/navigation';
 import WeatherWidget from "@/components/WeatherWidget";
+import dbConnect from '@/lib/dbConnect';
+import Report from '@/models/Report';
+
+interface ReportType {
+  _id: string;
+  deskripsi: string;
+  status: 'Menunggu' | 'Ditangani' | 'Selesai';
+  kategori: string;
+  createdAt: string;
+}
+
+type SummaryItem = {
+  _id: 'Menunggu' | 'Ditangani';
+  count: number;
+}
+
+
+type ReportSummaryMap = {
+    Menunggu: number;
+    Ditangani: number;
+}
+
+
+async function getReportSummary(): Promise<ReportSummaryMap> {
+  await dbConnect();
+  const summary: SummaryItem[] = await Report.aggregate([
+    { $match: { status: { $in: ['Menunggu', 'Ditangani'] } } },
+    { $group: { _id: '$status', count: { $sum: 1 } } }
+  ]);
+  
+  const summaryMap: ReportSummaryMap = { Menunggu: 0, Ditangani: 0 };
+  
+
+  summary.forEach(item => {
+    summaryMap[item._id] = item.count;
+  });
+  return summaryMap;
+}
+
+const urgentNeeds: { id: number; item: string; location: string }[] = [
+    { id: 1, item: "Genset Darurat", location: "Blok C RW 05" },
+    { id: 2, item: "Tenaga Medis (P3K)", location: "Posko Utama" },
+];
+const userReputation = {
+    points: 150,
+    badge: "Pelindung Warga",
+};
 
 export default async function DashboardWargaPage() {
   const user = verifyAuth(); 
-
   if (!user) {
     redirect("/login");
   }
+
+
+  const recentReports = await getRecentReports();
+  const reportSummary = await getReportSummary();
 
   const quickAccessLinks = [
       { href: "/warga/peta", icon: Map, label: "Peta Respons" },
@@ -18,92 +68,103 @@ export default async function DashboardWargaPage() {
   ];
 
   return (
-    <div className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen text-slate-800 p-4 sm:p-8 font-sans">
+    <div className="bg-gradient-to-br from-slate-50 via-white to-indigo-50 min-h-screen text-slate-800 p-4 sm:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
         
-        {/* --- Header --- */}
         <div className="mb-10 text-center lg:text-left" data-aos="fade-down">
           <h1 className="text-4xl font-extrabold text-slate-900">
-            Selamat Datang, <span className="text-indigo-600">{user.nama}</span>!
+            Selamat Datang, <span className="text-[#4B5EAA]">{user.nama}</span>!
           </h1>
-          <p className="mt-2 text-lg text-slate-600">
-            Siap membantu sesama? Mari bersama kita jaga lingkungan tetap aman.
-          </p>
         </div>
 
-        {/* --- Layout Utama Dua Kolom --- */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* Kolom Kiri (Konten Utama) */}
           <div className="lg:col-span-2 space-y-8">
-            
-            {/* Kartu Aksi Utama: Buat Laporan */}
-            <div data-aos="fade-up" 
-              className="bg-white border border-slate-200 rounded-2xl shadow-md hover:shadow-xl transition-shadow p-6 flex flex-col md:flex-row items-center gap-6">
-              
-              <div className="bg-indigo-100 p-5 rounded-full">
-                <AlertTriangle className="w-10 h-10 text-indigo-600" />
-              </div>
-              
+            <div data-aos="fade-up" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6 flex flex-col md:flex-row items-center gap-6">
+              <div className="bg-red-100 p-5 rounded-full"><AlertTriangle className="w-10 h-10 text-red-600" /></div>
               <div className="flex-grow text-center md:text-left">
                 <h2 className="text-2xl font-bold text-slate-900">Laporkan Keadaan Darurat</h2>
-                <p className="text-slate-600 mt-1">
-                  Lihat atau alami kejadian darurat? Jangan ragu, segera laporkan agar cepat ditangani.
-                </p>
+                <p className="text-slate-600 mt-1">Lihat atau alami kejadian darurat? Laporkan segera.</p>
               </div>
-              
-              <Link 
-                href="/warga/lapor" 
-                className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-500 transition-colors w-full md:w-auto text-center shadow-md">
-                Buat Laporan
-              </Link>
+              <Link href="/warga/lapor" className="bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 w-full md:w-auto text-center">Buat Laporan</Link>
+            </div>
+            
+            <div data-aos="fade-up" data-aos-delay="100" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
+                <h3 className="text-xl font-bold mb-4 flex items-center text-slate-900"><List className="w-5 h-5 mr-2 text-[#4B5EAA]"/> Ringkasan Laporan Komunitas</h3>
+                <div className="flex space-x-4">
+                    <div className="flex-1 bg-red-100 text-red-700 p-4 rounded-lg text-center">
+                        <p className="text-2xl font-bold">{reportSummary.Menunggu}</p>
+                        <p className="text-sm font-semibold">Menunggu</p>
+                    </div>
+                    <div className="flex-1 bg-orange-100 text-orange-700 p-4 rounded-lg text-center">
+                        <p className="text-2xl font-bold">{reportSummary.Ditangani}</p>
+                        <p className="text-sm font-semibold">Ditangani</p>
+                    </div>
+                </div>
             </div>
 
-            {/* Kartu Laporan Terakhir Anda */}
-            <div data-aos="fade-up" data-aos-delay="100" 
-              className="bg-white border border-slate-200 rounded-2xl shadow-md hover:shadow-lg transition-shadow p-6">
-              
-              <h3 className="text-xl font-bold mb-4 flex items-center text-slate-900">
-                <List className="w-5 h-5 mr-2 text-indigo-600"/> 
-                Laporan Terakhir Anda
-              </h3>
-              
-              <div className="text-center py-10 border-2 border-dashed rounded-xl border-slate-200 bg-slate-50">
-                <p className="text-slate-500">Anda belum membuat laporan apapun.</p>
+            <div data-aos="fade-up" data-aos-delay="200" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
+              <h3 className="text-xl font-bold mb-4 flex items-center text-slate-900">Laporan Darurat Terkini</h3>
+              <div className="space-y-4">
+                {recentReports.length > 0 ? (
+                  recentReports.map(report => (
+                    <div key={report._id} className="bg-slate-50 p-4 rounded-lg flex justify-between items-center border">
+                        <div>
+                            <span className="text-xs font-semibold px-2 py-1 rounded-full bg-red-100 text-red-700">{report.status}</span>
+                            <p className="font-semibold text-slate-800 mt-1">{report.deskripsi}</p>
+                        </div>
+                        <Link href={`/warga/laporan/${report._id}`} className="text-sm font-semibold text-[#4B5EAA] hover:underline">Lihat</Link>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-10 border-2 border-dashed rounded-xl"><p className="text-slate-500">Tidak ada laporan darurat aktif saat ini.</p></div>
+                )}
               </div>
             </div>
-
           </div>
 
-          {/* Kolom Kanan (Sidebar Widget) */}
           <div className="lg:col-span-1 space-y-8">
-            
-            {/* Widget Cuaca */}
-            <div data-aos="fade-left" data-aos-delay="200" 
-              className="bg-white border border-slate-200 rounded-2xl shadow-md hover:shadow-lg transition-shadow p-6">
-              <WeatherWidget />
-            </div>
+            <div data-aos="fade-left" data-aos-delay="100"><WeatherWidget /></div>
 
-            {/* Kartu Akses Cepat */}
-            <div data-aos="fade-left" data-aos-delay="300" 
-              className="bg-white border border-slate-200 rounded-2xl shadow-md hover:shadow-lg transition-shadow p-6">
-              <h3 className="text-xl font-bold mb-4 text-slate-900">Akses Cepat</h3>
-              <ul className="space-y-2">
-                {quickAccessLinks.map(link => (
-                  <li key={link.href}>
-                    <Link href={link.href} 
-                      className="flex items-center p-3 rounded-xl hover:bg-indigo-50 transition-colors">
-                      <link.icon className="w-6 h-6 text-indigo-600 mr-4" />
-                      <span className="font-semibold text-slate-700">{link.label}</span>
-                    </Link>
+            <div data-aos="fade-left" data-aos-delay="200" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
+              <h3 className="text-xl font-bold mb-4 flex items-center text-slate-900"><Megaphone className="w-5 h-5 mr-2 text-[#4B5EAA]"/> Panggilan Bantuan</h3>
+              <ul className="space-y-3">
+                {urgentNeeds.map(need => (
+                  <li key={need.id} className="bg-indigo-50 p-3 rounded-lg border border-indigo-200">
+                    <p className="font-semibold text-slate-800">{need.item}</p>
+                    <p className="text-sm text-slate-500">{need.location}</p>
                   </li>
                 ))}
               </ul>
             </div>
-
+            
+            <div data-aos="fade-left" data-aos-delay="300" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
+              <h3 className="text-xl font-bold mb-4 flex items-center text-slate-900"><Trophy className="w-5 h-5 mr-2 text-[#4B5EAA]"/> Reputasi Anda</h3>
+              <div className="text-center bg-amber-50 p-4 rounded-lg border border-amber-200">
+                <p className="text-lg font-bold text-amber-700">{userReputation.badge}</p>
+                <p className="text-2xl font-bold text-slate-800">{userReputation.points} <span className="text-sm font-normal">Poin</span></p>
+              </div>
+            </div>
+            
+            <div data-aos="fade-left" data-aos-delay="400" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
+                <h3 className="text-xl font-bold mb-4 text-slate-900">Akses Cepat</h3>
+                <ul className="space-y-2">
+                    {quickAccessLinks.map(link => (
+                    <li key={link.href}><Link href={link.href} className="flex items-center p-3 rounded-xl hover:bg-slate-100"><link.icon className="w-6 h-6 text-[#4B5EAA] mr-4" /> <span className="font-semibold text-slate-700">{link.label}</span></Link></li>
+                    ))}
+                </ul>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+// Fungsi getRecentReports tidak berubah
+async function getRecentReports(): Promise<ReportType[]> {
+  await dbConnect();
+  const reports = await Report.find({ status: 'Menunggu' }).sort({ createdAt: -1 }).limit(3).lean();
+  return JSON.parse(JSON.stringify(reports));
+}
+
