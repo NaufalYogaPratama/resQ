@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { AlertTriangle, BookOpen, Map, Package, List, Megaphone, Trophy } from 'lucide-react';
-import { verifyAuth } from '@/lib/auth'; 
+import { verifyAuth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import WeatherWidget from "@/components/WeatherWidget";
 import dbConnect from '@/lib/dbConnect';
 import Report from '@/models/Report';
+import User from '@/models/User';
 
 interface ReportType {
   _id: string;
@@ -12,6 +13,9 @@ interface ReportType {
   status: 'Menunggu' | 'Ditangani' | 'Selesai';
   kategori: string;
   createdAt: string;
+  pelapor: {
+    _id: string;
+  } | null;
 }
 
 type SummaryItem = {
@@ -35,12 +39,33 @@ async function getReportSummary(): Promise<ReportSummaryMap> {
   
   const summaryMap: ReportSummaryMap = { Menunggu: 0, Ditangani: 0 };
   
-
   summary.forEach(item => {
     summaryMap[item._id] = item.count;
   });
   return summaryMap;
 }
+
+async function getRecentReports(userId: string): Promise<ReportType[]> {
+  await dbConnect();
+  
+  const reports = await Report.find({
+    status: { $in: ['Menunggu', 'Ditangani'] } 
+  })
+  .sort({ createdAt: -1 })
+  .limit(10)
+  .populate('pelapor', '_id')
+
+  reports.sort((a, b) => {
+    const aIsOwner = a.pelapor?._id.toString() === userId;
+    const bIsOwner = b.pelapor?._id.toString() === userId;
+    if (aIsOwner && !bIsOwner) return -1;
+    if (!aIsOwner && bIsOwner) return 1;
+    return 0;
+  });
+
+  return JSON.parse(JSON.stringify(reports.slice(0, 3)));
+}
+
 
 const urgentNeeds: { id: number; item: string; location: string }[] = [
     { id: 1, item: "Genset Darurat", location: "Blok C RW 05" },
@@ -57,8 +82,7 @@ export default async function DashboardWargaPage() {
     redirect("/login");
   }
 
-
-  const recentReports = await getRecentReports();
+  const recentReports = await getRecentReports(user.id);
   const reportSummary = await getReportSummary();
 
   const quickAccessLinks = [
@@ -66,6 +90,12 @@ export default async function DashboardWargaPage() {
       { href: "/warga/sumber-daya", icon: Package, label: "Bank Sumber Daya" },
       { href: "/warga/edukasi", icon: BookOpen, label: "Pusat Edukasi" },
   ];
+
+  const statusColors = {
+    Menunggu: "bg-red-100 text-red-700",
+    Ditangani: "bg-orange-100 text-orange-700",
+    Selesai: "bg-green-100 text-green-700",
+  };
 
   return (
     <div className="bg-gradient-to-br from-slate-50 via-white to-indigo-50 min-h-screen text-slate-800 p-4 sm:p-8 font-sans">
@@ -104,13 +134,15 @@ export default async function DashboardWargaPage() {
             </div>
 
             <div data-aos="fade-up" data-aos-delay="200" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
-              <h3 className="text-xl font-bold mb-4 flex items-center text-slate-900">Laporan Darurat Terkini</h3>
+              <h3 className="text-xl font-bold mb-4 flex items-center text-slate-900">Laporan Komunitas Terkini</h3>
               <div className="space-y-4">
                 {recentReports.length > 0 ? (
                   recentReports.map(report => (
                     <div key={report._id} className="bg-slate-50 p-4 rounded-lg flex justify-between items-center border">
                         <div>
-                            <span className="text-xs font-semibold px-2 py-1 rounded-full bg-red-100 text-red-700">{report.status}</span>
+                            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${statusColors[report.status]}`}>
+                              {report.status}
+                            </span>
                             <p className="font-semibold text-slate-800 mt-1">{report.deskripsi}</p>
                         </div>
                         <Link href={`/warga/laporan/${report._id}`} className="text-sm font-semibold text-[#4B5EAA] hover:underline">Lihat</Link>
@@ -160,11 +192,3 @@ export default async function DashboardWargaPage() {
     </div>
   );
 }
-
-// Fungsi getRecentReports tidak berubah
-async function getRecentReports(): Promise<ReportType[]> {
-  await dbConnect();
-  const reports = await Report.find({ status: 'Menunggu' }).sort({ createdAt: -1 }).limit(3).lean();
-  return JSON.parse(JSON.stringify(reports));
-}
-

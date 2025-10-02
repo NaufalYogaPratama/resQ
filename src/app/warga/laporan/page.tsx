@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Mic, MicOff, LocateFixed, Camera } from "lucide-react";
 
-// Tipe data global untuk SpeechRecognition API
 declare global {
   interface Window {
     SpeechRecognition: any;
@@ -13,7 +12,6 @@ declare global {
   }
 }
 
-// Konstanta
 const DESIRED_ACCURACY = 50; // meter
 const MAX_WAIT_MS = 15000;   // milidetik
 
@@ -33,21 +31,18 @@ export default function LaporPage() {
   const router = useRouter();
   const watchIdRef = useRef<number | null>(null);
 
-  // State untuk form
   const [kategori, setKategori] = useState("Medis");
   const [deskripsi, setDeskripsi] = useState("");
   const [alamat, setAlamat] = useState("");
   const [lokasi, setLokasi] = useState<{ lat: number; lng: number; accuracy?: number } | null>(null);
   const [foto, setFoto] = useState<File | null>(null);
 
-  // State untuk UI
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
-  // --- SEMUA FUNGSI LOGIKA (TIDAK BERUBAH) ---
   const fetchAddress = async (lat: number, lng: number) => {
     try {
       const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);

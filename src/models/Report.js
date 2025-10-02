@@ -51,6 +51,10 @@ const ReportSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  
+  gambarPublicId: {
+    type: String,
+  },
 
 }, {
   timestamps: true,

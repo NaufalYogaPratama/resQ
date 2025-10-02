@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Map, List, Package, User, LogOut, LayoutDashboard, Menu, X } from 'lucide-react';
 
-// Tipe data untuk user props
 type UserData = {
   nama?: string | null;
   email?: string | null;
@@ -29,7 +28,6 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
     }
   };
 
-  // Tambahkan 'Beranda' ke daftar link
   const navLinks = [
     { name: 'Beranda', href: '/relawan/dashboard', icon: LayoutDashboard },
     { name: 'Peta Respon', href: '/relawan/peta', icon: Map },
@@ -79,7 +77,7 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
                     <p className="text-xs text-slate-400 truncate" title={user?.email || ''}>{user?.email}</p>
                   </div>
                   <Link 
-                    href="/relawan/profil" 
+                    href="/profil" 
                     onClick={() => setIsProfileOpen(false)} 
                     className="flex items-center w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700"
                   >

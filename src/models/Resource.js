@@ -25,6 +25,12 @@ const ResourceSchema = new mongoose.Schema({
     enum: ['Tersedia', 'Sedang Digunakan', 'Tidak Tersedia'],
     default: 'Tersedia',
   },
+  gambarUrl: {
+    type: String,
+  },
+  gambarPublicId: {
+    type: String,
+  },
 }, {
   timestamps: true,
 });
