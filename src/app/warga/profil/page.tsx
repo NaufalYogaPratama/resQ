@@ -133,7 +133,7 @@ export default async function ProfilWargaPage() {
                             </div>
                             <div className="space-y-3">
                                 {user.resourceList && user.resourceList.length > 0 ? (
-                      
+                                    // --- PERBAIKAN DI SINI ---
                                     user.resourceList.map((res: ResourceListItem) => (
                                         <Link key={res._id} href={`/warga/sumber-daya/${res._id}`} className="flex items-center gap-4 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
                                             <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
