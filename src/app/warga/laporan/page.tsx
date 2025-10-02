@@ -131,10 +131,10 @@ export default function LaporPage() {
     formData.append("kategori", kategori);
     formData.append("deskripsi", deskripsi);
     formData.append("lokasi", JSON.stringify({
-      type: "Point",
-      coordinates: [lokasi.lng, lokasi.lat],
+      coordinates: [lokasi.lng, lokasi.lat], 
       alamat: alamat,
     }));
+    
     if (foto) formData.append("gambar", foto);
     try {
       const res = await fetch("/api/reports", { method: "POST", body: formData });
@@ -194,14 +194,18 @@ export default function LaporPage() {
               <div>
                 <label htmlFor="kategori" className="block text-sm font-medium text-gray-700">Kategori Laporan</label>
                 <select
-                  id="kategori" value={kategori} onChange={(e) => setKategori(e.target.value)} required
+                  id="kategori"
+                  value={kategori}
+                  onChange={(e) => setKategori(e.target.value)}
+                  required
                   className="w-full mt-1 p-2 border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-indigo-500"
                 >
-                  <option>Medis</option>
-                  <option>Evakuasi</option>
-                  <option>Kerusakan Properti</option>
-                  <option>Lainnya</option>
+                  <option value="Medis">Medis</option>
+                  <option value="Evakuasi">Evakuasi</option>
+                  <option value="Kerusakan Properti">Kerusakan Properti</option>
+                  <option value="Lainnya">Lainnya</option>
                 </select>
+
               </div>
 
               <div>

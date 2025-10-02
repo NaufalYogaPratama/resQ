@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { List, ArrowRight } from 'lucide-react';
 import dbConnect from '@/lib/dbConnect';
 import Report from '@/models/Report';
-import User from '@/models/User'; // Wajib di-import untuk .populate()
+import User from '@/models/User'; 
 
 // Tipe data untuk laporan
 interface ReportType {
@@ -18,7 +18,7 @@ interface ReportType {
   };
 }
 
-// Fungsi untuk mengambil semua laporan aktif di server
+
 async function getActiveReports(): Promise<ReportType[]> {
   await dbConnect();
   try {
@@ -40,11 +40,10 @@ export default async function DaftarLaporanPage() {
 
   const reports = await getActiveReports();
 
-  // --- PERBAIKAN DI SINI ---
   const statusColors = {
     Menunggu: "bg-red-100 text-red-800",
     Ditangani: "bg-orange-100 text-orange-800",
-    Selesai: "bg-green-100 text-green-800", // Tambahkan definisi untuk 'Selesai'
+    Selesai: "bg-green-100 text-green-800",
   };
 
   return (

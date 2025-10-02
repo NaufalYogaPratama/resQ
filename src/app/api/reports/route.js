@@ -4,42 +4,46 @@ import { verifyAuth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import cloudinary from "cloudinary";
 
-// Konfigurasi Cloudinary
+
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Fungsi upload ke Cloudinary
 async function uploadImage(file) {
   const fileBuffer = await file.arrayBuffer();
   const mime = file.type;
   const base64Data = Buffer.from(fileBuffer).toString("base64");
   const fileUri = `data:${mime};base64,${base64Data}`;
 
-  const result = await cloudinary.v2.uploader.upload(fileUri, {
-    folder: "resq_reports",
-  });
-
-  return result;
+  // Menggunakan try-catch di sini untuk memberikan pesan error yang lebih spesifik
+  try {
+    const result = await cloudinary.v2.uploader.upload(fileUri, {
+      folder: "resq_reports",
+    });
+    return result;
+  } catch (error) {
+    console.error("Cloudinary Upload Error:", error);
+    throw new Error("Gagal mengunggah gambar ke server.");
+  }
 }
 
 // =============================
 // GET -> Ambil semua laporan aktif
 // =============================
 export async function GET() {
-  const user = verifyAuth();
-  if (!user) {
-    return NextResponse.json(
-      { success: false, message: "Akses ditolak. Silakan login." },
-      { status: 401 }
-    );
-  }
-
-  await dbConnect();
-
   try {
+    const user = await verifyAuth();
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "Akses ditolak. Silakan login." },
+        { status: 401 }
+      );
+    }
+
+    await dbConnect();
+
     const activeReports = await Report.find({
       status: { $in: ["Menunggu", "Ditangani"] },
     })
@@ -48,8 +52,9 @@ export async function GET() {
 
     return NextResponse.json({ success: true, data: activeReports });
   } catch (error) {
+    console.error("GET Reports Error:", error);
     return NextResponse.json(
-      { success: false, message: "Server Error", error: error.message },
+      { success: false, message: "Terjadi kesalahan pada server.", error: error.message },
       { status: 500 }
     );
   }
@@ -59,17 +64,17 @@ export async function GET() {
 // POST -> Buat laporan baru
 // =============================
 export async function POST(request) {
-  const user = verifyAuth();
-  if (!user) {
-    return NextResponse.json(
-      { success: false, message: "Akses ditolak." },
-      { status: 401 }
-    );
-  }
-
-  await dbConnect();
-
   try {
+    const user = await verifyAuth();
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "Akses ditolak." },
+        { status: 401 }
+      );
+    }
+
+    await dbConnect();
+
     const formData = await request.formData();
     const kategori = formData.get("kategori");
     const deskripsi = formData.get("deskripsi");
@@ -78,22 +83,26 @@ export async function POST(request) {
 
     if (!kategori || !deskripsi || !lokasiRaw) {
       return NextResponse.json(
-        { success: false, message: "Data tidak lengkap." },
+        { success: false, message: "Data tidak lengkap. Pastikan kategori, deskripsi, dan lokasi terisi." },
         { status: 400 }
       );
     }
 
     let lokasi;
     try {
-      lokasi = JSON.parse(lokasiRaw);
+      const parsed = JSON.parse(lokasiRaw);
+      lokasi = {
+        type: "Point",
+        coordinates: parsed.coordinates,
+        alamat: parsed.alamat || "",
+      };
     } catch (e) {
       return NextResponse.json(
-        { success: false, message: "Format lokasi tidak valid." },
+        { success: false, message: "Format data lokasi tidak valid." },
         { status: 400 }
       );
     }
 
-    // Data laporan
     let reportData = {
       pelapor: user.id,
       kategori,
@@ -101,7 +110,6 @@ export async function POST(request) {
       lokasi,
     };
 
-    // Upload gambar ke Cloudinary jika ada
     if (gambar && gambar.size > 0) {
       const uploadResult = await uploadImage(gambar);
       reportData.gambarUrl = uploadResult.secure_url;
@@ -112,9 +120,12 @@ export async function POST(request) {
 
     return NextResponse.json({ success: true, data: newReport }, { status: 201 });
   } catch (error) {
+
+    console.error("POST Report Error:", error);
+
     return NextResponse.json(
-      { success: false, message: error.message },
-      { status: 400 }
+      { success: false, message: error.message || "Terjadi kesalahan pada server saat membuat laporan." },
+      { status: 500 } 
     );
   }
 }
