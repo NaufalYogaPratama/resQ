@@ -15,7 +15,6 @@ export default function NavbarAdmin({ user }: { user: UserData }) {
   const [isEmergency, setIsEmergency] = useState(false);
   const router = useRouter();
 
-  // Cek status mode darurat saat komponen dimuat
   useEffect(() => {
     const fetchEmergencyStatus = async () => {
       try {
@@ -42,18 +41,23 @@ export default function NavbarAdmin({ user }: { user: UserData }) {
   };
 
   const handleToggleEmergency = async () => {
+    if (!confirm(`Anda yakin ingin mengubah Mode Darurat menjadi ${isEmergency ? 'NONAKTIF' : 'AKTIF'}?`)) {
+      return;
+    }
+    
     try {
       const res = await fetch('/api/settings/emergency-mode', { method: 'POST' });
       const data = await res.json();
       if (data.success) {
         setIsEmergency(data.isEmergency);
         alert(`Mode Darurat sekarang: ${data.isEmergency ? 'AKTIF' : 'NONAKTIF'}`);
+        router.refresh();
       } else {
         throw new Error(data.message);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Gagal mengubah mode darurat:', error);
-      alert('Gagal mengubah mode darurat. Pastikan Anda adalah Admin.');
+      alert(`Gagal mengubah mode darurat: ${error.message}`);
     }
   };
 
@@ -70,7 +74,7 @@ export default function NavbarAdmin({ user }: { user: UserData }) {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <button 
+            <button
               onClick={handleToggleEmergency}
               className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isEmergency ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 hover:bg-gray-700'}`}
             >

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Package, Wrench, Phone, User } from "lucide-react";
 
-// Tipe data untuk sumber daya yang diterima dari API
 interface ResourceType {
   _id: string;
   namaSumberDaya: string;
@@ -22,6 +21,8 @@ export default function SumberDayaRelawanPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'Semua' | 'Aset' | 'Keahlian'>('Semua');
   const [searchTerm, setSearchTerm] = useState('');
+  
+  const [isEmergency, setIsEmergency] = useState(false);
 
   useEffect(() => {
     const fetchResources = async () => {
@@ -31,6 +32,7 @@ export default function SumberDayaRelawanPage() {
         const data = await res.json();
         if (data.success) {
           setResources(data.data);
+          setIsEmergency(data.isEmergency); 
         }
       } catch (error) {
         console.error("Gagal mengambil data sumber daya:", error);
@@ -41,7 +43,6 @@ export default function SumberDayaRelawanPage() {
     fetchResources();
   }, []);
 
-  // Logika filter dan pencarian
   const filteredResources = resources.filter(res => {
       const matchesFilter = filter === 'Semua' || res.tipe === filter;
       const matchesSearch = res.namaSumberDaya.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -53,18 +54,20 @@ export default function SumberDayaRelawanPage() {
     <div className="bg-slate-50 min-h-screen text-slate-800 p-4 sm:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
         
-        {/* Header Halaman */}
         <div data-aos="fade-down" className="mb-8">
           <h1 className="text-4xl font-extrabold text-slate-900 flex items-center">
             <Package className="w-10 h-10 mr-4 text-green-600"/>
-            Bank Sumber Daya Komunitas
+            {isEmergency ? "Bank Sumber Daya Komunitas" : "Sumber Daya Milik Anda"}
           </h1>
           <p className="mt-2 text-lg text-slate-600">
-            Daftar aset dan keahlian yang tersedia untuk respons darurat.
+             {isEmergency 
+              ? "Daftar aset dan keahlian yang tersedia untuk respons darurat."
+              : "Berikut adalah sumber daya yang telah Anda daftarkan. Ini akan dapat dilihat relawan lain saat Mode Darurat aktif."
+            }
           </p>
         </div>
         
-        {/* Kontrol Filter dan Pencarian */}
+        {/* Kontrol Filter dan Pencarian (TETAP SAMA) */}
         <div data-aos="fade-up" className="flex flex-col md:flex-row gap-4 mb-8 sticky top-24 z-40 bg-slate-50/80 backdrop-blur-md p-4 rounded-xl border">
             <div className="flex-1">
                 <label className="text-sm font-medium text-slate-600">Cari Sumber Daya</label>
@@ -90,35 +93,27 @@ export default function SumberDayaRelawanPage() {
             </div>
         </div>
 
-        {/* Daftar Sumber Daya */}
         <div data-aos="fade-up" data-aos-delay="100">
           {isLoading ? (
             <p className="text-slate-500 text-center">Memuat data sumber daya...</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredResources.length > 0 ? (
-                filteredResources.map((res) => (
+                filteredResources.map((res: ResourceType) => (
                   <div key={res._id} className="bg-white border border-slate-200 rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden">
+                    {/* ... (sisa dari JSX map tetap sama) ... */}
                     {res.gambarUrl && <img src={res.gambarUrl} alt={res.namaSumberDaya} className="w-full h-40 object-cover" />}
                     <div className="p-5">
-                      <div className="flex justify-between items-start">
-                        <div>
-                           <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
-                                res.tipe === 'Aset' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
-                           }`}>{res.tipe}</span>
-                        </div>
-                        {/* Di masa depan, status ketersediaan bisa ditampilkan di sini */}
-                      </div>
+                      <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${ res.tipe === 'Aset' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800' }`}>{res.tipe}</span>
                       <h3 className="mt-3 text-xl font-bold text-slate-900">{res.namaSumberDaya}</h3>
                       {res.deskripsi && <p className="mt-1 text-sm text-slate-600 h-10 line-clamp-2">{res.deskripsi}</p>}
-                      
                       <div className="mt-4 pt-4 border-t border-slate-200">
                         <p className="text-sm font-semibold text-slate-800 flex items-center gap-2"><User className="w-4 h-4 text-slate-500"/>{res.pemilik.namaLengkap}</p>
-                        {res.pemilik.noWa && 
-                          <a href={`https://wa.me/${res.pemilik.noWa}`} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-2 text-sm text-green-600 font-semibold hover:underline">
+                        {res.pemilik.noWa && isEmergency && (
+                          <a href={`https://wa.me/${res.pemilik.noWa.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-2 text-sm text-green-600 font-semibold hover:underline">
                             <Phone className="w-4 h-4"/> Hubungi via WhatsApp
                           </a>
-                        }
+                        )}
                       </div>
                     </div>
                   </div>
@@ -126,8 +121,16 @@ export default function SumberDayaRelawanPage() {
               ) : (
                 <div className="col-span-full text-center py-20 bg-white border-2 border-dashed border-slate-300 rounded-xl">
                   <Package className="w-16 h-16 mx-auto text-slate-300"/>
-                  <p className="mt-4 text-slate-600 font-semibold">Tidak ada sumber daya yang cocok.</p>
-                  <p className="text-slate-500">Coba ubah filter atau kata kunci pencarian Anda.</p>
+                  <p className="mt-4 text-slate-600 font-semibold">
+                    {isEmergency 
+                      ? "Tidak Ada Sumber Daya yang Cocok" 
+                      : "Bank Sumber Daya Belum Terbuka"}
+                  </p>
+                  <p className="text-slate-500">
+                    {isEmergency
+                      ? "Coba ubah filter atau kata kunci pencarian Anda."
+                      : "Sumber daya milik warga akan muncul di sini saat Mode Darurat diaktifkan oleh Admin."}
+                  </p>
                 </div>
               )}
             </div>

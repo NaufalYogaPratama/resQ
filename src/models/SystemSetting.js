@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 
 const SystemSettingSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    default: 'global',
+    unique: true,
+  },
   modeDarurat: {
     type: Boolean,
     default: false,

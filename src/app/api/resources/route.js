@@ -35,21 +35,22 @@ export async function GET() {
 
   await dbConnect();
   try {
-    const settings = await SystemSetting.findOne({});
+    const settings = await SystemSetting.findOne({ name: 'global' });
     const isEmergency = settings ? settings.modeDarurat : false;
 
     if (isEmergency && ['Admin', 'Relawan'].includes(user.peran)) {
       const allResources = await Resource.find({}).populate('pemilik', 'namaLengkap noWa');
-      return NextResponse.json({ success: true, data: allResources });
+      return NextResponse.json({ success: true, data: allResources, isEmergency: isEmergency });
     }
     
     const userResources = await Resource.find({ pemilik: user.id });
-    return NextResponse.json({ success: true, data: userResources });
+    return NextResponse.json({ success: true, data: userResources, isEmergency: isEmergency });
 
   } catch (error) {
     return NextResponse.json({ success: false, message: "Server Error" }, { status: 500 });
   }
 }
+
 
 // FUNGSI POST: MEMBUAT SUMBER DAYA BARU (Diset ulang untuk menangani teks saja)
 export async function POST(request) {
@@ -60,12 +61,10 @@ export async function POST(request) {
 
   await dbConnect();
   try {
-    // Diubah kembali ke request.json() karena tidak ada file
     const body = await request.json();
     const newResource = await Resource.create({
       ...body,
       pemilik: user.id,
-      // Field gambar dikosongkan
       gambarUrl: null,
       gambarPublicId: null,
     });
