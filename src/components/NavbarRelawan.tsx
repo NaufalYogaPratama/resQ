@@ -77,7 +77,7 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
                     <p className="text-xs text-slate-400 truncate" title={user?.email || ''}>{user?.email}</p>
                   </div>
                   <Link 
-                    href="/profil" 
+                    href="/relawan/profil" 
                     onClick={() => setIsProfileOpen(false)} 
                     className="flex items-center w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700"
                   >

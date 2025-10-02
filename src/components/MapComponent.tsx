@@ -8,16 +8,11 @@ import 'leaflet/dist/leaflet.css';
 interface ReportType {
   _id: string;
   deskripsi: string;
+  gambarUrl?: string;
   kategori: string;
   status: 'Menunggu' | 'Ditangani' | 'Selesai' | 'Darurat' | 'Siaga' | 'Waspada';
-  lokasi: {
-    coordinates: [number, number]; 
-    alamat?: string;
-  };
-  pelapor: {
-    _id: string;
-    namaLengkap: string;
-  };
+  lokasi: { coordinates: [number, number]; alamat?: string };
+  pelapor: { _id: string; namaLengkap: string };
 }
 
 interface MapComponentProps {
@@ -25,7 +20,6 @@ interface MapComponentProps {
   userRole: 'Warga' | 'Relawan' | 'Admin' | undefined;
 }
 
-// FIX untuk ikon default Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
@@ -34,15 +28,10 @@ L.Icon.Default.mergeOptions({
 });
 
 const getIconByStatus = (status: ReportType['status']) => {
-  let color = '#64748b'; // slate-500 untuk Selesai/default
-  
-  if (status === 'Darurat' || status === 'Menunggu') {
-    color = '#dc2626'; // red-600
-  } else if (status === 'Siaga' || status === 'Ditangani') {
-    color = '#f97316'; // orange-500
-  } else if (status === 'Waspada') {
-    color = '#f59e0b'; // amber-500
-  }
+  let color = '#64748b';
+  if (status === 'Darurat' || status === 'Menunggu') color = '#dc2626';
+  else if (status === 'Siaga' || status === 'Ditangani') color = '#f97316';
+  else if (status === 'Waspada') color = '#f59e0b';
 
   return L.divIcon({
     className: `custom-div-icon`,
@@ -64,9 +53,7 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
     try {
       const res = await fetch('/api/reports');
       const data = await res.json();
-      if (data.success) {
-        setReports(data.data);
-      }
+      if (data.success) setReports(data.data);
     } catch (error) {
       console.error("Gagal mengambil data laporan:", error);
     } finally {
@@ -74,9 +61,7 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
     }
   };
 
-  useEffect(() => {
-    fetchReports();
-  }, []);
+  useEffect(() => { fetchReports(); }, []);
 
   const handleClaim = async (reportId: string) => {
     if (!confirm('Apakah Anda yakin ingin menangani laporan ini?')) return;
@@ -87,11 +72,8 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
       if (!res.ok) throw new Error(data.message || 'Gagal mengklaim laporan.');
       alert('Laporan berhasil diklaim!');
       fetchReports();
-    } catch (err: any) {
-      alert(`Error: ${err.message}`);
-    } finally {
-      setIsSubmitting(null);
-    }
+    } catch (err: any) { alert(`Error: ${err.message}`); }
+    finally { setIsSubmitting(null); }
   };
 
   const handleComplete = async (reportId: string) => {
@@ -103,11 +85,8 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
       if (!res.ok) throw new Error(data.message || 'Gagal menyelesaikan laporan.');
       alert('Terima kasih! Laporan telah diselesaikan.');
       fetchReports();
-    } catch (err: any) {
-      alert(`Error: ${err.message}`);
-    } finally {
-      setIsSubmitting(null);
-    }
+    } catch (err: any) { alert(`Error: ${err.message}`); }
+    finally { setIsSubmitting(null); }
   };
 
   const filteredReports = reports.filter(report => 
@@ -121,10 +100,9 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
 
   return (
     <div className="relative h-[calc(100vh-80px)]">
-      
-      {/* Panel Filter dengan tema terang */}
+      {/* Filter kategori */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-white/80 backdrop-blur-md p-2 rounded-lg shadow-lg border border-slate-200">
-        <label className="text-sm mr-2 text-slate-600">Filter Kategori:</label>
+        <label className="text-sm mr-2 text-slate-600">Filter:</label>
         <select 
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
@@ -134,15 +112,15 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
         </select>
       </div>
 
+      {/* Peta */}
       <MapContainer 
         center={[-6.9929, 110.4232]}
         zoom={13} 
         style={{ height: '100%', width: '100%' }}
       >
-        {/* Menggunakan TileLayer OpenStreetMap untuk tema terang */}
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution='&copy; OpenStreetMap'
         />
 
         {filteredReports.map((report) => (
@@ -152,27 +130,46 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
             icon={getIconByStatus(report.status)}
           >
             <Popup>
-              <div className="custom-popup">
-                <strong>{report.kategori} ({report.status})</strong>
-                <p>{report.deskripsi}</p>
-                {report.lokasi.alamat && <p className="text-xs italic">"{report.lokasi.alamat}"</p>}
-                <small>Pelapor: {report.pelapor.namaLengkap}</small>
-                
+              <div className="w-64">
+                <h2 className="text-lg font-bold text-indigo-800">
+                  {report.kategori} ({report.status})
+                </h2>
+
+                {report.gambarUrl ? (
+                  <img
+                    src={report.gambarUrl}
+                    alt="Kejadian"
+                    className="w-full h-32 object-cover rounded-lg my-2"
+                  />
+                ) : (
+                  <div className="w-full h-32 bg-gray-100 flex items-center justify-center rounded-lg my-2">
+                    <span className="text-gray-400 text-sm">Tidak ada foto</span>
+                  </div>
+                )}
+
+                <p className="text-gray-700 text-sm">{report.deskripsi}</p>
+                {report.lokasi.alamat && (
+                  <p className="text-xs text-gray-500 italic">Lokasi: {report.lokasi.alamat}</p>
+                )}
+                <p className="text-xs text-gray-500">Pelapor: {report.pelapor.namaLengkap}</p>
+
+                {/* Tombol Relawan */}
                 {userRole === 'Relawan' && report.status === 'Menunggu' && (
                   <button
                     onClick={() => handleClaim(report._id)}
                     disabled={isSubmitting === report._id}
-                    className="w-full mt-3 bg-indigo-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-indigo-500 disabled:bg-slate-400"
+                    className="w-full mt-2 bg-indigo-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-indigo-500 disabled:bg-slate-400 transition-colors"
                   >
                     {isSubmitting === report._id ? 'Memproses...' : 'Klaim Bantuan'}
                   </button>
                 )}
 
+                {/* Tombol Pelapor */}
                 {report.pelapor._id === userId && report.status === 'Ditangani' && (
                   <button
                     onClick={() => handleComplete(report._id)}
                     disabled={isSubmitting === report._id}
-                    className="w-full mt-3 bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 disabled:bg-slate-400"
+                    className="w-full mt-2 bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 disabled:bg-slate-400 transition-colors"
                   >
                     {isSubmitting === report._id ? 'Memproses...' : 'Tandai Selesai'}
                   </button>
@@ -195,24 +192,6 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
           left: 50%;
           top: 50%;
           margin: -10px 0 0 -10px;
-        }
-        /* Styling untuk popup tema terang */
-        .leaflet-popup-content-wrapper {
-          background-color: #ffffff;
-          color: #1e293b; /* text-slate-800 */
-          border-radius: 0.75rem; /* rounded-xl */
-        }
-        .leaflet-popup-tip {
-          background-color: #ffffff;
-        }
-        .leaflet-popup-content strong {
-          color: #4338ca; /* text-indigo-700 */
-        }
-        .leaflet-popup-content small {
-          color: #64748b; /* text-slate-500 */
-        }
-        .leaflet-container a.leaflet-popup-close-button {
-          color: #64748b !important;
         }
       `}</style>
     </div>

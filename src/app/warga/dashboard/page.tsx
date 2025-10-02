@@ -116,7 +116,7 @@ export default async function DashboardWargaPage() {
                 <h2 className="text-2xl font-bold text-slate-900">Laporkan Keadaan Darurat</h2>
                 <p className="text-slate-600 mt-1">Lihat atau alami kejadian darurat? Laporkan segera.</p>
               </div>
-              <Link href="/warga/lapor" className="bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 w-full md:w-auto text-center">Buat Laporan</Link>
+                <Link href="/warga/laporan" className="bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 w-full md:w-auto text-center">Buat Laporan</Link>
             </div>
             
             <div data-aos="fade-up" data-aos-delay="100" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
