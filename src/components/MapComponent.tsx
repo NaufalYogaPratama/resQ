@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -26,6 +25,7 @@ interface MapComponentProps {
   userRole: 'Warga' | 'Relawan' | 'Admin' | undefined;
 }
 
+// FIX untuk ikon default Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
@@ -34,14 +34,14 @@ L.Icon.Default.mergeOptions({
 });
 
 const getIconByStatus = (status: ReportType['status']) => {
-  let color = '#94a3b8'; // slate-400 untuk Selesai/default
+  let color = '#64748b'; // slate-500 untuk Selesai/default
   
   if (status === 'Darurat' || status === 'Menunggu') {
-    color = '#ef4444'; // red-500
+    color = '#dc2626'; // red-600
   } else if (status === 'Siaga' || status === 'Ditangani') {
     color = '#f97316'; // orange-500
   } else if (status === 'Waspada') {
-    color = '#facc15'; // yellow-400
+    color = '#f59e0b'; // amber-500
   }
 
   return L.divIcon({
@@ -86,7 +86,7 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Gagal mengklaim laporan.');
       alert('Laporan berhasil diklaim!');
-      fetchReports(); // Ambil ulang data dari server
+      fetchReports();
     } catch (err: any) {
       alert(`Error: ${err.message}`);
     } finally {
@@ -102,7 +102,7 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Gagal menyelesaikan laporan.');
       alert('Terima kasih! Laporan telah diselesaikan.');
-      fetchReports(); // Ambil ulang data dari server
+      fetchReports();
     } catch (err: any) {
       alert(`Error: ${err.message}`);
     } finally {
@@ -116,18 +116,19 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
   );
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-purple-900"><p className="text-gray-400">Memuat data laporan...</p></div>;
+    return <div className="flex justify-center items-center h-screen bg-slate-50"><p className="text-slate-500">Memuat data laporan...</p></div>;
   }
 
   return (
-    <div className="relative h-[calc(100vh-80px)]"> {/* Sesuaikan tinggi dengan tinggi navbar */}
-      {/* Panel Filter dengan Glassmorphism */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-white/10 backdrop-blur-md p-2 rounded-lg shadow-lg border border-white/20">
-        <label className="text-sm mr-2 text-gray-300">Filter Kategori:</label>
+    <div className="relative h-[calc(100vh-80px)]">
+      
+      {/* Panel Filter dengan tema terang */}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-white/80 backdrop-blur-md p-2 rounded-lg shadow-lg border border-slate-200">
+        <label className="text-sm mr-2 text-slate-600">Filter Kategori:</label>
         <select 
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="p-2 border border-white/20 rounded-md bg-indigo-900/30 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          className="p-2 border border-slate-300 rounded-md bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
         </select>
@@ -137,9 +138,8 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
         center={[-6.9929, 110.4232]}
         zoom={13} 
         style={{ height: '100%', width: '100%' }}
-        className="rounded-2xl overflow-hidden shadow-lg"
       >
-        {/* Mengganti ke TileLayer OpenStreetMap untuk tema terang */}
+        {/* Menggunakan TileLayer OpenStreetMap untuk tema terang */}
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -162,7 +162,7 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
                   <button
                     onClick={() => handleClaim(report._id)}
                     disabled={isSubmitting === report._id}
-                    className="w-full mt-3 bg-indigo-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-indigo-500 disabled:bg-gray-600"
+                    className="w-full mt-3 bg-indigo-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-indigo-500 disabled:bg-slate-400"
                   >
                     {isSubmitting === report._id ? 'Memproses...' : 'Klaim Bantuan'}
                   </button>
@@ -172,7 +172,7 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
                   <button
                     onClick={() => handleComplete(report._id)}
                     disabled={isSubmitting === report._id}
-                    className="w-full mt-3 bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 disabled:bg-gray-600"
+                    className="w-full mt-3 bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 disabled:bg-slate-400"
                   >
                     {isSubmitting === report._id ? 'Memproses...' : 'Tandai Selesai'}
                   </button>
@@ -188,7 +188,7 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
           width: 20px;
           height: 20px;
           border-radius: 50% 50% 50% 0;
-          border: 2px solid rgba(255, 255, 255, 0.5);
+          border: 2px solid white;
           box-shadow: 0 0 5px rgba(0,0,0,0.5);
           position: absolute;
           transform: rotate(-45deg);
@@ -196,23 +196,23 @@ export default function MapComponent({ userId, userRole }: MapComponentProps) {
           top: 50%;
           margin: -10px 0 0 -10px;
         }
+        /* Styling untuk popup tema terang */
         .leaflet-popup-content-wrapper {
-          background-color: #1e293b; /* bg-slate-800 */
-          color: #e2e8f0; /* text-slate-200 */
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 0.5rem;
+          background-color: #ffffff;
+          color: #1e293b; /* text-slate-800 */
+          border-radius: 0.75rem; /* rounded-xl */
         }
         .leaflet-popup-tip {
-          background-color: #1e293b;
+          background-color: #ffffff;
         }
         .leaflet-popup-content strong {
-          color: #93c5fd; /* text-indigo-300 */
+          color: #4338ca; /* text-indigo-700 */
         }
         .leaflet-popup-content small {
-          color: #94a3b8; /* text-slate-400 */
+          color: #64748b; /* text-slate-500 */
         }
         .leaflet-container a.leaflet-popup-close-button {
-          color: #94a3b8 !important;
+          color: #64748b !important;
         }
       `}</style>
     </div>

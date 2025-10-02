@@ -2,25 +2,25 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Map, List, Package, User, LogOut } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Map, List, Package, User, LogOut, LayoutDashboard, Menu, X } from 'lucide-react';
 
-// Definisikan tipe data untuk user props agar TypeScript tidak error
+// Tipe data untuk user props
 type UserData = {
-  name?: string | null;
+  nama?: string | null;
   email?: string | null;
   role?: string | null;
 };
 
 export default function NavbarRelawan({ user }: { user: UserData }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
-  // Implementasi fungsi logout manual
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-      // Arahkan ke homepage setelah logout berhasil
       router.push('/');
       router.refresh();
     } catch (error) {
@@ -29,51 +29,65 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
     }
   };
 
+  // Tambahkan 'Beranda' ke daftar link
+  const navLinks = [
+    { name: 'Beranda', href: '/relawan/dashboard', icon: LayoutDashboard },
+    { name: 'Peta Respon', href: '/relawan/peta', icon: Map },
+    { name: 'Daftar Laporan', href: '/relawan/laporan', icon: List },
+    { name: 'Bank Sumber Daya', href: '/relawan/sumber-daya', icon: Package },
+  ];
+
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-50">
+    <nav className="sticky top-0 z-[1100] bg-slate-900 border-b border-slate-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-4">
-            <Link href="/relawan/dashboard" className="text-2xl font-bold text-green-600">resQ (Relawan)</Link>
-            <div className="hidden md:flex md:space-x-2">
-              <Link href="/relawan/peta" className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100">
-                <Map className="w-4 h-4 mr-2" />Peta Respon
-              </Link>
-              <Link href="/relawan/laporan" className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100">
-                <List className="w-4 h-4 mr-2" />Daftar Laporan
-              </Link>
-              <Link href="/relawan/sumber-daya" className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100">
-                <Package className="w-4 h-4 mr-2" />Bank Sumber Daya
-              </Link>
+        <div className="flex items-center justify-between h-20">
+          
+          <div className="flex items-center space-x-6">
+            <Link href="/relawan/dashboard" className="text-3xl font-bold text-white">
+              ResQ 
+            </Link>
+            <div className="hidden md:flex items-center space-x-1">
+              {navLinks.map((link) => (
+                <Link 
+                  key={link.name} 
+                  href={link.href} 
+                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    pathname === link.href 
+                    ? 'bg-green-500 text-white' 
+                    : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                  }`}
+                >
+                  <link.icon className="w-4 h-4 mr-2" />
+                  {link.name}
+                </Link>
+              ))}
             </div>
           </div>
           
-          {/* Menu Profil dan Logout yang sudah diimplementasikan */}
-          <div className="flex items-center">
+          <div className="hidden md:flex items-center">
             <div className="relative">
               <button 
                 onClick={() => setIsProfileOpen(!isProfileOpen)} 
-                className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full text-gray-600 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                className="flex items-center justify-center w-10 h-10 bg-slate-700 rounded-full text-slate-300 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-green-500"
               >
                 <User className="w-5 h-5" />
               </button>
-              
               {isProfileOpen && (
-                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50">
-                  <div className="px-4 py-3 border-b">
-                    <p className="text-sm font-semibold text-gray-800 truncate" title={user?.name || ''}>{user?.name}</p>
-                    <p className="text-xs text-gray-500 truncate" title={user?.email || ''}>{user?.email}</p>
+                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 bg-slate-800 ring-1 ring-slate-700 z-50">
+                  <div className="px-4 py-3 border-b border-slate-700">
+                    <p className="text-sm font-semibold text-white truncate" title={user?.nama || ''}>{user?.nama}</p>
+                    <p className="text-xs text-slate-400 truncate" title={user?.email || ''}>{user?.email}</p>
                   </div>
                   <Link 
-                    href="/profil" 
+                    href="/relawan/profil" 
                     onClick={() => setIsProfileOpen(false)} 
-                    className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="flex items-center w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700"
                   >
                     <User className="w-4 h-4 mr-2" /> Profil Saya
                   </Link>
                   <button 
                     onClick={handleLogout} 
-                    className="flex items-center w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    className="flex items-center w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10"
                   >
                     <LogOut className="w-4 h-4 mr-2" /> Keluar
                   </button>
@@ -81,8 +95,50 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
               )}
             </div>
           </div>
+
+          {/* Tombol Hamburger (Mobile) */}
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-700 focus:outline-none"
+            >
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Menu Mobile */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                pathname === link.href ? 'bg-green-500 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+              }`}
+            >
+              <link.icon className="w-5 h-5 mr-3" />
+              {link.name}
+            </Link>
+          ))}
+          <div className="pt-4 mt-4 border-t border-slate-700">
+            <div className="mt-3 space-y-1">
+              <div className="px-3 py-2">
+                <p className="font-medium text-white">{user?.nama}</p>
+              </div>
+              <Link href="/relawan/profil" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center w-full px-3 py-2 text-base font-medium text-slate-300 hover:bg-slate-700 rounded-md">
+                <User className="w-5 h-5 mr-3" /> Profil Saya
+              </Link>
+              <button onClick={handleLogout} className="flex items-center w-full px-3 py-2 text-base font-medium text-red-400 hover:bg-red-500/10 rounded-md">
+                <LogOut className="w-5 h-5 mr-3" /> Keluar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
