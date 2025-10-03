@@ -1,5 +1,6 @@
 import dbConnect from "@/lib/dbConnect";
 import Report from "@/models/Report";
+import ChatRoom from "@/models/ChatRoom";
 import { verifyAuth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
@@ -29,6 +30,14 @@ export async function PUT(request, { params }) {
     report.status = 'Ditangani';
     report.penolong = user.id;
     await report.save();
+
+    const existingChatRoom = await ChatRoom.findOne({ reportId: report._id });
+    if (!existingChatRoom) {
+      await ChatRoom.create({
+        reportId: report._id,
+        participants: [report.pelapor, user.id],
+      });
+    }
 
     return NextResponse.json({ success: true, data: report });
 

@@ -6,6 +6,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, User as UserIcon, Calendar, MapPin, Tag, Shield, CheckCircle, Phone } from "lucide-react";
 import CompleteReportButton from "@/components/CompleteReportButton";
+import ChatBox from "@/components/ChatBox";
 
 interface ReportDetailType {
   _id: string;
@@ -120,6 +121,11 @@ export default async function ReportDetailPageWarga({ params }: { params: { id: 
 
           </div>
         </div>
+        {(report.status === 'Ditangani' || report.status === 'Selesai') && (
+          <div className="mt-8">
+            <ChatBox reportId={report._id} currentUserId={user.id} />
+          </div>
+        )}
       </div>
     </div>
   );

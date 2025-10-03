@@ -25,14 +25,11 @@ export default function EmergencyBanner() {
     };
 
     fetchEmergencyStatus();
-    // Atur interval untuk memeriksa status setiap 30 detik
     const intervalId = setInterval(fetchEmergencyStatus, 30000);
 
-    // Hentikan interval saat komponen di-unmount
     return () => clearInterval(intervalId);
   }, []);
 
-  // Jangan tampilkan apa-apa jika sedang loading atau mode darurat tidak aktif
   if (isLoading || !isEmergency) {
     return null;
   }

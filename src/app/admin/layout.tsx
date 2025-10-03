@@ -10,7 +10,6 @@ export default async function AdminLayout({
 }) {
   const user = verifyAuth();
 
-  // Hanya user dengan peran 'Admin' yang diizinkan masuk
   if (!user || user.peran !== 'Admin') {
     redirect("/login?error=Unauthorized");
   }

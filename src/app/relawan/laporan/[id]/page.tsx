@@ -5,6 +5,7 @@ import { verifyAuth } from "@/lib/auth";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, User as UserIcon, Calendar, MapPin, Tag, Shield, Phone, CheckCircle } from "lucide-react";
+import ChatBox from "@/components/ChatBox";
 
 interface ReportDetailType {
   _id: string;
@@ -119,6 +120,11 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
 
           </div>
         </div>
+        {(report.status === 'Ditangani' || report.status === 'Selesai') && (
+          <div className="mt-8">
+            <ChatBox reportId={report._id} currentUserId={user.id} />
+          </div>
+        )}
       </div>
     </div>
   );
