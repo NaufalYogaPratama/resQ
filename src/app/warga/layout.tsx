@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import NavbarWarga from "@/components/NavbarWarga";
 import { verifyAuth } from "@/lib/auth";
+import EmergencyBanner from "@/components/EmergencyBanner";
 
 export default async function WargaLayout({
   children,
@@ -21,7 +22,10 @@ export default async function WargaLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <NavbarWarga user={userForNavbar} />
+      <header className="sticky top-0 z-[1100]">
+        <EmergencyBanner />
+        <NavbarWarga user={userForNavbar} />
+      </header>
       <main>
         {children}
       </main>

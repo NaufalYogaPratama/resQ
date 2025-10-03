@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import NavbarRelawan from "@/components/NavbarRelawan";
 import { verifyAuth } from "@/lib/auth";
+import EmergencyBanner from "@/components/EmergencyBanner";
 
 export default async function RelawanLayout({
   children,
@@ -21,7 +22,10 @@ export default async function RelawanLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <NavbarRelawan user={userForNavbar} />
+      <header className="sticky top-0 z-[1100]">
+        <EmergencyBanner />
+        <NavbarRelawan user={userForNavbar} />
+      </header>
       <main>{children}</main>
     </div>
   );

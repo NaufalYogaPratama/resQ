@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import NavbarAdmin from "@/components/NavbarAdmin";
 import { verifyAuth } from "@/lib/auth";
+import EmergencyBanner from "@/components/EmergencyBanner";
 
 export default async function AdminLayout({
   children,
@@ -16,7 +17,10 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <NavbarAdmin user={user} />
+      <header className="sticky top-0 z-[1100]">
+        <EmergencyBanner />
+        <NavbarAdmin user={user} />
+      </header>
       <main>{children}</main>
     </div>
   );
