@@ -1,11 +1,13 @@
 import Link from 'next/link';
-import { AlertTriangle, BookOpen, Map, Package, List, Megaphone, Trophy } from 'lucide-react';
+import { AlertTriangle, BookOpen, Map, Package, List, Megaphone, Trophy, ClipboardList, ClipboardCheck } from 'lucide-react';
 import { verifyAuth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import WeatherWidget from "@/components/WeatherWidget";
 import dbConnect from '@/lib/dbConnect';
 import Report from '@/models/Report';
 import User from '@/models/User';
+import Checklist from '@/models/Checklist'; 
+import { checklistItems } from '@/lib/checklistItems';
 
 interface ReportType {
   _id: string;
@@ -66,6 +68,16 @@ async function getRecentReports(userId: string): Promise<ReportType[]> {
   return JSON.parse(JSON.stringify(reports.slice(0, 3)));
 }
 
+async function getChecklistProgress(userId: string) {
+  await dbConnect();
+  const userChecklist = await Checklist.findOne({ user: userId }); 
+  const totalItems = checklistItems.length;
+  const completedItems = userChecklist ? userChecklist.checkedItems.length : 0;
+  const progress = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+
+  return { completedItems, totalItems, progress };
+}
+
 
 
 export default async function DashboardWargaPage() {
@@ -75,14 +87,18 @@ export default async function DashboardWargaPage() {
     redirect("/login");
   }
 
-  const recentReports = await getRecentReports(user.id);
-  const reportSummary = await getReportSummary();
+  const [recentReports, reportSummary, checklistProgress] = await Promise.all([
+    getRecentReports(user.id),
+    getReportSummary(),
+    getChecklistProgress(user.id)
+])
 
   const quickAccessLinks = [
-      { href: "/warga/peta", icon: Map, label: "Peta Respons" },
-      { href: "/warga/sumber-daya", icon: Package, label: "Bank Sumber Daya" },
-      { href: "/warga/edukasi", icon: BookOpen, label: "Pusat Edukasi" },
-  ];
+    { href: "/warga/peta", icon: Map, label: "Peta Respons" },
+    { href: "/warga/sumber-daya", icon: Package, label: "Bank Sumber Daya" },
+    { href: "/warga/edukasi", icon: BookOpen, label: "Pusat Edukasi" },
+    { href: "/warga/checklist", icon: ClipboardList, label: "Checklist Siaga" }, 
+];
 
   const statusColors = {
     Menunggu: "bg-red-100 text-red-700",
@@ -153,6 +169,39 @@ export default async function DashboardWargaPage() {
 
           <div className="lg:col-span-1 space-y-8">
             <div data-aos="fade-left" data-aos-delay="100"><WeatherWidget /></div>
+
+            {/* --- KARTU BARU: CHECKLIST KESIAPSIAGAAN --- */}
+            <div data-aos="fade-left" data-aos-delay="200" 
+              className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
+              <h3 className="text-xl font-bold mb-4 flex items-center text-slate-900">
+                <ClipboardCheck className="w-6 h-6 mr-3 text-[#4B5EAA]"/>
+                Kesiapsiagaan Anda
+              </h3>
+              
+              {checklistProgress.progress === 100 ? (
+                <div className="text-center bg-green-50 p-4 rounded-lg border border-green-200">
+                    <Trophy className="w-12 h-12 text-green-500 mx-auto"/>
+                    <p className="mt-2 font-bold text-green-800">Lencana Siaga Diraih!</p>
+                    <p className="text-sm text-green-700">Tas Siaga Bencana Anda sudah lengkap.</p>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                      <p className="text-sm font-semibold text-slate-700">Tas Siaga Bencana</p>
+                      <p className="text-sm font-bold text-indigo-600">{checklistProgress.progress}%</p>
+                  </div>
+                  <div className="w-full bg-slate-200 rounded-full h-2.5">
+                      <div className="bg-indigo-600 h-2.5 rounded-full" style={{ width: `${checklistProgress.progress}%` }}></div>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2">
+                      {checklistProgress.completedItems} dari {checklistProgress.totalItems} item siap.
+                  </p>
+                  <Link href="/warga/checklist" className="mt-4 inline-block w-full text-center bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700">
+                      Lengkapi Sekarang
+                  </Link>
+                </div>
+              )}
+            </div>
 
             
             

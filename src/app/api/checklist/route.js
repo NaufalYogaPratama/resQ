@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { verifyAuth } from '@/lib/auth';
 import dbConnect from '@/lib/dbConnect';
+import User from '@/models/User'; 
 import Checklist from '@/models/Checklist';
 
 const checklistItems = [
@@ -40,6 +41,7 @@ export async function GET() {
     });
 }
 
+
 export async function POST(request) {
     const user = await verifyAuth();
     if (!user) {
@@ -50,14 +52,35 @@ export async function POST(request) {
         const { checkedItems } = await request.json();
         await dbConnect();
 
+        // 1. Simpan progres checklist
         await Checklist.findOneAndUpdate(
             { user: user.id },
-            { user: user.id, checkedItems },
-            { upsert: true, new: true }
+            { checkedItems },
+            { upsert: true }
         );
 
-        return NextResponse.json({ success: true, message: 'Progres disimpan.' });
+        // 2. Logika pemberian lencana (sekarang akan berfungsi)
+        let badgeAwarded = false;
+        if (checkedItems.length === checklistItems.length) {
+            const currentUser = await User.findById(user.id);
+            const alreadyHasBadge = currentUser.lencana && currentUser.lencana.includes("Lencana Siaga");
+
+            if (!alreadyHasBadge) {
+                await User.findByIdAndUpdate(user.id, { 
+                    $addToSet: { lencana: "Lencana Siaga" } 
+                });
+                badgeAwarded = true;
+            }
+        }
+        
+        return NextResponse.json({ 
+            success: true, 
+            message: 'Progres disimpan.',
+            badgeAwarded: badgeAwarded,
+            badgeName: 'Lencana Siaga'
+        });
     } catch (error) {
-        return NextResponse.json({ success: false, message: 'Gagal menyimpan progres.' }, { status: 500 });
+        console.error("API Checklist POST Error:", error);
+        return NextResponse.json({ success: false, message: 'Gagal menyimpan progres karena kesalahan server.' }, { status: 500 });
     }
 }

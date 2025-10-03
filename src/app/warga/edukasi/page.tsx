@@ -39,20 +39,7 @@ export default async function EdukasiPage() {
         </div>
         
         <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          <div data-aos="fade-up">
-            <Link href="/warga/edukasi/checklist" className="block bg-indigo-600 text-white border border-slate-200 rounded-2xl shadow-md overflow-hidden h-full group transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-              <div className="p-6 flex flex-col justify-between h-full">
-                <div>
-                  <ClipboardList className="w-10 h-10 mb-4"/>
-                  <h2 className="text-2xl font-bold">Checklist Interaktif</h2>
-                  <p className="mt-2 text-indigo-200 line-clamp-3 text-sm">
-                    Siapkan Tas Siaga Bencana Anda dan simpan progresnya di sini. Jadilah lebih siap menghadapi keadaan darurat!
-                  </p>
-                </div>
-                <p className="mt-4 text-sm font-semibold">Mulai Sekarang &rarr;</p>
-              </div>
-            </Link>
-          </div>
+          
           {articles.length > 0 ? (
             articles.map((article: ArticleType, index: number) => (
               <div key={article._id} data-aos="fade-up" data-aos-delay={index * 100}>

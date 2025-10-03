@@ -2,10 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { BarChart3, Users, BookOpen, LogOut, Shield, ChevronDown,PieChart, ListChecks, Package, Map } from 'lucide-react';
+import { BarChart3, Users, BookOpen, LogOut, Shield, ChevronDown, PieChart, ListChecks, Package, Map } from 'lucide-react';
 import { useState } from 'react';
 
-export default function SidebarAdmin({ user }) {
+
+interface UserData {
+  nama: string;
+  peran: string;
+}
+
+export default function SidebarAdmin({ user }: { user: UserData }) {
   const pathname = usePathname();
   const router = useRouter();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -27,7 +33,8 @@ export default function SidebarAdmin({ user }) {
     { name: 'Manajemen User', href: '/admin/users', icon: Users },
     { name: 'Manajemen Konten', href: '/admin/edukasi', icon: BookOpen },
     { name: 'Peta Respons', href: '/admin/peta', icon: Map },
-];
+  ];
+
   return (
     <aside className="w-64 flex-shrink-0 bg-slate-900 text-white flex flex-col">
       <div className="h-20 flex items-center justify-center text-2xl font-bold border-b border-slate-700">
@@ -41,14 +48,14 @@ export default function SidebarAdmin({ user }) {
           <Link
             key={link.name}
             href={link.href}
-            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium ${
               pathname.startsWith(link.href)
                 ? 'bg-indigo-600 text-white shadow-lg'
                 : 'text-slate-400 hover:bg-slate-700 hover:text-white'
             }`}
           >
             <link.icon className="w-5 h-5" />
-            <span className="font-medium">{link.name}</span>
+            <span>{link.name}</span>
           </Link>
         ))}
       </nav>
