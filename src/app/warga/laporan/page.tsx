@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Mic, MicOff, LocateFixed, Camera } from "lucide-react";
+import { Mic, MicOff, LocateFixed, Camera, Bot } from "lucide-react";
+import WaraChatbot from "@/components/WaraChatbot";
 
 declare global {
   interface Window {
@@ -42,6 +43,14 @@ export default function LaporPage() {
   const [isLocating, setIsLocating] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
+
+  const [showWara, setShowWara] = useState(false);
+
+  const handleWaraComplete = (data: { kategori: string; deskripsi: string; }) => {
+    if (data.kategori) setKategori(data.kategori);
+    if (data.deskripsi) setDeskripsi(data.deskripsi);
+  };
+
 
   const fetchAddress = async (lat: number, lng: number) => {
     try {
@@ -150,115 +159,126 @@ export default function LaporPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-8">
-            <h1 className="text-4xl font-extrabold text-slate-900">Buat Laporan Darurat</h1>
-            <p className="mt-2 text-lg text-slate-600">Tandai lokasi di peta dan isi detail kejadian di sebelah kanan.</p>
-        </div>
+    <>
+      {showWara && <WaraChatbot onComplete={handleWaraComplete} onClose={() => setShowWara(false)} />}
 
-        {/* --- STRUKTUR UTAMA DUA KOLOM --- */}
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          
-          {/* KOLOM KIRI: PETA */}
-          <div className="space-y-4 h-[70vh] lg:h-auto flex flex-col">
-            <label className="block text-lg font-semibold text-gray-800">
-              1. Tandai Lokasi Kejadian
-            </label>
+      <div className="min-h-screen bg-slate-50 font-sans">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="mb-8">
+              <h1 className="text-4xl font-extrabold text-slate-900">Buat Laporan Darurat</h1>
+              <p className="mt-2 text-lg text-slate-600">Isi detail kejadian secara manual, atau gunakan asisten AI kami untuk bantuan.</p>
+          </div>
+
+          <div className="mb-8">
             <button
               type="button"
-              onClick={handleGetCurrentLocation}
-              disabled={isLocating}
-              className="w-full flex items-center justify-center gap-2 p-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-gray-400"
+              onClick={() => setShowWara(true)}
+              className="w-full flex items-center justify-center gap-3 p-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all"
             >
-              <LocateFixed size={18} />
-              {isLocating ? "Mencari Lokasi..." : "Gunakan Lokasi Saat Ini"}
+              <Bot size={22} />
+              <span className="text-lg font-bold">Gunakan Asisten Cerdas WARA</span>
             </button>
-            <div className="flex-grow rounded-lg overflow-hidden shadow-md">
-                <LocationPicker onLocationSelect={handleLocationSelect} initialPosition={lokasi} />
-            </div>
-            {lokasi && (
-              <p className="text-xs text-green-600">
-                ✓ Lokasi dipilih: Lat {lokasi.lat.toFixed(5)}, Lon {lokasi.lng.toFixed(5)}
-                {lokasi.accuracy ? ` — akurasi ±${Math.round(lokasi.accuracy)} m` : ""}
-              </p>
-            )}
           </div>
-          
-          {/* KOLOM KANAN: FORMULIR */}
-          <div className="space-y-6">
-             <label className="block text-lg font-semibold text-gray-800">
-              2. Isi Detail Laporan
-            </label>
-            <div className="bg-white p-6 rounded-lg shadow-md space-y-4 border">
-              <div>
-                <label htmlFor="kategori" className="block text-sm font-medium text-gray-700">Kategori Laporan</label>
-                <select
-                  id="kategori"
-                  value={kategori}
-                  onChange={(e) => setKategori(e.target.value)}
-                  required
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-indigo-500"
-                >
-                  <option value="Medis">Medis</option>
-                  <option value="Evakuasi">Evakuasi</option>
-                  <option value="Kerusakan Properti">Kerusakan Properti</option>
-                  <option value="Lainnya">Lainnya</option>
-                </select>
 
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+            
+            <div className="space-y-4 h-[70vh] lg:h-auto flex flex-col">
+              <label className="block text-lg font-semibold text-gray-800">
+                1. Tandai Lokasi Kejadian
+              </label>
+              <button
+                type="button"
+                onClick={handleGetCurrentLocation}
+                disabled={isLocating}
+                className="w-full flex items-center justify-center gap-2 p-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-gray-400"
+              >
+                <LocateFixed size={18} />
+                {isLocating ? "Mencari Lokasi..." : "Gunakan Lokasi Saat Ini"}
+              </button>
+              <div className="flex-grow rounded-lg overflow-hidden shadow-md">
+                  <LocationPicker onLocationSelect={handleLocationSelect} initialPosition={lokasi} />
               </div>
-
-              <div>
-                <label htmlFor="alamat" className="block text-sm font-medium text-gray-700">Alamat Lengkap / Patokan (Otomatis)</label>
-                <input
-                  id="alamat" type="text" value={alamat} onChange={(e) => setAlamat(e.target.value)}
-                  placeholder="Akan terisi setelah memilih lokasi..." required
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md bg-gray-50 focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="foto" className="block text-sm font-medium text-gray-700">Unggah Foto (Opsional)</label>
-                <div className="mt-1 flex items-center border border-gray-300 rounded-md p-2">
-                    <Camera className="w-5 h-5 text-gray-500"/>
-                    <input id="foto" type="file" accept="image/*" onChange={handleFotoChange}
-                        className="ml-4 text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                    />
-                </div>
-                {foto && <p className="text-xs text-green-600 mt-1">✓ Foto terpilih: {foto.name}</p>}
-              </div>
-
-              <div>
-                <label htmlFor="deskripsi" className="block text-sm font-medium text-gray-700">Deskripsi Kejadian</label>
-                <div className="mt-1 relative">
-                  <textarea
-                    id="deskripsi" rows={4} value={deskripsi} onChange={(e) => setDeskripsi(e.target.value)} required
-                    className="w-full p-2 border border-gray-300 rounded-md shadow-sm pr-12 focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Contoh: Terjadi kebakaran di rumah Bapak RT..."
-                  />
-                  <button
-                    type="button" onClick={handleListen}
-                    className={`absolute top-2 right-2 p-2 rounded-full transition-colors ${isListening ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
-                    title={isListening ? "Berhenti Merekam" : "Mulai Merekam Suara"}
+              {lokasi && (
+                <p className="text-xs text-green-600">
+                  ✓ Lokasi dipilih: Lat {lokasi.lat.toFixed(5)}, Lon {lokasi.lng.toFixed(5)}
+                  {lokasi.accuracy ? ` — akurasi ±${Math.round(lokasi.accuracy)} m` : ""}
+                </p>
+              )}
+            </div>
+            
+            <div className="space-y-6">
+               <label className="block text-lg font-semibold text-gray-800">
+                2. Isi Detail Laporan
+              </label>
+              <div className="bg-white p-6 rounded-lg shadow-md space-y-4 border">
+                <div>
+                  <label htmlFor="kategori" className="block text-sm font-medium text-gray-700">Kategori Laporan</label>
+                  <select
+                    id="kategori"
+                    value={kategori}
+                    onChange={(e) => setKategori(e.target.value)}
+                    required
+                    className="w-full mt-1 p-2 border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-indigo-500"
                   >
-                    {isListening ? <MicOff size={20} /> : <Mic size={20} />}
-                  </button>
+                    <option value="Medis">Medis</option>
+                    <option value="Evakuasi">Evakuasi</option>
+                    <option value="Kerusakan Properti">Kerusakan Properti</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+
+                </div>
+
+                <div>
+                  <label htmlFor="alamat" className="block text-sm font-medium text-gray-700">Alamat Lengkap / Patokan (Otomatis)</label>
+                  <input
+                    id="alamat" type="text" value={alamat} onChange={(e) => setAlamat(e.target.value)}
+                    placeholder="Akan terisi setelah memilih lokasi..." required
+                    className="w-full mt-1 p-2 border border-gray-300 rounded-md bg-gray-50 focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="foto" className="block text-sm font-medium text-gray-700">Unggah Foto (Opsional)</label>
+                  <div className="mt-1 flex items-center border border-gray-300 rounded-md p-2">
+                      <Camera className="w-5 h-5 text-gray-500"/>
+                      <input id="foto" type="file" accept="image/*" onChange={handleFotoChange}
+                          className="ml-4 text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                      />
+                  </div>
+                  {foto && <p className="text-xs text-green-600 mt-1">✓ Foto terpilih: {foto.name}</p>}
+                </div>
+
+                <div>
+                  <label htmlFor="deskripsi" className="block text-sm font-medium text-gray-700">Deskripsi Kejadian</label>
+                  <div className="mt-1 relative">
+                    <textarea
+                      id="deskripsi" rows={4} value={deskripsi} onChange={(e) => setDeskripsi(e.target.value)} required
+                      className="w-full p-2 border border-gray-300 rounded-md shadow-sm pr-12 focus:ring-2 focus:ring-indigo-500"
+                      placeholder="Contoh: Terjadi kebakaran di rumah Bapak RT..."
+                    />
+                    <button
+                      type="button" onClick={handleListen}
+                      className={`absolute top-2 right-2 p-2 rounded-full transition-colors ${isListening ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+                      title={isListening ? "Berhenti Merekam" : "Mulai Merekam Suara"}
+                    >
+                      {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+                    </button>
+                  </div>
                 </div>
               </div>
+
+              {error && <p className="text-red-600 text-center font-semibold">{error}</p>}
+
+              <button
+                type="submit" disabled={isLoading}
+                className="w-full bg-red-600 text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-red-700 disabled:bg-gray-400 transition-all shadow-lg shadow-red-500/20"
+              >
+                {isLoading ? "Mengirim..." : "Kirim Laporan"}
+              </button>
             </div>
-
-            {error && <p className="text-red-600 text-center font-semibold">{error}</p>}
-
-            <button
-              type="submit" disabled={isLoading}
-              className="w-full bg-red-600 text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-red-700 disabled:bg-gray-400 transition-all shadow-lg shadow-red-500/20"
-            >
-              {isLoading ? "Mengirim..." : "Kirim Laporan"}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
-
