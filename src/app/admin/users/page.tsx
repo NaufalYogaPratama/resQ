@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Users as UsersIcon, Shield, Search } from 'lucide-react';
+import { Users as UsersIcon, Shield, Search, CheckCircle } from 'lucide-react';
 
-// Tipe data untuk pengguna
+// Tipe data untuk pengguna, pastikan 'statusRelawan' ada
 interface UserType {
   _id: string;
   namaLengkap: string;
   email: string;
   peran: 'Warga' | 'Relawan' | 'Admin';
+  statusRelawan?: 'None' | 'Diajukan' | 'Diterima'; 
 }
 
 export default function ManageUsersPage() {
@@ -17,29 +18,32 @@ export default function ManageUsersPage() {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
 
-    const fetchUsers = async () => {
-        setIsLoading(true);
-        try {
-            const res = await fetch('/api/users');
-            const data = await res.json();
-            if (data.success) {
-                setUsers(data.data);
-            } else {
-                throw new Error(data.message || 'Gagal mengambil data pengguna.');
-            }
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     useEffect(() => {
+        const fetchUsers = async () => {
+            setIsLoading(true);
+            try {
+                const res = await fetch('/api/users');
+                const data = await res.json();
+                if (data.success) {
+                    // Urutkan agar pengajuan muncul di paling atas
+                    const sortedUsers = data.data.sort((a: UserType, b: UserType) => {
+                        if (a.statusRelawan === 'Diajukan' && b.statusRelawan !== 'Diajukan') return -1;
+                        if (a.statusRelawan !== 'Diajukan' && b.statusRelawan === 'Diajukan') return 1;
+                        return a.namaLengkap.localeCompare(b.namaLengkap);
+                    });
+                    setUsers(sortedUsers);
+                } else {
+                    throw new Error(data.message || "Gagal mengambil data pengguna.");
+                }
+            } catch (err: any) { setError(err.message); } 
+            finally { setIsLoading(false); }
+        };
         fetchUsers();
     }, []);
 
     const handleRoleChange = async (userId: string, newRole: string) => {
-        if (!confirm(`Anda yakin ingin mengubah peran pengguna ini menjadi ${newRole}?`)) return;
+        const action = newRole === 'Relawan' ? 'menyetujui pengajuan ini' : `mengubah peran menjadi ${newRole}`;
+        if (!confirm(`Anda yakin ingin ${action}?`)) return;
 
         try {
             const res = await fetch(`/api/users/${userId}/role`, {
@@ -50,17 +54,19 @@ export default function ManageUsersPage() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);
 
-    
+            // Perbarui state secara lokal untuk UI yang responsif
             setUsers(currentUsers => 
-                currentUsers.map(u => u._id === userId ? { ...u, peran: data.data.peran } : u)
+                currentUsers.map(u => 
+                    u._id === userId ? { ...u, peran: data.data.peran, statusRelawan: data.data.statusRelawan } : u
+                )
             );
             alert("Peran pengguna berhasil diperbarui.");
-
         } catch (err: any) {
             alert(`Error: ${err.message}`);
         }
     };
-
+    
+    // Filter pengguna berdasarkan input pencarian
     const filteredUsers = users.filter(user => 
         user.namaLengkap.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -94,34 +100,47 @@ export default function ManageUsersPage() {
                     <table className="min-w-full divide-y divide-slate-200">
                         <thead className="bg-slate-50">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Nama Lengkap</th>
-                                <th className="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Email</th>
+                                <th className="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Nama Pengguna</th>
                                 <th className="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Peran</th>
                                 <th className="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Aksi</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-slate-200">
                             {isLoading ? (
-                                <tr><td colSpan={4} className="p-6 text-center text-slate-500">Memuat data...</td></tr>
+                                <tr><td colSpan={3} className="p-6 text-center text-slate-500">Memuat data pengguna...</td></tr>
                             ) : filteredUsers.map(user => (
-                                <tr key={user._id} className="hover:bg-slate-50">
-                                    <td className="px-6 py-4 font-medium text-slate-900">{user.namaLengkap}</td>
-                                    <td className="px-6 py-4 text-slate-500">{user.email}</td>
+                                <tr key={user._id} className={`transition-colors ${user.statusRelawan === 'Diajukan' ? 'bg-indigo-50 hover:bg-indigo-100' : 'hover:bg-slate-50'}`}>
                                     <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                                            user.peran === 'Admin' ? 'bg-purple-100 text-purple-800' :
-                                            user.peran === 'Relawan' ? 'bg-green-100 text-green-800' :
-                                            'bg-slate-100 text-slate-800'
-                                        }`}>{user.peran}</span>
+                                        <div className="font-medium text-slate-900">{user.namaLengkap}</div>
+                                        <div className="text-sm text-slate-500">{user.email}</div>
                                     </td>
-                                    <td className="px-6 py-4 text-sm font-medium space-x-4">
-                                        {user.peran === 'Warga' && (
-                                            <button onClick={() => handleRoleChange(user._id, 'Relawan')} className="text-green-600 hover:text-green-800 font-semibold">Jadikan Relawan</button>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2">
+                                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                                                user.peran === 'Admin' ? 'bg-purple-100 text-purple-800' :
+                                                user.peran === 'Relawan' ? 'bg-green-100 text-green-800' :
+                                                'bg-slate-100 text-slate-800'
+                                            }`}>{user.peran}</span>
+                                            {user.statusRelawan === 'Diajukan' && (
+                                                <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 animate-pulse">
+                                                    Menunggu Persetujuan
+                                                </span>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-sm font-medium">
+                                        {user.peran === 'Warga' && user.statusRelawan === 'Diajukan' && (
+                                            <button onClick={() => handleRoleChange(user._id, 'Relawan')} 
+                                                className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 font-semibold">
+                                                <CheckCircle className="w-4 h-4"/> Setujui
+                                            </button>
+                                        )}
+                                        {user.peran === 'Warga' && user.statusRelawan !== 'Diajukan' && (
+                                             <button onClick={() => handleRoleChange(user._id, 'Relawan')} className="text-indigo-600 hover:text-indigo-800 font-semibold">Jadikan Relawan</button>
                                         )}
                                         {user.peran === 'Relawan' && (
-                                            <button onClick={() => handleRoleChange(user._id, 'Warga')} className="text-slate-500 hover:text-slate-700 font-semibold">Jadikan Warga</button>
+                                            <button onClick={() => handleRoleChange(user._id, 'Warga')} className="text-slate-500 hover:text-slate-700 font-semibold">Turunkan jadi Warga</button>
                                         )}
-                                    
                                     </td>
                                 </tr>
                             ))}

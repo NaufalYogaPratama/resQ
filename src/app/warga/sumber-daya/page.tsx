@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Package, Wrench, Trash2, Camera } from "lucide-react";
+import { Package, Wrench, Trash2, Camera, Trophy, X } from "lucide-react";
 import Link from "next/link";
 
 interface ResourceType {
@@ -23,6 +23,9 @@ export default function SumberDayaPage() {
   
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [showRewardModal, setShowRewardModal] = useState(false);
+  const [rewardName, setRewardName] = useState('');
 
   const fetchMyResources = async () => {
     try {
@@ -51,9 +54,7 @@ export default function SumberDayaPage() {
       formData.append('namaSumberDaya', namaSumberDaya);
       formData.append('tipe', tipe);
       formData.append('deskripsi', deskripsi);
-      if (gambar) {
-        formData.append('gambar', gambar);
-      }
+      if (gambar) formData.append('gambar', gambar);
 
       const res = await fetch("/api/resources", {
         method: "POST",
@@ -65,8 +66,15 @@ export default function SumberDayaPage() {
         throw new Error(data.message || "Gagal menambahkan sumber daya.");
       }
 
-      // Reset form dan ambil ulang data
-      fetchMyResources();
+
+      if (data.rewardAwarded) {
+        setRewardName(data.rewardName);
+        setShowRewardModal(true);
+      } else {
+  
+      }
+      
+      fetchMyResources(); 
       setNamaSumberDaya("");
       setTipe("Aset");
       setDeskripsi("");
@@ -166,8 +174,7 @@ export default function SumberDayaPage() {
               {myResources.length > 0 ? (
                 myResources.map((res: ResourceType) => (
                   <li key={res._id} className="list-none bg-white border border-slate-200 rounded-xl p-4 flex justify-between items-center shadow hover:shadow-md transition-shadow">
-                    
-                    {/* --- PERBAIKAN DI SINI --- */}
+ 
                     <Link href={`/warga/sumber-daya/${res._id}`} className="flex items-center gap-4 flex-grow">
                       {res.gambarUrl ? (
                         <img src={res.gambarUrl} alt={res.namaSumberDaya} className="w-16 h-16 rounded-lg object-cover" />
@@ -201,6 +208,20 @@ export default function SumberDayaPage() {
             </div>
           )}
         </div>
+        {showRewardModal && (
+            <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl shadow-xl max-w-sm text-center p-8 relative" data-aos="zoom-in">
+                    <button onClick={() => setShowRewardModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><X /></button>
+                    <Trophy className="w-20 h-20 text-yellow-500 mx-auto animate-bounce"/>
+                    <h2 className="text-2xl font-bold text-slate-900 mt-4">Pencapaian Baru!</h2>
+                    <p className="text-slate-600 mt-2">Terima kasih atas kontribusinya! Anda mendapatkan:</p>
+                    <p className="text-xl font-bold text-indigo-600 mt-2">{rewardName}</p>
+                    <Link href="/warga/profil" className="mt-6 inline-block w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700">
+                        Lihat di Profil
+                    </Link>
+                </div>
+            </div>
+        )}
       </div>
     </div>
   );

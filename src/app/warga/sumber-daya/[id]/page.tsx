@@ -51,7 +51,6 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
                                 <h1 className="text-4xl font-extrabold text-slate-900 mt-4">{resource.namaSumberDaya}</h1>
                                 {resource.deskripsi && <p className="mt-4 text-lg text-slate-600">{resource.deskripsi}</p>}
                             </div>
-                            {/* Tombol Edit memanggil Client Component Modal */}
                             <EditResourceModal resource={resource} />
                         </div>
                     </div>

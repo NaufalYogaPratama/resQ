@@ -37,6 +37,11 @@ const UserSchema = new mongoose.Schema({
     type: [String], 
     default: [],
   },
+  statusRelawan: {
+    type: String,
+    enum: ['None', 'Diajukan', 'Diterima'],
+    default: 'None',
+  },
 }, {
   timestamps: true,
 });

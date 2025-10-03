@@ -10,15 +10,15 @@ import {
     User as UserIcon, Mail, Phone, FileText, Package, Wrench, Trophy
 } from 'lucide-react';
 import Link from 'next/link';
+import ApplyVolunteerButton from '@/components/ApplyVolunteerButton'; 
 
-// Definisikan tipe data
 interface ResourceListItem {
     _id: string;
     namaSumberDaya: string;
     tipe: 'Aset' | 'Keahlian';
 }
 
-// --- FUNGSI DIPERBARUI UNTUK MENGAMBIL 'lencana' ---
+
 async function getUserData(userId: string) {
     await dbConnect();
     try {
@@ -28,18 +28,13 @@ async function getUserData(userId: string) {
             { $lookup: { from: 'resources', localField: '_id', foreignField: 'pemilik', as: 'resources' }},
             {
                 $project: {
-                    namaLengkap: 1,
-                    email: 1,
-                    noWa: 1,
-                    peran: 1,
-                    lencana: 1, // Ambil data lencana
+                    namaLengkap: 1, email: 1, noWa: 1, peran: 1, lencana: 1, statusRelawan: 1, // Ambil data baru
                     totalReports: { $size: '$reports' },
                     totalResources: { $size: '$resources' },
                     resourceList: { $slice: ['$resources', -3] } 
                 }
             }
         ]);
-        
         if (!userData || userData.length === 0) return null;
         return JSON.parse(JSON.stringify(userData[0]));
     } catch (error) {
@@ -55,13 +50,8 @@ export default async function ProfilWargaPage() {
     }
 
     const user = await getUserData(session.id);
-
     if (!user) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <p>Gagal memuat data pengguna.</p>
-            </div>
-        );
+        return <div className="flex items-center justify-center min-h-screen"><p>Gagal memuat data pengguna.</p></div>;
     }
     
     if (user.peran !== 'Warga') {
@@ -95,7 +85,7 @@ export default async function ProfilWargaPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
-                        {/* KARTU STATISTIK */}
+
                         <div data-aos="fade-up" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
                             <h2 className="text-xl font-bold text-slate-900 mb-4">Statistik Kontribusi</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -111,7 +101,6 @@ export default async function ProfilWargaPage() {
                             </div>
                         </div>
 
-                        {/* --- KARTU LENCANA BARU --- */}
                         <div data-aos="fade-up" data-aos-delay="100" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
                             <h2 className="text-xl font-bold text-slate-900 mb-4">Lencana Didapat</h2>
                             <div className="flex flex-wrap gap-4">
@@ -122,12 +111,20 @@ export default async function ProfilWargaPage() {
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-slate-500">Belum ada lencana yang didapat. Selesaikan checklist untuk mendapatkan lencana pertamamu!</p>
+                                    <p className="text-slate-500">Belum ada lencana yang didapat.</p>
                                 )}
                             </div>
                         </div>
-                        
-                        {/* KARTU SUMBER DAYA */}
+
+                
+                        <div data-aos="fade-up" data-aos-delay="200" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
+                            <h2 className="text-xl font-bold text-slate-900 mb-4">Status Relawan</h2>
+                            <ApplyVolunteerButton 
+                                totalResources={user.totalResources} 
+                                currentStatus={user.statusRelawan} 
+                            />
+                        </div>
+  
                         <div data-aos="fade-up" data-aos-delay="200" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-bold text-slate-900">Sumber Daya Terdaftar</h2>
@@ -153,7 +150,6 @@ export default async function ProfilWargaPage() {
                         </div>
                     </div>
 
-                    {/* KOLOM KANAN INFORMASI KONTAK */}
                     <div className="space-y-8 lg:col-span-1">
                          <div data-aos="fade-left" data-aos-delay="200" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
                             <h2 className="text-xl font-bold text-slate-900 mb-4">Informasi Kontak</h2>

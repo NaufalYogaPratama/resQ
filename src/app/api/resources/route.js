@@ -1,19 +1,19 @@
 import dbConnect from "@/lib/dbConnect";
 import Resource from "@/models/Resource";
 import SystemSetting from "@/models/SystemSetting";
+import User from "@/models/User";
 import { verifyAuth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import cloudinary from 'cloudinary';
 
-// 1. --- KONFIGURASI CLOUDINARY DIAKTIFKAN KEMBALI ---
-// Pastikan variabel environment di file .env.local Anda sudah benar.
+
 cloudinary.v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// 2. --- FUNGSI HELPER UNTUK UPLOAD GAMBAR ---
+
 async function uploadImage(file) {
     const fileBuffer = await file.arrayBuffer();
     const mime = file.type;
@@ -32,7 +32,6 @@ async function uploadImage(file) {
     }
 }
 
-// FUNGSI GET: TIDAK BERUBAH
 export async function GET() {
   const user = await verifyAuth();
   if (!user) {
@@ -57,8 +56,6 @@ export async function GET() {
   }
 }
 
-
-// 3. --- FUNGSI POST DIPERBARUI UNTUK MENGELOLA GAMBAR ---
 export async function POST(request) {
   const user = await verifyAuth();
   if (!user) {
@@ -68,14 +65,13 @@ export async function POST(request) {
   await dbConnect();
   try {
     const formData = await request.formData();
-
     const namaSumberDaya = formData.get('namaSumberDaya');
     const tipe = formData.get('tipe');
     const deskripsi = formData.get('deskripsi');
     const gambar = formData.get('gambar'); 
 
     if (!namaSumberDaya || !tipe) {
-        return NextResponse.json({ success: false, message: "Nama dan tipe sumber daya wajib diisi." }, { status: 400 });
+        return NextResponse.json({ success: false, message: "Nama dan tipe wajib diisi." }, { status: 400 });
     }
     
     const newResourceData = {
@@ -85,7 +81,6 @@ export async function POST(request) {
       pemilik: user.id,
     };
 
-    // Logika untuk upload gambar jika ada
     if (gambar && gambar.size > 0) {
         const uploadResult = await uploadImage(gambar);
         newResourceData.gambarUrl = uploadResult.secure_url;
@@ -94,9 +89,33 @@ export async function POST(request) {
     
     const newResource = await Resource.create(newResourceData);
 
-    return NextResponse.json({ success: true, data: newResource }, { status: 201 });
+    let rewardAwarded = false;
+    let rewardName = '';
+    const resourceCount = await Resource.countDocuments({ pemilik: user.id });
+
+    if (resourceCount >= 3) {
+      const currentUser = await User.findById(user.id);
+      const alreadyHasBadge = currentUser.lencana && currentUser.lencana.includes("Kontributor Aktif");
+
+      if (!alreadyHasBadge) {
+        await User.findByIdAndUpdate(user.id, {
+          $inc: { poin: 50 }, 
+          $addToSet: { lencana: "Kontributor Aktif" } 
+        });
+        rewardAwarded = true;
+        rewardName = "Lencana Kontributor Aktif (+50 Poin)";
+      }
+    }
+    
+    return NextResponse.json({ 
+        success: true, 
+        data: newResource,
+        rewardAwarded,
+        rewardName
+    }, { status: 201 });
+
   } catch (error) {
     console.error("POST Resource Error:", error);
-    return NextResponse.json({ success: false, message: error.message || "Terjadi kesalahan pada server." }, { status: 500 });
+    return NextResponse.json({ success: false, message: error.message || "Terjadi kesalahan." }, { status: 500 });
   }
 }
