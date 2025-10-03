@@ -1,27 +1,27 @@
 import { verifyAuth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import dbConnect from "@/lib/dbConnect";
-import Resource from "@/models/Resource"; // Pastikan path ini benar
+import Resource from "@/models/Resource";
 import { Package, Wrench, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import EditResourceModal from "@/components/EditResourceModal";
 
-// Fungsi ini berjalan di server untuk mengambil data
+
 async function getResource(id: string, userId: string) {
     await dbConnect();
     try {
         const resource = await Resource.findById(id);
         if (!resource || resource.pemilik.toString() !== userId) {
-            notFound(); // Tampilkan 404 jika resource tidak ada atau bukan milik user
+            notFound(); 
         }
         return JSON.parse(JSON.stringify(resource));
     } catch (error) {
-        notFound(); // Tampilkan 404 jika format ID salah
+        notFound(); 
     }
 }
 
 export default async function ResourceDetailPage({ params }: { params: { id: string } }) {
-    const user = verifyAuth();
+    const user = await verifyAuth();
     if (!user) redirect("/login");
 
     const resource = await getResource(params.id, user.id);

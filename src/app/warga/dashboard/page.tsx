@@ -90,15 +90,7 @@ export default async function DashboardWargaPage() {
     Selesai: "bg-green-100 text-green-700",
   };
   
-  // Data placeholder yang hilang
-  const urgentNeeds: { id: number; item: string; location: string }[] = [
-      { id: 1, item: "Genset Darurat", location: "Blok C RW 05" },
-      { id: 2, item: "Tenaga Medis (P3K)", location: "Posko Utama" },
-  ];
-  const userReputation = {
-      points: 150,
-      badge: "Pelindung Warga",
-  };
+ 
 
 
   return (
@@ -162,25 +154,7 @@ export default async function DashboardWargaPage() {
           <div className="lg:col-span-1 space-y-8">
             <div data-aos="fade-left" data-aos-delay="100"><WeatherWidget /></div>
 
-            <div data-aos="fade-left" data-aos-delay="200" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
-              <h3 className="text-xl font-bold mb-4 flex items-center text-slate-900"><Megaphone className="w-5 h-5 mr-2 text-[#4B5EAA]"/> Panggilan Bantuan</h3>
-              <ul className="space-y-3">
-                {urgentNeeds.map(need => (
-                  <li key={need.id} className="bg-indigo-50 p-3 rounded-lg border border-indigo-200">
-                    <p className="font-semibold text-slate-800">{need.item}</p>
-                    <p className="text-sm text-slate-500">{need.location}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
             
-            <div data-aos="fade-left" data-aos-delay="300" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
-              <h3 className="text-xl font-bold mb-4 flex items-center text-slate-900"><Trophy className="w-5 h-5 mr-2 text-[#4B5EAA]"/> Reputasi Anda</h3>
-              <div className="text-center bg-amber-50 p-4 rounded-lg border border-amber-200">
-                <p className="text-lg font-bold text-amber-700">{userReputation.badge}</p>
-                <p className="text-2xl font-bold text-slate-800">{userReputation.points} <span className="text-sm font-normal">Poin</span></p>
-              </div>
-            </div>
             
             <div data-aos="fade-left" data-aos-delay="400" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
                 <h3 className="text-xl font-bold mb-4 text-slate-900">Akses Cepat</h3>

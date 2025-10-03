@@ -1,26 +1,35 @@
 import { redirect } from "next/navigation";
-import NavbarAdmin from "@/components/NavbarAdmin";
 import { verifyAuth } from "@/lib/auth";
-import EmergencyBanner from "@/components/EmergencyBanner";
+import SidebarAdmin from "@/components/SidebarAdmin";
+import AdminHeader from "@/components/AdminHeader";
+import EmergencyBanner from "@/components/EmergencyBanner"; 
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = verifyAuth();
+  const user = await verifyAuth();
 
   if (!user || user.peran !== 'Admin') {
     redirect("/login?error=Unauthorized");
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="sticky top-0 z-[1100]">
-        <EmergencyBanner />
-        <NavbarAdmin user={user} />
-      </header>
-      <main>{children}</main>
+    <div className="flex h-screen bg-slate-100 font-sans">
+      {/* Sidebar Statis di Kiri */}
+      <SidebarAdmin user={user} />
+    
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <AdminHeader />
+      
+        <main className="flex-1 overflow-x-hidden overflow-y-auto">
+            <EmergencyBanner />
+            <div className="p-4 sm:p-8">
+              {children}
+            </div>
+        </main>
+      </div>
     </div>
   );
 }
