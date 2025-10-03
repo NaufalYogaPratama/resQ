@@ -1,113 +1,102 @@
-"use client";
+import { verifyAuth } from "@/lib/auth";
+import { redirect, notFound } from "next/navigation";
+import dbConnect from "@/lib/dbConnect";
+import Report from "@/models/Report";
+import User from "@/models/User";
+import Link from "next/link";
+import { ArrowLeft, MapPin, User as UserIcon, Calendar, Shield, CheckCircle, Tag } from "lucide-react";
+import ReportActionsAdmin from "@/components/ReportActionsAdmin";
+// Import loader baru, bukan 'dynamic'
+import StaticMapLoader from "@/components/StaticMapLoader";
 
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Trash2 } from "lucide-react";
+interface ReportDetailType {
+    _id: string; deskripsi: string; kategori: string; status: 'Menunggu' | 'Ditangani' | 'Selesai';
+    lokasi: { coordinates: [number, number]; alamat?: string; }; gambarUrl?: string; createdAt: string;
+    pelapor: { _id: string; namaLengkap: string; noWa?: string; };
+    penolong?: { _id: string; namaLengkap: string; };
+}
 
-export default function ReportDetailPage() {
-  const { id } = useParams();
-  const router = useRouter();
+// Hapus 'dynamic' import dari sini
 
-  const [report, setReport] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  const fetchReport = async () => {
+async function getReport(id: string): Promise<ReportDetailType | null> {
+    await dbConnect();
     try {
-      const res = await fetch(`/api/reports/${id}`);
-      const data = await res.json();
-      if (data.success) {
-        setReport(data.data);
-      } else {
-        throw new Error(data.message);
-      }
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
+        const report = await Report.findById(id).populate('pelapor', 'namaLengkap noWa').populate('penolong', 'namaLengkap');
+        if (!report) return null;
+        return JSON.parse(JSON.stringify(report));
+    } catch (error) {
+        return null;
     }
-  };
+}
 
-  useEffect(() => {
-    fetchReport();
-  }, [id]);
-
-  const handleStatusChange = async (status: string) => {
-    try {
-      const res = await fetch(`/api/reports/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setReport(data.data);
-        alert("Status berhasil diperbarui.");
-      }
-    } catch (err: any) {
-      alert(err.message);
+export default async function ReportDetailPageAdmin({ params }: { params: { id: string } }) {
+    const user = await verifyAuth();
+    if (!user || user.peran !== 'Admin') {
+        redirect("/login");
     }
-  };
 
-  const handleDelete = async () => {
-    if (!confirm("Yakin ingin menghapus laporan ini?")) return;
-    try {
-      await fetch(`/api/reports/${id}`, { method: "DELETE" });
-      alert("Laporan dihapus.");
-      router.push("/admin/laporan");
-    } catch (err: any) {
-      alert("Gagal menghapus laporan.");
-    }
-  };
+    const report = await getReport(params.id);
+    if (!report) notFound();
 
-  if (isLoading) return <p className="p-6">Memuat detail laporan...</p>;
-  if (error) return <p className="p-6 text-red-600">Error: {error}</p>;
+    const statusInfo = {
+        Menunggu: { color: "bg-red-100 text-red-800", icon: <Shield className="w-5 h-5" />, text: "Menunggu" },
+        Ditangani: { color: "bg-orange-100 text-orange-800", icon: <UserIcon className="w-5 h-5" />, text: "Ditangani" },
+        Selesai: { color: "bg-green-100 text-green-800", icon: <CheckCircle className="w-5 h-5" />, text: "Selesai" },
+    };
 
-  return (
-    <div className="space-y-6">
-      <button
-        onClick={() => router.back()}
-        className="flex items-center text-slate-600 hover:text-slate-900"
-      >
-        <ArrowLeft className="w-5 h-5 mr-2" /> Kembali
-      </button>
+    return (
+        <div className="bg-slate-50 min-h-screen p-4 sm:p-8 font-sans">
+            <div className="max-w-6xl mx-auto">
+                <div className="mb-6">
+                    <Link href="/admin/laporan" className="inline-flex items-center gap-2 text-slate-600 hover:text-indigo-600 font-semibold">
+                        <ArrowLeft className="w-4 h-4" />
+                        Kembali ke Manajemen Laporan
+                    </Link>
+                </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
-        <h2 className="text-2xl font-bold text-slate-900">Detail Laporan</h2>
-        <p><span className="font-semibold">Deskripsi:</span> {report.deskripsi}</p>
-        <p><span className="font-semibold">Kategori:</span> {report.kategori}</p>
-        <p><span className="font-semibold">Status:</span> {report.status}</p>
-        <p><span className="font-semibold">Pelapor:</span> {report.pelapor?.namaLengkap}</p>
-        <p><span className="font-semibold">Penolong:</span> {report.penolong?.namaLengkap || "-"}</p>
-        <p><span className="font-semibold">Tanggal:</span> {new Date(report.createdAt).toLocaleString("id-ID")}</p>
-      </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-1 space-y-6">
+                        {report.gambarUrl && (
+                             <img src={report.gambarUrl} alt="Foto laporan" className="w-full h-64 object-cover rounded-2xl shadow-md border" />
+                        )}
+                        <div className="h-80 rounded-2xl overflow-hidden shadow-md border">
+                            <StaticMapLoader position={[report.lokasi.coordinates[1], report.lokasi.coordinates[0]]} />
+                        </div>
+                    </div>
+                    
+                    <div className="lg:col-span-2 bg-white p-8 rounded-2xl shadow-md border">
 
-      <div className="flex gap-3">
-        <button
-          onClick={() => handleStatusChange("Menunggu")}
-          className="px-4 py-2 bg-red-100 text-red-700 rounded-lg"
-        >
-          Tandai Menunggu
-        </button>
-        <button
-          onClick={() => handleStatusChange("Ditangani")}
-          className="px-4 py-2 bg-orange-100 text-orange-700 rounded-lg"
-        >
-          Tandai Ditangani
-        </button>
-        <button
-          onClick={() => handleStatusChange("Selesai")}
-          className="px-4 py-2 bg-green-100 text-green-700 rounded-lg"
-        >
-          Tandai Selesai
-        </button>
-        <button
-          onClick={handleDelete}
-          className="ml-auto flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-        >
-          <Trash2 className="w-4 h-4" /> Hapus
-        </button>
-      </div>
-    </div>
-  );
+                        <div className="flex justify-between items-start mb-4">
+                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold ${statusInfo[report.status].color}`}>
+                                {statusInfo[report.status].icon}
+                                {statusInfo[report.status].text}
+                            </div>
+                            <span className="text-sm text-slate-500">{new Date(report.createdAt).toLocaleString('id-ID')}</span>
+                        </div>
+                        <h1 className="text-4xl font-extrabold text-slate-900">{report.kategori}</h1>
+                        <p className="mt-4 text-lg text-slate-600">{report.deskripsi}</p>
+
+                        <div className="mt-6 pt-6 border-t grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <h3 className="font-bold text-slate-800 mb-2">Detail Kejadian</h3>
+                                <ul className="space-y-3 text-slate-600">
+                                    <li className="flex items-start gap-3"><Tag className="w-5 h-5 text-slate-400 mt-1"/> <strong>Kategori:</strong> {report.kategori}</li>
+                                    <li className="flex items-start gap-3"><MapPin className="w-5 h-5 text-slate-400 mt-1"/> <strong>Alamat:</strong> {report.lokasi.alamat || 'Tidak ada alamat'}</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-slate-800 mb-2">Pihak Terkait</h3>
+                                <ul className="space-y-3 text-slate-600">
+                                    <li className="flex items-start gap-3"><UserIcon className="w-5 h-5 text-slate-400 mt-1"/> <strong>Pelapor:</strong> {report.pelapor.namaLengkap}</li>
+                                    <li className="flex items-start gap-3"><Shield className="w-5 h-5 text-slate-400 mt-1"/> <strong>Ditangani Oleh:</strong> {report.penolong?.namaLengkap || 'Belum ada'}</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <ReportActionsAdmin report={report} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }

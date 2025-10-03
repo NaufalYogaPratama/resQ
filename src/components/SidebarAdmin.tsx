@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { BarChart3, Users, BookOpen, LogOut, Shield, ChevronDown,PieChart, ListChecks } from 'lucide-react';
+import { BarChart3, Users, BookOpen, LogOut, Shield, ChevronDown,PieChart, ListChecks, Package, Map } from 'lucide-react';
 import { useState } from 'react';
 
 export default function SidebarAdmin({ user }) {
@@ -23,8 +23,10 @@ export default function SidebarAdmin({ user }) {
     { name: 'Dashboard', href: '/admin/dashboard', icon: BarChart3 },
     { name: 'Analitik', href: '/admin/analitik', icon: PieChart }, 
     { name: 'Manajemen Laporan', href: '/admin/laporan', icon: ListChecks },
+    { name: 'Manajemen Sumber Daya', href: '/admin/sumber-daya', icon: Package },
     { name: 'Manajemen User', href: '/admin/users', icon: Users },
     { name: 'Manajemen Konten', href: '/admin/edukasi', icon: BookOpen },
+    { name: 'Peta Respons', href: '/admin/peta', icon: Map },
 ];
   return (
     <aside className="w-64 flex-shrink-0 bg-slate-900 text-white flex flex-col">
