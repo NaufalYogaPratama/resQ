@@ -26,12 +26,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      {/* Pindahkan className ke dalam tag body */}
+
       <body className={`${geistSans.variable} font-sans antialiased`}>
-        {/* Bungkus children dengan AOSProvider di sini */}
+      
         <AOSProvider>
           {children}
         </AOSProvider>
+        <div id="modal-root"></div>
       </body>
     </html>
   );

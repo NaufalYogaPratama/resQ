@@ -47,7 +47,7 @@ async function getReport(id: string): Promise<ReportDetailType | null> {
 }
 
 export default async function ReportDetailPage({ params }: { params: { id: string } }) {
-  const user = verifyAuth();
+  const user = await verifyAuth();
   if (!user || user.peran !== 'Relawan') {
     redirect("/login");
   }

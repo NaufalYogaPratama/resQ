@@ -69,7 +69,8 @@ async function getRecentReports(userId: string): Promise<ReportType[]> {
 
 
 export default async function DashboardWargaPage() {
-  const user = verifyAuth(); 
+ 
+  const user = await verifyAuth(); 
   if (!user) {
     redirect("/login");
   }
@@ -88,6 +89,17 @@ export default async function DashboardWargaPage() {
     Ditangani: "bg-orange-100 text-orange-700",
     Selesai: "bg-green-100 text-green-700",
   };
+  
+  // Data placeholder yang hilang
+  const urgentNeeds: { id: number; item: string; location: string }[] = [
+      { id: 1, item: "Genset Darurat", location: "Blok C RW 05" },
+      { id: 2, item: "Tenaga Medis (P3K)", location: "Posko Utama" },
+  ];
+  const userReputation = {
+      points: 150,
+      badge: "Pelindung Warga",
+  };
+
 
   return (
     <div className="bg-gradient-to-br from-slate-50 via-white to-indigo-50 min-h-screen text-slate-800 p-4 sm:p-8 font-sans">
@@ -108,21 +120,21 @@ export default async function DashboardWargaPage() {
                 <h2 className="text-2xl font-bold text-slate-900">Laporkan Keadaan Darurat</h2>
                 <p className="text-slate-600 mt-1">Lihat atau alami kejadian darurat? Laporkan segera.</p>
               </div>
-                <Link href="/warga/laporan" className="bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 w-full md:w-auto text-center">Buat Laporan</Link>
+              <Link href="/warga/laporan" className="bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 w-full md:w-auto text-center">Buat Laporan</Link>
             </div>
             
             <div data-aos="fade-up" data-aos-delay="100" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
-                <h3 className="text-xl font-bold mb-4 flex items-center text-slate-900"><List className="w-5 h-5 mr-2 text-[#4B5EAA]"/> Ringkasan Laporan Komunitas</h3>
-                <div className="flex space-x-4">
-                    <div className="flex-1 bg-red-100 text-red-700 p-4 rounded-lg text-center">
-                        <p className="text-2xl font-bold">{reportSummary.Menunggu}</p>
-                        <p className="text-sm font-semibold">Menunggu</p>
-                    </div>
-                    <div className="flex-1 bg-orange-100 text-orange-700 p-4 rounded-lg text-center">
-                        <p className="text-2xl font-bold">{reportSummary.Ditangani}</p>
-                        <p className="text-sm font-semibold">Ditangani</p>
-                    </div>
+              <h3 className="text-xl font-bold mb-4 flex items-center text-slate-900"><List className="w-5 h-5 mr-2 text-[#4B5EAA]"/> Ringkasan Laporan Komunitas</h3>
+              <div className="flex space-x-4">
+                <div className="flex-1 bg-red-100 text-red-700 p-4 rounded-lg text-center">
+                  <p className="text-2xl font-bold">{reportSummary.Menunggu}</p>
+                  <p className="text-sm font-semibold">Menunggu</p>
                 </div>
+                <div className="flex-1 bg-orange-100 text-orange-700 p-4 rounded-lg text-center">
+                  <p className="text-2xl font-bold">{reportSummary.Ditangani}</p>
+                  <p className="text-sm font-semibold">Ditangani</p>
+                </div>
+              </div>
             </div>
 
             <div data-aos="fade-up" data-aos-delay="200" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
@@ -131,13 +143,13 @@ export default async function DashboardWargaPage() {
                 {recentReports.length > 0 ? (
                   recentReports.map(report => (
                     <div key={report._id} className="bg-slate-50 p-4 rounded-lg flex justify-between items-center border">
-                        <div>
-                            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${statusColors[report.status]}`}>
-                              {report.status}
-                            </span>
-                            <p className="font-semibold text-slate-800 mt-1">{report.deskripsi}</p>
-                        </div>
-                        <Link href={`/warga/laporan/${report._id}`} className="text-sm font-semibold text-[#4B5EAA] hover:underline">Lihat</Link>
+                      <div>
+                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${statusColors[report.status]}`}>
+                          {report.status}
+                        </span>
+                        <p className="font-semibold text-slate-800 mt-1">{report.deskripsi}</p>
+                      </div>
+                      <Link href={`/warga/laporan/${report._id}`} className="text-sm font-semibold text-[#4B5EAA] hover:underline">Lihat</Link>
                     </div>
                   ))
                 ) : (
@@ -150,7 +162,26 @@ export default async function DashboardWargaPage() {
           <div className="lg:col-span-1 space-y-8">
             <div data-aos="fade-left" data-aos-delay="100"><WeatherWidget /></div>
 
-                        
+            <div data-aos="fade-left" data-aos-delay="200" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
+              <h3 className="text-xl font-bold mb-4 flex items-center text-slate-900"><Megaphone className="w-5 h-5 mr-2 text-[#4B5EAA]"/> Panggilan Bantuan</h3>
+              <ul className="space-y-3">
+                {urgentNeeds.map(need => (
+                  <li key={need.id} className="bg-indigo-50 p-3 rounded-lg border border-indigo-200">
+                    <p className="font-semibold text-slate-800">{need.item}</p>
+                    <p className="text-sm text-slate-500">{need.location}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div data-aos="fade-left" data-aos-delay="300" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
+              <h3 className="text-xl font-bold mb-4 flex items-center text-slate-900"><Trophy className="w-5 h-5 mr-2 text-[#4B5EAA]"/> Reputasi Anda</h3>
+              <div className="text-center bg-amber-50 p-4 rounded-lg border border-amber-200">
+                <p className="text-lg font-bold text-amber-700">{userReputation.badge}</p>
+                <p className="text-2xl font-bold text-slate-800">{userReputation.points} <span className="text-sm font-normal">Poin</span></p>
+              </div>
+            </div>
+            
             <div data-aos="fade-left" data-aos-delay="400" className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
                 <h3 className="text-xl font-bold mb-4 text-slate-900">Akses Cepat</h3>
                 <ul className="space-y-2">

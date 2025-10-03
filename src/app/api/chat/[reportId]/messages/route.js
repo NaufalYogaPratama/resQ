@@ -9,12 +9,10 @@ export async function GET(request, { params }) {
     try {
         await dbConnect();
 
-        const user = verifyAuth();
+        const user = await verifyAuth();
         if (!user) {
             return NextResponse.json({ success: false, message: "Akses ditolak." }, { status: 401 });
         }
-
-        await Promise.resolve(); 
         
         const { reportId } = params;
 
@@ -38,13 +36,12 @@ export async function POST(request, { params }) {
     try {
         await dbConnect();
 
-        const user = verifyAuth();
+        // --- PERBAIKAN DI SINI ---
+        const user = await verifyAuth();
         if (!user) {
             return NextResponse.json({ success: false, message: "Akses ditolak." }, { status: 401 });
         }
         
-        await Promise.resolve();
-
         const { reportId } = params;
         const { content } = await request.json();
 

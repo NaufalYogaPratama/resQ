@@ -1,14 +1,12 @@
-// src/app/api/reports/[id]/complete/route.js
-
 import dbConnect from "@/lib/dbConnect";
 import Report from "@/models/Report";
-import User from "@/models/User"; // Impor model User untuk update poin
+import User from "@/models/User";
 import { verifyAuth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
 export async function PUT(request, { params }) {
-  // 1. Verifikasi sesi pengguna
-  const user = verifyAuth();
+  // --- PERBAIKAN DI SINI ---
+  const user = await verifyAuth();
   if (!user) {
     return NextResponse.json({ success: false, message: "Akses ditolak. Anda harus login." }, { status: 401 });
   }
@@ -19,26 +17,22 @@ export async function PUT(request, { params }) {
   try {
     const report = await Report.findById(id);
 
-    // Validasi 1: Pastikan laporan ada
     if (!report) {
       return NextResponse.json({ success: false, message: "Laporan tidak ditemukan." }, { status: 404 });
     }
 
-    // Validasi 2: Pastikan yang menyelesaikan adalah pelapor asli
+    // Validasi ini sekarang akan berjalan dengan benar
     if (report.pelapor.toString() !== user.id) {
         return NextResponse.json({ success: false, message: "Hanya pelapor yang bisa menyelesaikan laporannya." }, { status: 403 });
     }
 
-    // Validasi 3: Pastikan laporan sudah ditangani
     if (report.status !== 'Ditangani') {
       return NextResponse.json({ success: false, message: "Laporan ini belum atau sudah selesai ditangani." }, { status: 400 });
     }
 
-    // 2. Update status laporan
     report.status = 'Selesai';
     await report.save();
 
-    // 3. Tambahkan poin untuk relawan (Fitur Gamifikasi)
     if (report.penolong) {
       // Tambahkan 10 poin untuk setiap laporan yang diselesaikan
       await User.findByIdAndUpdate(report.penolong, { $inc: { poin: 10 } });

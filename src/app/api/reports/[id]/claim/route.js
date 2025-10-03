@@ -5,7 +5,8 @@ import { verifyAuth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
 export async function PUT(request, { params }) {
-  const user = verifyAuth();
+  // --- PERBAIKAN DI SINI ---
+  const user = await verifyAuth();
   if (!user) {
     return NextResponse.json({ success: false, message: "Akses ditolak. Anda harus login." }, { status: 401 });
   }
@@ -31,11 +32,12 @@ export async function PUT(request, { params }) {
     report.penolong = user.id;
     await report.save();
 
+    // Otomatis buat chat room jika belum ada
     const existingChatRoom = await ChatRoom.findOne({ reportId: report._id });
     if (!existingChatRoom) {
       await ChatRoom.create({
         reportId: report._id,
-        participants: [report.pelapor, user.id],
+        participants: [report.pelapor, user.id], // pelapor dan penolong
       });
     }
 

@@ -33,10 +33,11 @@ async function getActiveReports(): Promise<ReportType[]> {
 }
 
 export default async function DaftarLaporanPage() {
-  const user = verifyAuth();
+  const user = await verifyAuth();
   if (!user || user.peran !== 'Relawan') {
     redirect("/login");
   }
+
 
   const reports = await getActiveReports();
 

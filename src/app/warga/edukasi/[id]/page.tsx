@@ -19,7 +19,7 @@ interface ArticleType {
   createdAt: string;
 }
 
-// Fungsi untuk mengambil SATU artikel spesifik berdasarkan ID-nya
+
 async function getArticleById(id: string): Promise<ArticleType | null> {
   await dbConnect();
   try {
@@ -45,7 +45,6 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
     <div className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen text-slate-800 font-sans">
       <div className="max-w-4xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
         
-        {/* Tombol Kembali */}
         <div className="mb-8" data-aos="fade-in">
           <Link href="/warga/edukasi" className="inline-flex items-center text-indigo-600 hover:text-indigo-500 transition-colors group font-semibold">
             <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
@@ -54,7 +53,6 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
         </div>
         
         <article>
-          {/* Header Artikel */}
           <header className="mb-8" data-aos="fade-up">
             <span className="text-sm font-semibold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">{article.kategori}</span>
             <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mt-4 leading-tight">
@@ -72,7 +70,7 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
             </div>
           </header>
           
-          {/* Gambar Utama Artikel */}
+  
           {article.gambarUrl && (
             <figure className="mb-8" data-aos="fade-up" data-aos-delay="100">
               <img 
@@ -83,7 +81,7 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
             </figure>
           )}
 
-          {/* Isi Konten Artikel */}
+      
           <div 
             data-aos="fade-up" data-aos-delay="200"
             className="prose prose-lg max-w-none prose-p:text-slate-700 prose-headings:text-slate-900 prose-strong:text-indigo-700 prose-a:text-indigo-600"

@@ -18,7 +18,6 @@ interface WeatherApiType {
   }
 }
 
-// Fungsi untuk menentukan style dan rekomendasi berdasarkan suhu
 const getThemeByTemperature = (temp: number) => {
     if (temp > 30) {
         return {
@@ -58,14 +57,11 @@ export default function WeatherWidget() {
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const apiKey = process.env.NEXT_PUBLIC_WEATHERAPI_KEY; 
-        if (!apiKey) {
-            throw new Error("API Key untuk cuaca tidak ditemukan.");
-        }
-        const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=Semarang&aqi=no`);
-        const data = await response.json();
+     
+        const res = await fetch('/api/weather');
+        const data = await res.json();
         
-        if (data.error) throw new Error(data.error.message);
+        if (data.error) throw new Error(data.error.message || "Gagal mengambil data dari API internal.");
         setWeather(data);
       } catch (error) {
         console.error("Gagal memuat data cuaca:", error);

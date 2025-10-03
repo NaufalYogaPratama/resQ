@@ -5,6 +5,7 @@ import User from '@/models/User';
 import Resource from '@/models/Resource';
 import Report from '@/models/Report';
 import mongoose from 'mongoose';
+import EditProfileModal from '@/components/EditProfileModal';
 import { 
     User as UserIcon, Mail, Phone, Edit, FileText, Package, Wrench
 } from 'lucide-react';
@@ -99,10 +100,8 @@ export default async function ProfilWargaPage() {
                             <p className="text-md text-[#4B5EAA] font-semibold">{user.peran}</p>
                         </div>
                         <div className="flex-shrink-0 w-full sm:w-auto">
-                           <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#4B5EAA] text-white px-5 py-3 rounded-lg font-semibold hover:bg-[#3A4D89] transition-colors shadow-sm">
-                                <Edit className="w-4 h-4" />
-                                Edit Profil
-                           </button>
+                           {/* --- PERUBAHAN DI SINI --- */}
+                           <EditProfileModal user={user} />
                         </div>
                     </div>
                 </div>

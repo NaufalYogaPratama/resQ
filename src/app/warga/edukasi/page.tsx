@@ -18,10 +18,8 @@ interface ArticleType {
   createdAt: string;
 }
 
-// Fungsi untuk mengambil data langsung di server
 async function getArticles(): Promise<ArticleType[]> {
   await dbConnect();
-  // Baris ini sekarang akan berfungsi karena model User sudah di-import
   const articles = await Article.find({}).sort({ createdAt: -1 }).populate('penulis', 'namaLengkap');
   return JSON.parse(JSON.stringify(articles));
 }

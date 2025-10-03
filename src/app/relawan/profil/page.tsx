@@ -13,7 +13,7 @@ async function getUserDetails(userId: string) {
 }
 
 export default async function ProfilRelawanPage() {
-  const session = verifyAuth();
+  const session = await verifyAuth();
   if (!session) {
     redirect('/login');
   }
