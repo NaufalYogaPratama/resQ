@@ -1,3 +1,5 @@
+
+
 import dbConnect from "@/lib/dbConnect";
 import { verifyAuth } from "@/lib/auth";
 import { NextResponse } from "next/server";
@@ -5,7 +7,7 @@ import ChatRoom from "@/models/ChatRoom";
 import Message from "@/models/Message";
 import User from "@/models/User";
 
-export async function GET(request, { params }) {
+export async function GET(request, { params }) { 
     try {
         await dbConnect();
 
@@ -22,7 +24,7 @@ export async function GET(request, { params }) {
         }
 
         const messages = await Message.find({ chatRoomId: chatRoom._id })
-            .populate('sender', 'namaLengkap')
+            .populate('sender', 'namaLengkap peran')
             .sort({ createdAt: 'asc' });
 
         return NextResponse.json({ success: true, data: messages });
@@ -36,7 +38,6 @@ export async function POST(request, { params }) {
     try {
         await dbConnect();
 
-        // --- PERBAIKAN DI SINI ---
         const user = await verifyAuth();
         if (!user) {
             return NextResponse.json({ success: false, message: "Akses ditolak." }, { status: 401 });
@@ -60,7 +61,7 @@ export async function POST(request, { params }) {
             content: content,
         });
 
-        const populatedMessage = await Message.findById(newMessage._id).populate('sender', 'namaLengkap');
+        const populatedMessage = await Message.findById(newMessage._id).populate('sender', 'namaLengkap peran');
 
         return NextResponse.json({ success: true, data: populatedMessage }, { status: 201 });
     } catch (error) {
