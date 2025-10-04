@@ -40,7 +40,7 @@ export default function SidebarAdmin({ user }: { user: UserData }) {
     <aside className="w-64 flex-shrink-0 bg-slate-900 text-white flex flex-col">
       <div className="h-20 flex items-center justify-center text-2xl font-bold border-b border-slate-700">
         <Link href="/admin/dashboard" className="flex items-center gap-2">
-            <Shield className="text-indigo-400"/>
+  
             ResQ <span className="font-normal text-slate-400 text-xl">Admin</span>
         </Link>
       </div>

@@ -8,7 +8,6 @@ import { ArrowLeft, MapPin, User as UserIcon, Calendar, Shield, CheckCircle, Pho
 import CompleteReportButton from "@/components/CompleteReportButton";
 import ChatBox from "@/components/ChatBox";
 
-// Tipe data untuk laporan
 interface ReportDetailType {
   _id: string;
   deskripsi: string;
@@ -34,9 +33,7 @@ async function getReport(id: string): Promise<ReportDetailType | null> {
     }
 }
 
-// PERBAIKAN: Fungsi komponen halaman harus 'async' untuk menggunakan 'await'
 export default async function ReportDetailPageWarga({ params }: { params: { id: string } }) {
-    // PERBAIKAN: Gunakan 'await' saat memanggil verifyAuth
     const user = await verifyAuth();
     if (!user) {
         redirect("/login");

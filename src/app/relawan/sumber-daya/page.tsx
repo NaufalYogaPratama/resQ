@@ -56,7 +56,7 @@ export default function SumberDayaRelawanPage() {
         
         <div data-aos="fade-down" className="mb-8">
           <h1 className="text-4xl font-extrabold text-slate-900 flex items-center">
-            <Package className="w-10 h-10 mr-4 text-green-600"/>
+            <Package className="w-10 h-10 mr-4 text-teal-600"/>
             {isEmergency ? "Bank Sumber Daya Komunitas" : "Sumber Daya Milik Anda"}
           </h1>
           <p className="mt-2 text-lg text-slate-600">

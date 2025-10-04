@@ -53,7 +53,7 @@ export default async function DaftarLaporanPage() {
         
         <div className="mb-8" data-aos="fade-down">
           <h1 className="text-4xl font-extrabold text-slate-900 flex items-center">
-            <List className="w-10 h-10 mr-4 text-green-600"/>
+            <List className="w-10 h-10 mr-4 text-teal-600"/>
             Daftar Laporan Aktif
           </h1>
           <p className="mt-2 text-lg text-slate-600">

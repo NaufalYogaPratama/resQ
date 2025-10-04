@@ -14,34 +14,35 @@ interface BadgeProps {
 
 const badgeTiers: BadgeProps[] = [
   {
-    name: "Perunggu",
+    name: "Relawan Sigap",
     icon: Shield,
-    requiredPoints: 10,
+    requiredPoints: 10, 
     color: "text-amber-600",
-    description: "Selesaikan 1 laporan",
+    description: "Mendapatkan 10 Poin dari aksi pertama.",
   },
   {
-    name: "Perak",
+    name: "Pelindung Warga",
     icon: Star,
-    requiredPoints: 50,
+    requiredPoints: 50, 
     color: "text-slate-500",
-    description: "Selesaikan 5 laporan (50 Poin)",
+    description: "Mencapai 50 Poin Reputasi.",
   },
   {
-    name: "Emas",
+    name: "Garda Tangguh",
     icon: Award,
-    requiredPoints: 100,
+    requiredPoints: 100, 
     color: "text-yellow-500",
-    description: "Selesaikan 10 laporan (100 Poin)",
+    description: "Mencapai 100 Poin Reputasi.",
   },
   {
-    name: "Permata",
+    name: "Pilar Komunitas",
     icon: Gem,
-    requiredPoints: 200,
+    requiredPoints: 200, 
     color: "text-indigo-500",
-    description: "Selesaikan 20 laporan (200 Poin)",
+    description: "Mencapai 200 Poin Reputasi.",
   },
 ];
+
 
 export default function Badges({ points }: { points: number }) {
   return (

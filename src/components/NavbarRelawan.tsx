@@ -36,23 +36,27 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
   ];
 
   return (
-    <nav className="bg-slate-900 border-b border-slate-700">
+    <nav className="bg-teal-900 border-b border-teal-800 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           
           <div className="flex items-center space-x-6">
-            <Link href="/relawan/dashboard" className="text-3xl font-bold text-white">
-              ResQ 
+            <Link href="/relawan/dashboard" className="flex items-center gap-3 text-3xl font-bold text-white">
+              ResQ
+              <span className="text-xs font-bold bg-white text-teal-800 px-2 py-0.5 rounded-full">
+                RELAWAN
+              </span>
             </Link>
+            
             <div className="hidden md:flex items-center space-x-1">
               {navLinks.map((link) => (
                 <Link 
                   key={link.name} 
                   href={link.href} 
                   className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    pathname === link.href 
-                    ? 'bg-green-500 text-white' 
-                    : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                    pathname.startsWith(link.href)
+                    ? 'bg-teal-700 text-white' 
+                    : 'text-teal-200 hover:bg-teal-800 hover:text-white'
                   }`}
                 >
                   <link.icon className="w-4 h-4 mr-2" />
@@ -66,20 +70,20 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
             <div className="relative">
               <button 
                 onClick={() => setIsProfileOpen(!isProfileOpen)} 
-                className="flex items-center justify-center w-10 h-10 bg-slate-700 rounded-full text-slate-300 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-green-500"
+                className="flex items-center justify-center w-10 h-10 bg-teal-800 rounded-full text-teal-200 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-teal-900 focus:ring-amber-400"
               >
                 <User className="w-5 h-5" />
               </button>
               {isProfileOpen && (
-                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 bg-slate-800 ring-1 ring-slate-700 z-50">
-                  <div className="px-4 py-3 border-b border-slate-700">
+                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 bg-teal-900 ring-1 ring-teal-700 z-50">
+                  <div className="px-4 py-3 border-b border-teal-700">
                     <p className="text-sm font-semibold text-white truncate" title={user?.nama || ''}>{user?.nama}</p>
-                    <p className="text-xs text-slate-400 truncate" title={user?.email || ''}>{user?.email}</p>
+                    <p className="text-xs text-teal-300 truncate" title={user?.email || ''}>{user?.email}</p>
                   </div>
                   <Link 
                     href="/relawan/profil" 
                     onClick={() => setIsProfileOpen(false)} 
-                    className="flex items-center w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700"
+                    className="flex items-center w-full text-left px-4 py-2 text-sm text-teal-200 hover:bg-teal-800"
                   >
                     <User className="w-4 h-4 mr-2" /> Profil Saya
                   </Link>
@@ -94,11 +98,10 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
             </div>
           </div>
 
-          {/* Tombol Hamburger (Mobile) */}
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-700 focus:outline-none"
+              className="inline-flex items-center justify-center p-2 rounded-md text-teal-200 hover:text-white hover:bg-teal-800 focus:outline-none"
             >
               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -106,7 +109,6 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
         </div>
       </div>
 
-      {/* Menu Mobile */}
       {isMobileMenuOpen && (
         <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
           {navLinks.map((link) => (
@@ -115,19 +117,20 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
               href={link.href}
               onClick={() => setIsMobileMenuOpen(false)}
               className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                pathname === link.href ? 'bg-green-500 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                pathname.startsWith(link.href) ? 'bg-teal-700 text-white' : 'text-teal-200 hover:bg-teal-800 hover:text-white'
               }`}
             >
               <link.icon className="w-5 h-5 mr-3" />
               {link.name}
             </Link>
           ))}
-          <div className="pt-4 mt-4 border-t border-slate-700">
+          <div className="pt-4 mt-4 border-t border-teal-700">
             <div className="mt-3 space-y-1">
               <div className="px-3 py-2">
                 <p className="font-medium text-white">{user?.nama}</p>
+                 <p className="text-sm text-teal-300">{user?.email}</p>
               </div>
-              <Link href="/relawan/profil" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center w-full px-3 py-2 text-base font-medium text-slate-300 hover:bg-slate-700 rounded-md">
+              <Link href="/relawan/profil" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center w-full px-3 py-2 text-base font-medium text-teal-200 hover:bg-teal-800 rounded-md">
                 <User className="w-5 h-5 mr-3" /> Profil Saya
               </Link>
               <button onClick={handleLogout} className="flex items-center w-full px-3 py-2 text-base font-medium text-red-400 hover:bg-red-500/10 rounded-md">

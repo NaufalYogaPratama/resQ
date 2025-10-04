@@ -1,25 +1,20 @@
-"use client";
+import { verifyAuth } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+import MapLoader from '@/components/MapLoader'; 
 
-import dynamic from 'next/dynamic';
-import { useMemo } from 'react';
+export default async function PetaWargaPage() {
+  const user = await verifyAuth();
+  if (!user) {
+    redirect("/login");
+  }
 
-interface MapLoaderProps {
-  userId: string | undefined;
-  userRole: 'Warga' | 'Relawan' | 'Admin' | undefined;
-}
+  return (
 
-export default function MapLoader({ userId, userRole }: MapLoaderProps) {
-  const Map = useMemo(() => dynamic(
-    () => import('@/components/MapComponent'), 
-    { 
-      ssr: false,
-      loading: () => (
-        <div className="flex justify-center items-center h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-purple-900">
-          <p className="text-gray-400">Memuat peta interaktif...</p>
-        </div>
-      )
-    }
-  ), []);
-
-  return <Map userId={userId} userRole={userRole} />;
+    <div className="h-[calc(100vh-5rem)]">
+      <MapLoader 
+        userId={user.id} 
+        userRole={user.peran as 'Warga' | 'Relawan' | 'Admin'} 
+      />
+    </div>
+  );
 }
