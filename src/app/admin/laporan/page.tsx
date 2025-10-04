@@ -128,6 +128,9 @@ export default function ManageReportsPage() {
                                     <td className="px-6 py-4 text-sm text-slate-500">{new Date(report.createdAt).toLocaleDateString('id-ID')}</td>
                                     <td className="px-6 py-4 text-right text-sm font-medium space-x-2">
                                         <Link href={`/admin/laporan/${report._id}`} className="text-indigo-600 hover:text-indigo-800" title="Lihat Detail">Detail</Link>
+                                        {report.status === 'Selesai' && (
+                                            <Link href={`/admin/analitik/${report._id}`} className="text-green-600 hover:text-green-800" title="Lihat Analitik">Analitik</Link>
+                                        )}
                                         <button onClick={() => handleDelete(report._id)} className="text-red-600 hover:text-red-800" title="Hapus Laporan">Hapus</button>
                                     </td>
                                 </tr>

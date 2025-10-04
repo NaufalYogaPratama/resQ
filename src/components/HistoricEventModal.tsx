@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { X } from "lucide-react";
 import { HistoricEvent } from "@/types";
+import ImpactedAreaPicker from "./ImpactedAreaPicker";
 
 interface ModalProps {
   event: HistoricEvent | null;
@@ -11,6 +13,16 @@ interface ModalProps {
 }
 
 export default function HistoricEventModal({ event, onClose, onSave }: ModalProps) {
+  // Gunakan dynamic import di dalam komponen
+  const ImpactedAreaPickerWithNoSSR = useMemo(() => dynamic(
+    () => import('@/components/ImpactedAreaPicker'),
+    { 
+      ssr: false,
+      loading: () => <p>Memuat peta...</p> 
+    }
+  ), []);
+
+  // Definisikan state formData
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -18,7 +30,8 @@ export default function HistoricEventModal({ event, onClose, onSave }: ModalProp
     eventType: 'Banjir',
     source: '',
   });
-  const [coordinates, setCoordinates] = useState('');
+  
+  const [coordinates, setCoordinates] = useState<[number, number][]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -27,12 +40,11 @@ export default function HistoricEventModal({ event, onClose, onSave }: ModalProp
       setFormData({
         title: event.title,
         description: event.description,
-        date: new Date(event.date).toISOString().split('T')[0], // Format YYYY-MM-DD
+        date: new Date(event.date).toISOString().split('T')[0],
         eventType: event.eventType,
         source: event.source || '',
       });
-      const coordsString = event.impactedAreas?.coordinates.map(p => p.join(',')).join('\n');
-      setCoordinates(coordsString || '');
+      setCoordinates(event.impactedAreas?.coordinates || []);
     }
   }, [event]);
 
@@ -42,23 +54,17 @@ export default function HistoricEventModal({ event, onClose, onSave }: ModalProp
     setError("");
 
     try {
-        const coordinatesArray = coordinates.split('\n')
-            .filter(line => line.trim() !== '')
-            .map(line => {
-                const parts = line.split(',').map(Number);
-                if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) {
-                    throw new Error('Format koordinat tidak valid. Gunakan format: longitude,latitude');
-                }
-                return [parts[0], parts[1]] as [number, number];
-            });
+      if (coordinates.length === 0) {
+        throw new Error("Silakan tandai minimal satu area terdampak di peta.");
+      }
 
-        const submissionData = {
-            ...formData,
-            impactedAreas: {
-                type: 'MultiPoint',
-                coordinates: coordinatesArray,
-            }
-        };
+      const submissionData = {
+        ...formData,
+        impactedAreas: {
+          type: 'MultiPoint',
+          coordinates: coordinates,
+        }
+      };
 
       const url = event?._id ? `/api/historic-events/${event._id}` : '/api/historic-events';
       const method = event?._id ? 'PUT' : 'POST';
@@ -74,7 +80,7 @@ export default function HistoricEventModal({ event, onClose, onSave }: ModalProp
         throw new Error(data.message || "Gagal menyimpan data.");
       }
       
-      onSave(); 
+      onSave();
       onClose();
       alert(`Data histori berhasil ${event?._id ? 'diperbarui' : 'ditambahkan'}!`);
 
@@ -126,8 +132,11 @@ export default function HistoricEventModal({ event, onClose, onSave }: ModalProp
           </div>
           
           <div>
-            <label htmlFor="coordinates" className="block text-sm font-medium text-slate-600">Koordinat Area Terdampak</label>
-            <textarea id="coordinates" value={coordinates} onChange={(e) => setCoordinates(e.target.value)} required rows={4} className="w-full mt-1 p-2 border border-slate-300 rounded-md font-mono text-sm" placeholder="Satu koordinat per baris, format: longitude,latitude&#10;Contoh:&#10;110.4393,-6.9634&#10;110.4465,-6.9718"></textarea>
+            <label className="block text-sm font-medium text-slate-600 mb-1">Tandai Area Terdampak di Peta</label>
+            <ImpactedAreaPickerWithNoSSR 
+              initialPoints={coordinates} 
+              onPointsChange={setCoordinates} 
+            />
           </div>
 
           <div>
