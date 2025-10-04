@@ -4,7 +4,6 @@ import { verifyAuth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import cloudinary from "cloudinary";
 
-
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -54,7 +53,11 @@ export async function GET() {
   } catch (error) {
     console.error("GET Reports Error:", error);
     return NextResponse.json(
-      { success: false, message: "Terjadi kesalahan pada server.", error: error.message },
+      {
+        success: false,
+        message: "Terjadi kesalahan pada server.",
+        error: error.message,
+      },
       { status: 500 }
     );
   }
@@ -83,7 +86,11 @@ export async function POST(request) {
 
     if (!kategori || !deskripsi || !lokasiRaw) {
       return NextResponse.json(
-        { success: false, message: "Data tidak lengkap. Pastikan kategori, deskripsi, dan lokasi terisi." },
+        {
+          success: false,
+          message:
+            "Data tidak lengkap. Pastikan kategori, deskripsi, dan lokasi terisi.",
+        },
         { status: 400 }
       );
     }
@@ -118,14 +125,21 @@ export async function POST(request) {
 
     const newReport = await Report.create(reportData);
 
-    return NextResponse.json({ success: true, data: newReport }, { status: 201 });
+    return NextResponse.json(
+      { success: true, data: newReport },
+      { status: 201 }
+    );
   } catch (error) {
-
     console.error("POST Report Error:", error);
 
     return NextResponse.json(
-      { success: false, message: error.message || "Terjadi kesalahan pada server saat membuat laporan." },
-      { status: 500 } 
+      {
+        success: false,
+        message:
+          error.message ||
+          "Terjadi kesalahan pada server saat membuat laporan.",
+      },
+      { status: 500 }
     );
   }
 }

@@ -2,8 +2,7 @@ import Link from 'next/link';
 import dbConnect from '@/lib/dbConnect';
 import Article from '@/models/Article';
 import User from '@/models/User';
-import { ClipboardList } from 'lucide-react';
-import { BookOpen } from 'lucide-react';
+import { ClipboardList, BookOpen, Clock } from 'lucide-react';
 
 interface ArticleType {
   _id: string;
@@ -36,6 +35,18 @@ export default async function EdukasiPage() {
             Pusat Edukasi Kesiapsiagaan
           </h1>
           <p className="mt-2 text-lg text-slate-600">Tingkatkan pengetahuan Anda untuk membangun komunitas yang lebih tangguh.</p>
+        </div>
+
+        <div className="mt-12" data-aos="fade-up">
+            <Link href="/warga/edukasi/histori" className="block bg-indigo-700 text-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+                <div className="flex items-center gap-4">
+                    <Clock className="w-12 h-12" />
+                    <div>
+                        <h2 className="text-2xl font-bold">Modul Interaktif: Belajar dari Krisis Lalu</h2>
+                        <p className="mt-1 text-indigo-200">Lihat visualisasi timeline dan peta dampak bencana historis di Semarang.</p>
+                    </div>
+                </div>
+            </Link>
         </div>
         
         <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
