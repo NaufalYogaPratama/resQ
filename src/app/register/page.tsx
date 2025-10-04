@@ -1,38 +1,61 @@
 "use client";
 
 import { useState } from 'react';
-// import { useRouter } from 'next/navigation'; // Removed for compatibility
-// import Link from 'next/link'; // Removed for compatibility
-import { Eye, EyeOff } from 'lucide-react';
+
+import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 // Ilustrasi untuk panel kiri
 const RegisterIllustration = () => (
-  <div className="relative w-full h-full flex flex-col items-center justify-center p-8 text-center">
-    <img 
-      src="https://ouch-cdn2.icons8.com/X56z2-D0T6kOMhJp-c0gYET-7-sB3-d8_beX_s6ab2s/rs:fit:456:456/czM6Ly9pY29uczgu/b3VjaC1wcm9kLmFz/c2V0cy9wbmcvNDE3/LzM4NjM1MmE5LWJj/Y2QtNGU3YS04YmFj/LTI0MDVlY2RmZDI5/MC5wbmc.png" 
-      alt="Ilustrasi Komunitas Bekerja Sama" 
-      width={300} 
-      height={300} 
-      className="object-contain mb-8 animate-float"
-    />
-    <h2 className="text-3xl font-bold text-white mb-4 leading-relaxed">
-      Mari Bergotong Royong, <br /> Bersama ResQ.
-    </h2>
-    <p className="text-white/80 max-w-sm">
-      Laporkan, koordinasikan, dan berikan bantuan dengan teknologi yang terintegrasi.
+
+  <div className="w-full h-full bg-[#4B5EAA] text-white flex flex-col justify-center px-10 py-12 rounded-r-[4rem]">
+    <h1 className="text-3xl font-bold mb-6">Selamat Datang di ResQ</h1>
+    <p className="text-white/90 mb-10 max-w-md">
+      Platform gotong royong digital untuk keamanan dan bantuan masyarakat secara cepat, aman, dan terhubung.
     </p>
-    <style jsx>{`
-      @keyframes float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-15px); }
-        100% { transform: translateY(0px); }
-      }
-      .animate-float {
-        animation: float 4s ease-in-out infinite;
-      }
-    `}</style>
+
+    <div className="space-y-6">
+      {[
+        {
+          title: "Lapor Cerdas (AI Chatbot)",
+          desc: "Laporkan darurat via chat. AI kami menyusun detailnya secara otomatis.",
+        },
+        {
+          title: "Peta Respons",
+          desc: "Visualisasikan laporan di peta interaktif dengan pin berkode warna sesuai prioritas.",
+        },
+        {
+          title: "Bank Sumber Daya",
+          desc: "Petakan aset dan keahlian warga untuk mobilisasi cepat.",
+        },
+        {
+          title: "Pusat Edukasi",
+          desc: "Tingkatkan kesiapan Anda melalui panduan terkurasi.",
+        },
+      ].map((item, idx) => (
+        <div key={idx} className="flex items- gap-3">
+          <div className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-xl">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5" 
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="white"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg">{item.title}</h3>
+            <p className="text-white/80 text-sm">{item.desc}</p>
+          </div>
+        </div>
+      ))}
+    </div>
   </div>
 );
+
+  
 
 export default function RegisterPage() {
   const [namaLengkap, setNamaLengkap] = useState('');
@@ -82,7 +105,15 @@ export default function RegisterPage() {
         </div>
 
         {/* KANAN: Form Registrasi */}
-        <div className="w-full p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
+        <div className="w-full p-8 sm:p-12 lg:p-16 flex flex-col justify-center relative">
+        <a
+            href="/"
+            className="absolute top-6 left-6 flex items-center gap-2 text-[#4B5EAA] hover:text-[#3A4D89] transition font-semibold"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Kembali ke Beranda</span>
+          </a>
+
           <h2 className="text-3xl font-bold text-slate-900 mb-2">
             Buat Akun Baru
           </h2>

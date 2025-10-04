@@ -83,7 +83,7 @@ export default function HomePage() {
     },
     {
       icon: <Map className="w-10 h-10 text-[#4B5EAA]" />,
-      title: "Peta Respons Real-Time",
+      title: "Peta Respons",
       description: "Visualisasikan laporan di peta interaktif dengan pin berkode warna sesuai prioritas.",
     },
     {
@@ -127,11 +127,14 @@ export default function HomePage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-3">
-              <div className={`text-3xl font-bold transition-colors ${isScrolled ? 'text-[#3A4D89]' : 'text-slate-800'}`}>
-                ResQ
-              </div>
-            </div>
+          <div className="flex items-center gap-3">
+            <img
+              src="/ResQ.png"
+              alt="ResQ Logo"
+              className={`h-10 transition-transform duration-300 ${isScrolled ? 'scale-90' : 'scale-100'}`}
+            />
+          </div>
+
             <div className="hidden md:flex items-center space-x-8">
               <a href="#fitur" className={`font-medium transition-colors ${isScrolled ? 'text-slate-600 hover:text-[#3A4D89]' : 'text-slate-700 hover:text-slate-900'}`}>Fitur</a>
               <a href="#tentang" className={`font-medium transition-colors ${isScrolled ? 'text-slate-600 hover:text-[#3A4D89]' : 'text-slate-700 hover:text-slate-900'}`}>Tentang</a>
@@ -151,16 +154,15 @@ export default function HomePage() {
 
       <main>
       <section className="relative bg-gradient-to-br from-slate-50 via-white to-blue-50 text-slate-900 overflow-hidden">
-        {/* Hero Content */}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-30 pb-32">
             <div className="grid lg:grid-cols-2 gap-20 items-center">
-                {/* Left Content (UPDATED) */}
+              
                 <div className="text-left" data-aos="fade-right">
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-5">
                         Teknologi Menghubungkan <span className="text-[#4B5EAA]">Warga Menggerakkan.</span>
                     </h1>
                     <p className="text-lg text-slate-600 mb-8 leading-relaxed max-w-xl">
-                        Saat bencana, waktu adalah segalanya. ResQ mengubah niat baik menjadi aksi bersama—cepat, terarah, dan berdampak.
+                        Saat bencana, waktu adalah segalanya. ResQ mengubah niat baik menjadi aksi bersama, cepat, terarah, dan berdampak.
                     </p>
                     <div className="flex flex-wrap gap-4">
                         <Link
@@ -239,7 +241,7 @@ export default function HomePage() {
               Cara Kerja Gotong Royong
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Dari laporan hingga penanganan—semua terstruktur agar bantuan tepat sasaran dan tidak tumpang tindih.
+              Dari laporan hingga penanganan, semua terstruktur agar bantuan tepat sasaran dan tidak tumpang tindih.
             </p>
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
@@ -281,7 +283,7 @@ export default function HomePage() {
               Ambil Peran Anda
             </h2>
             <p className="text-xl text-[#475569] mb-10">
-              Setiap kontribusi berarti. Jadi pelapor, relawan, atau donatur—semua punya peran.
+              Setiap kontribusi berarti. Jadi pelapor, relawan, semua punya peran.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link
