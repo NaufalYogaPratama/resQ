@@ -7,7 +7,16 @@ import User from "@/models/User";
 import Report from "@/models/Report";   
 import Resource from "@/models/Resource";
 
-// Fungsi untuk mengambil statistik utama dari database
+interface ReportType {
+  _id: string;
+  deskripsi: string;
+  status: 'Menunggu' | 'Ditangani' | 'Selesai';
+  createdAt: string;
+  pelapor: {
+      namaLengkap: string;
+  } | null; 
+}
+
 async function getDashboardStats() {
   try {
     await dbConnect();
@@ -27,7 +36,7 @@ async function getDashboardStats() {
   }
 }
 
-// Fungsi untuk mengambil laporan terbaru dari database
+
 async function getRecentReports() {
     try {
         await dbConnect();
@@ -59,15 +68,14 @@ export default async function DashboardAdminPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header Halaman */}
+
       <div data-aos="fade-down">
         <h1 className="text-4xl font-extrabold text-slate-900">Dashboard Admin</h1>
         <p className="mt-2 text-lg text-slate-600">Selamat datang, {user?.nama}. Berikut adalah ringkasan sistem ResQ saat ini.</p>
       </div>
 
-      {/* Bagian Statistik Ringkas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-aos="fade-up">
-        {/* Kartu Statistik Biasa */}
+
         {statCards.map(stat => (
             <div key={stat.label} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.color}`}>
@@ -77,7 +85,7 @@ export default async function DashboardAdminPage() {
                 <p className="text-sm text-slate-500 font-medium">{stat.label}</p>
             </div>
         ))}
-        {/* Kartu Statistik Prioritas */}
+   
         <div data-aos-delay="100" className="bg-red-600 text-white p-6 rounded-2xl shadow-lg shadow-red-500/20 flex flex-col justify-between">
             <div>
                 <div className="bg-white/20 w-12 h-12 rounded-lg flex items-center justify-center">
@@ -91,8 +99,7 @@ export default async function DashboardAdminPage() {
             </Link>
         </div>
       </div>
-      
-      {/* Daftar Laporan Terbaru (Memenuhi Layar) */}
+
       <div data-aos="fade-up" data-aos-delay="200" className="bg-white border border-slate-200 rounded-2xl shadow-md">
         <div className="p-6 border-b flex justify-between items-center">
             <h2 className="text-2xl font-bold text-slate-900 flex items-center">
@@ -111,11 +118,13 @@ export default async function DashboardAdminPage() {
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-slate-200">
-                    {recentReports.map(report => (
+                      {recentReports.map((report: ReportType) => (
                         <tr key={report._id} className="hover:bg-slate-50">
                             <td className="px-6 py-4"><span className={`px-2 py-1 text-xs font-semibold rounded-full ${ report.status === 'Menunggu' ? 'bg-red-100 text-red-700' : report.status === 'Ditangani' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700' }`}>{report.status}</span></td>
                             <td className="px-6 py-4 text-sm font-medium text-slate-800 truncate max-w-sm">{report.deskripsi}</td>
-                            <td className="px-6 py-4 text-sm text-slate-500">{report.pelapor.namaLengkap}</td>
+                            <td className="px-6 py-4 text-sm text-slate-500">
+                                        {report.pelapor?.namaLengkap ?? 'Pengguna Dihapus'}
+                            </td>
                             <td className="px-6 py-4 text-sm text-slate-500">{new Date(report.createdAt).toLocaleDateString('id-ID')}</td>
                         </tr>
                     ))}

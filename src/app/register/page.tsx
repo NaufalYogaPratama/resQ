@@ -85,7 +85,6 @@ export default function RegisterPage() {
         throw new Error(data.message || 'Terjadi kesalahan saat mendaftar.');
       }
       
-      // Replaced router.push with standard window navigation
       window.location.href = '/login?status=success';
 
     } catch (err: any) {
@@ -104,7 +103,6 @@ export default function RegisterPage() {
           <RegisterIllustration />
         </div>
 
-        {/* KANAN: Form Registrasi */}
         <div className="w-full p-8 sm:p-12 lg:p-16 flex flex-col justify-center relative">
         <a
             href="/"
@@ -195,7 +193,6 @@ export default function RegisterPage() {
           <div className="mt-8">
             <p className="text-center text-sm text-slate-600">
               Sudah punya akun?{' '}
-              {/* Replaced Link with a standard anchor tag */}
               <a href="/login" className="font-semibold text-[#4B5EAA] hover:underline">
                 Masuk di sini
               </a>

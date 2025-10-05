@@ -1,4 +1,4 @@
-// Lokasi: src/app/relawan/laporan/[id]/page.tsx (Diperbaiki)
+
 
 import dbConnect from "@/lib/dbConnect";
 import Report from "@/models/Report";
@@ -22,11 +22,11 @@ interface ReportDetailType {
     _id: string;
     namaLengkap: string;
     noWa: string;
-  };
+  } | null;
   penolong?: {
     _id: string;
     namaLengkap: string;
-  };
+  } | null;
   gambarUrl?: string;
   createdAt: string;
 }
@@ -60,7 +60,7 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
     notFound(); 
   }
 
-  const isParticipant = user.id === report.pelapor._id.toString() || user.id === report.penolong?._id.toString();
+  const isParticipant = user.id === report.pelapor?._id.toString() || user.id === report.penolong?._id.toString();
 
 
   const statusInfo = {
@@ -108,13 +108,16 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
                 <ul className="space-y-2 text-slate-600">
                   <li className="flex items-center gap-3">
                     <UserIcon className="w-5 h-5 text-teal-500"/> 
-                    <strong>Pelapor:</strong> {report.pelapor.namaLengkap}
+                    <strong>Pelapor:</strong> {report.pelapor?.namaLengkap ?? 'Pengguna Dihapus'}
                   </li>
-                  <li className="flex items-center gap-3">
-                    <a href={`https://wa.me/${report.pelapor.noWa.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-teal-600 font-semibold hover:underline">
-                      <Phone className="w-4 h-4"/> Hubungi Pelapor
-                    </a>
-                  </li>
+                  {report.pelapor?.noWa && (
+                     <li className="flex items-center gap-3">
+                     <a href={`https://wa.me/${report.pelapor.noWa.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-teal-600 font-semibold hover:underline">
+                       <Phone className="w-4 h-4"/> Hubungi Pelapor
+                     </a>
+                   </li>
+                 )}
+                 
                   {report.penolong && (
                     <li className="flex items-center gap-3"><Shield className="w-5 h-5 text-teal-500"/> <strong>Ditangani oleh:</strong> {report.penolong.namaLengkap}</li>
                   )}

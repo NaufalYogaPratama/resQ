@@ -6,7 +6,7 @@ import dbConnect from '@/lib/dbConnect';
 import Report from '@/models/Report';
 import User from '@/models/User'; 
 
-// Tipe data untuk laporan
+
 interface ReportType {
   _id: string;
   deskripsi: string;
@@ -15,7 +15,7 @@ interface ReportType {
   createdAt: string;
   pelapor: {
     namaLengkap: string;
-  };
+  } | null;
 }
 
 
@@ -87,7 +87,9 @@ export default async function DaftarLaporanPage() {
                         <div className="text-sm text-slate-900 font-medium truncate max-w-xs">{report.deskripsi}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{report.kategori}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{report.pelapor.namaLengkap}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                        {report.pelapor?.namaLengkap ?? 'Pengguna Dihapus'}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                         {new Date(report.createdAt).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                       </td>

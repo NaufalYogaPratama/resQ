@@ -221,8 +221,14 @@ export default function MapComponent({ userId, userRole, volunteers = [] }: MapC
                             <h2 className={`text-lg font-bold ${report.status === 'Menunggu' ? 'text-red-700' : 'text-teal-800'}`}>{report.kategori} ({report.status})</h2>
                             {report.gambarUrl && <img src={report.gambarUrl} alt="Kejadian" className="w-full h-32 object-cover rounded-lg my-2"/>}
                             <p className="text-slate-700 text-sm mt-2">{report.deskripsi}</p>
-                            <p className="text-xs text-slate-500 mt-2 border-t pt-2">Pelapor: {report.pelapor.namaLengkap}</p>
-                            {report.penolong && <p className="text-xs text-slate-500">Ditangani oleh: {report.penolong.namaLengkap}</p>}
+                            <p className="text-xs text-slate-500 mt-2 border-t pt-2">
+                                Pelapor: {report.pelapor?.namaLengkap ?? 'Pengguna Dihapus'}
+                            </p>
+                            {report.penolong && (
+                                <p className="text-xs text-slate-500">
+                                    Ditangani oleh: {report.penolong?.namaLengkap ?? 'Relawan Dihapus'}
+                                </p>
+                            )}
                             
                             {/* Tombol untuk Relawan */}
                             {userRole === 'Relawan' && report.status === 'Menunggu' && (
@@ -233,7 +239,7 @@ export default function MapComponent({ userId, userRole, volunteers = [] }: MapC
                             )}
 
                             {/* Tombol untuk Warga (Pelapor) */}
-                            {report.pelapor._id === userId && report.status === 'Ditangani' && (
+                            {report.pelapor?._id === userId && report.status === 'Ditangani' && (
                               <button onClick={() => handleComplete(report._id)} disabled={!!isSubmitting}
                                 className="w-full mt-2 bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 disabled:bg-slate-400">
                                 {isSubmitting === report._id ? 'Memproses...' : 'Tandai Selesai'}

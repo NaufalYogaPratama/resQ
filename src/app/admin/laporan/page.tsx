@@ -11,8 +11,10 @@ interface ReportType {
   status: 'Menunggu' | 'Ditangani' | 'Selesai';
   kategori: string;
   createdAt: string;
-  pelapor: { namaLengkap: string; };
   penolong?: { namaLengkap: string; };
+  pelapor: {
+    namaLengkap: string;
+} | null; 
 }
 
 export default function ManageReportsPage() {
@@ -57,8 +59,11 @@ export default function ManageReportsPage() {
 
     const filteredReports = reports.filter(report => {
         const matchesStatus = statusFilter === 'Semua' || report.status === statusFilter;
-        const matchesSearch = report.deskripsi.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                              report.pelapor.namaLengkap.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesSearch = 
+            report.deskripsi.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (report.pelapor ? report.pelapor.namaLengkap.toLowerCase().includes(searchTerm.toLowerCase()) : false);
+            
         return matchesStatus && matchesSearch;
     });
 
@@ -123,7 +128,9 @@ export default function ManageReportsPage() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-sm font-medium text-slate-800 truncate max-w-xs">{report.deskripsi}</td>
-                                    <td className="px-6 py-4 text-sm text-slate-500">{report.pelapor.namaLengkap}</td>
+                                    <td className="px-6 py-4 text-sm text-slate-500">
+                                        {report.pelapor?.namaLengkap ?? 'Pengguna Dihapus'}
+                                    </td>
                                     <td className="px-6 py-4 text-sm text-slate-500">{report.penolong?.namaLengkap || '-'}</td>
                                     <td className="px-6 py-4 text-sm text-slate-500">{new Date(report.createdAt).toLocaleDateString('id-ID')}</td>
                                     <td className="px-6 py-4 text-right text-sm font-medium space-x-2">
