@@ -8,6 +8,7 @@ import { ArrowLeft, MapPin, User as UserIcon, Calendar, Shield, CheckCircle, Pho
 import CompleteReportButton from "@/components/CompleteReportButton";
 import ChatBox from "@/components/ChatBox";
 
+// --- PERBAIKAN 1: Update Tipe Data ---
 interface ReportDetailType {
   _id: string;
   deskripsi: string;
@@ -16,8 +17,12 @@ interface ReportDetailType {
   lokasi: { coordinates: [number, number]; alamat?: string; };
   gambarUrl?: string;
   createdAt: string;
-  pelapor: { _id: string; namaLengkap: string; noWa?: string; };
-  penolong?: { _id: string; namaLengkap: string; };
+  penolong?: { _id: string; namaLengkap: string; } | null;
+  pelapor: {
+    _id: string; // <-- Tambahkan _id
+    namaLengkap: string;
+    noWa?: string;
+  } | null;
 }
 
 async function getReport(id: string): Promise<ReportDetailType | null> {
@@ -45,7 +50,8 @@ export default async function ReportDetailPageWarga({ params }: { params: { id: 
         notFound();
     }
 
-    if (report.pelapor._id.toString() !== user.id && user.peran !== 'Admin') {
+    // --- PERBAIKAN 2: Tambahkan optional chaining (?.) ---
+    if (report.pelapor?._id.toString() !== user.id && user.peran !== 'Admin') {
         redirect("/warga/dashboard?error=unauthorized");
     }
 
@@ -96,9 +102,9 @@ export default async function ReportDetailPageWarga({ params }: { params: { id: 
                                 <h3 className="font-bold text-slate-800 mb-2">Informasi Pihak Terkait</h3>
                                 <ul className="space-y-2 text-slate-600">
                                     {report.penolong ? (
-                                        <li className="flex flex-col items-start gap-3">
-                                            <div className="flex items-center"><Shield className="w-5 h-5 text-indigo-500 mr-3"/> <strong>Ditangani oleh:</strong> {report.penolong.namaLengkap}</div>
-                                        
+                                        <li className="flex items-center gap-3">
+                                            <Shield className="w-5 h-5 text-indigo-500"/> 
+                                            <strong>Ditangani oleh:</strong> {report.penolong?.namaLengkap ?? 'Relawan Dihapus'}
                                         </li>
                                     ) : (
                                         <li className="flex items-center gap-3"><Shield className="w-5 h-5 text-indigo-500"/> <strong>Menunggu relawan...</strong></li>
