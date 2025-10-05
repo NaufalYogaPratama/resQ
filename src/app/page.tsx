@@ -9,7 +9,7 @@ import "aos/dist/aos.css"
 // Komponen baru untuk galeri foto di hero section
 const HeroImageGallery = () => {
   const images = [
-    "https://lokerpintar.id/wp-content/uploads/2022/09/Volunteer-Adalah-Arti-Manfaat-Alasan-dan-Cara-Menjadi-4-500x304.jpg",
+    "https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/radarsemarang/2021/02/SIMPANG-LIMA.jpg",
     "https://www.teachforindonesia.org/wp-content/uploads/2020/01/WhatsApp-Image-2020-01-03-at-09.47.41.jpeg",
     "https://pmikotasemarang.or.id/wp-content/uploads/2023/03/WhatsApp-Image-2023-03-20-at-07.54.36-1-1024x768.jpeg",
     "https://asset.kompas.com/crops/m05jVt_LhrSi7wDTXuwm_HkymWs=/0x0:0x0/1200x800/data/photo/2024/03/14/65f2cc5c82060.jpg",
@@ -17,11 +17,10 @@ const HeroImageGallery = () => {
 
   return (
     <div className="relative w-full h-[500px]" data-aos="fade-left">
-      {/* Background blobs for depth */}
+
       <div className="absolute top-10 left-10 w-72 h-72 bg-violet-300/35 rounded-full blur-3xl"></div>
       <div className="absolute bottom-10 right-10 w-72 h-72 bg-indigo-300/30 rounded-full blur-3xl"></div>
 
-      {/* Image collage */}
       <div
         className="absolute top-0 right-1/4 w-48 h-72 rounded-2xl shadow-2xl overflow-hidden transform -rotate-6 transition-transform hover:scale-105 hover:rotate-0"
         data-aos="zoom-in"
@@ -120,12 +119,11 @@ export default function HomePage() {
 
   return (
     <div className={"font-sans text-[#1E293B] bg-gradient-to-b from-white via-indigo-50/25 to-white"}>
-      {/* === LAYER GRADIENT & GLOW (ditambahkan tanpa menghapus teks) === */}
-      {/* menggunakan fixed & -z agar tidak mengganggu struktur asli dan tidak perlu mengubah parent class */}
+
       <div className="fixed inset-0 -z-10 pointer-events-none">
         <div className="absolute -top-56 -left-56 w-[40rem] h-[40rem] bg-gradient-to-br from-[#7DA0FF] via-[#4B5EAA] to-[#1E2A78] opacity-40 blur-[120px] rounded-full"></div>
         <div className="absolute -bottom-56 -right-56 w-[48rem] h-[48rem] bg-gradient-to-tr from-[#A0B8FF] via-[#CFE0FF] to-[#EAF4FF] opacity-30 blur-[140px] rounded-full"></div>
-        {/* lembut overlay injeksi highlight */}
+
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-30 mix-blend-soft-light"></div>
       </div>
 
@@ -140,7 +138,7 @@ export default function HomePage() {
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-3">
               <img
-                src="/ResQ.png"
+                src="/ResQlogo.png"
                 alt="ResQ Logo"
                 className={`h-10 transition-transform duration-300 ${isScrolled ? "scale-90" : "scale-100"}`}
               />
@@ -221,14 +219,14 @@ export default function HomePage() {
                   </Link>
                 </div>
               </div>
-              {/* Right Illustration */}
+
               <div className="hidden lg:block">
                 <HeroImageGallery />
               </div>
             </div>
           </div>
 
-          {/* subtle wave remains white to blend hero-to-body */}
+        
           <div
             className="absolute bottom-0 left-0 w-full h-24 sm:h-32 md:h-40"
             style={{ transform: "translateY(1px)" }}
@@ -253,9 +251,9 @@ export default function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((feature, index) => (
                 <div key={feature.title} data-aos="fade-up" data-aos-delay={index * 100}>
-                  {/* light glassmorphism surface with soft ring */}
+               
                   <div className="h-full rounded-2xl border border-white/60 bg-white/55 backdrop-blur-xl shadow-lg ring-1 ring-black/5 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 p-8">
-                    {/* subtle gradient tile + blur */}
+                    
                     <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 bg-gradient-to-br from-violet-100/80 via-white/60 to-indigo-100/80 border border-white/60 backdrop-blur-sm shadow-sm">
                       {feature.icon}
                     </div>
