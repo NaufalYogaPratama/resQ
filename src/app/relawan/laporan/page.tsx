@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { List, ArrowRight } from 'lucide-react';
 import dbConnect from '@/lib/dbConnect';
 import Report from '@/models/Report';
-import User from '@/models/User'; 
+
 
 
 interface ReportType {

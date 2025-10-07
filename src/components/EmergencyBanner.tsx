@@ -5,7 +5,7 @@ import { AlertTriangle } from 'lucide-react';
 
 export default function EmergencyBanner() {
   const [isEmergency, setIsEmergency] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+
 
   useEffect(() => {
     const fetchEmergencyStatus = async () => {
@@ -21,9 +21,7 @@ export default function EmergencyBanner() {
         }
       } catch (error) {
         console.error("Gagal mengambil status mode darurat:", error);
-      } finally {
-        setIsLoading(false);
-      }
+      } 
     };
 
     fetchEmergencyStatus();

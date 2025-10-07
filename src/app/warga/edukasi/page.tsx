@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import dbConnect from '@/lib/dbConnect';
 import Article from '@/models/Article';
-import User from '@/models/User';
-import { ClipboardList, BookOpen, Clock } from 'lucide-react';
+import { BookOpen, Clock } from 'lucide-react';
+import Image from 'next/image';
 
 interface ArticleType {
   _id: string;
@@ -75,7 +75,7 @@ export default async function EdukasiPage() {
                   className="block bg-white border border-slate-200 rounded-2xl shadow-md overflow-hidden h-full group transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 >
                   {article.gambarUrl && (
-                    <img
+                    <Image
                       src={article.gambarUrl}
                       alt={article.judul}
                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"

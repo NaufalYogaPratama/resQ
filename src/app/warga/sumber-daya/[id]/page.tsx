@@ -5,18 +5,32 @@ import Resource from "@/models/Resource";
 import { Package, Wrench, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import EditResourceModal from "@/components/EditResourceModal";
+import Image from 'next/image';
 
 
-async function getResource(id: string, userId: string) {
+interface ResourceType {
+    _id: string;
+    namaSumberDaya: string;
+    tipe: 'Aset' | 'Keahlian';
+    deskripsi?: string;
+    gambarUrl?: string;
+    pemilik: string; 
+}
+
+async function getResource(id: string, userId: string): Promise<ResourceType | null> {
     await dbConnect();
     try {
         const resource = await Resource.findById(id);
         if (!resource || resource.pemilik.toString() !== userId) {
-            notFound(); 
+            notFound();
+            return null;
         }
         return JSON.parse(JSON.stringify(resource));
     } catch (error) {
-        notFound(); 
+
+        console.error("Gagal mengambil sumber daya:", error);
+        notFound();
+        return null;
     }
 }
 
@@ -25,6 +39,11 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
     if (!user) redirect("/login");
 
     const resource = await getResource(params.id, user.id);
+
+
+    if (!resource) {
+        return notFound();
+    }
 
     return (
         <div className="bg-gradient-to-br from-slate-50 via-white to-indigo-50 min-h-screen p-4 sm:p-8 font-sans">
@@ -38,7 +57,13 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
 
                 <div className="bg-white border border-slate-200 rounded-2xl shadow-lg overflow-hidden" data-aos="fade-up">
                     {resource.gambarUrl ? (
-                        <img src={resource.gambarUrl} alt={resource.namaSumberDaya} className="w-full h-80 object-cover" />
+                 
+                        <Image 
+                            src={resource.gambarUrl} 
+                            alt={resource.namaSumberDaya}
+                            className="w-full h-80 object-cover"
+                            priority 
+                        />
                     ) : (
                         <div className="w-full h-80 bg-indigo-50 flex items-center justify-center">
                             {resource.tipe === "Aset" ? <Package className="w-24 h-24 text-indigo-200"/> : <Wrench className="w-24 h-24 text-indigo-200"/>}

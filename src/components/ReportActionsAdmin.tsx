@@ -4,13 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 
-// Definisikan tipe data untuk properti 'report'
 interface Report {
     _id: string;
     status: 'Menunggu' | 'Ditangani' | 'Selesai';
 }
 
-// PERBAIKAN: Berikan tipe data 'Report' pada props 'report'
 export default function ReportActionsAdmin({ report }: { report: Report }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
@@ -27,8 +25,12 @@ export default function ReportActionsAdmin({ report }: { report: Report }) {
             if (!res.ok) throw new Error('Gagal mengubah status.');
             alert('Status laporan berhasil diubah.');
             router.refresh();
-        } catch (err: any) {
-            alert(`Error: ${err.message}`);
+        } catch (err) {
+            if (err instanceof Error) {
+                alert(`Error: ${err.message}`);
+            } else {
+                alert("Terjadi kesalahan tidak dikenal.");
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -42,8 +44,12 @@ export default function ReportActionsAdmin({ report }: { report: Report }) {
             if (!res.ok) throw new Error('Gagal menghapus laporan.');
             alert("Laporan berhasil dihapus.");
             router.push("/admin/laporan");
-        } catch (err: any) {
-            alert(`Error: ${err.message}`);
+        } catch (err) {
+            if (err instanceof Error) {
+                alert(`Error: ${err.message}`);
+            } else {
+                alert("Terjadi kesalahan tidak dikenal.");
+            }
         } finally {
             setIsSubmitting(false);
         }

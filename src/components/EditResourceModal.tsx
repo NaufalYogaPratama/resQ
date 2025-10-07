@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Edit, X, Camera } from "lucide-react";
 
-// Tipe data untuk properti 'resource'
+
 interface Resource {
     _id: string;
     namaSumberDaya: string;
@@ -48,11 +48,16 @@ export default function EditResourceModal({ resource }: { resource: Resource }) 
             }
             
             setIsOpen(false);
-            router.refresh(); // Memuat ulang data di halaman detail
+            router.refresh(); 
             alert("Sumber daya berhasil diperbarui!");
 
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err) {
+
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("Terjadi kesalahan yang tidak diketahui.");
+            }
         } finally {
             setIsSubmitting(false);
         }

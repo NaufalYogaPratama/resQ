@@ -20,8 +20,7 @@ export default function ChecklistPage() {
     const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
-    
-    // --- STATE BARU UNTUK MODAL LENCANA ---
+ 
     const [showBadgeModal, setShowBadgeModal] = useState(false);
     const [badgeName, setBadgeName] = useState('');
 
@@ -68,7 +67,7 @@ export default function ChecklistPage() {
             const data = await res.json();
             if (!res.ok) throw new Error("Gagal menyimpan.");
             
-            // Cek apakah ada lencana yang didapat dari respon API
+      
             if (data.badgeAwarded) {
                 setBadgeName(data.badgeName);
                 setShowBadgeModal(true);
@@ -76,7 +75,11 @@ export default function ChecklistPage() {
                 alert("Progres Anda telah disimpan!");
             }
         } catch (err) {
-            alert("Gagal menyimpan progres.");
+            if (err instanceof Error) {
+                alert(`Gagal menyimpan: ${err.message}`);
+            } else {
+                alert("Gagal menyimpan karena kesalahan tidak dikenal.");
+            }
         } finally {
             setIsSaving(false);
         }

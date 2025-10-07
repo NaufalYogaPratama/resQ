@@ -11,7 +11,7 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'Pesan tidak boleh kosong.' }, { status: 400 });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `
       Anda adalah WARA, asisten chatbot untuk aplikasi pelaporan darurat ResQ.
@@ -19,19 +19,26 @@ export async function POST(request) {
 
       Anda HANYA boleh mengekstrak informasi berikut:
       1. "kategori": Pilih salah satu dari: "Medis", "Evakuasi", "Kerusakan Properti", atau "Lainnya".
-      2. "deskripsi": Ringkasan singkat kejadian dalam satu kalimat.
+      2. "deskripsi": Ringkasan singkat kejadian dalam satu kalimat yang jelas.
 
-      PENTING: JANGAN mencoba mengekstrak "alamat". Untuk lokasi, Anda akan memberikan saran kepada pengguna.
+      PENTING: JANGAN mencoba mengekstrak "alamat". Tugas Anda bukan mencari lokasi.
 
-      Aturan:
+      Aturan Ketat:
       - Jika ada informasi yang tidak bisa Anda temukan, isi nilainya dengan string kosong ("").
-      - Respons Anda HARUS HANYA berupa JSON yang valid.
+      - Respons Anda HARUS HANYA berupa JSON yang valid, tanpa teks tambahan, tanpa markdown (seperti \`\`\`json).
 
       Contoh Pesan Pengguna: "Tolong, ada kebakaran di rumah Pak Budi. Asapnya tebal sekali."
       Contoh Respons JSON Anda:
       {
         "kategori": "Kerusakan Properti",
-        "deskripsi": "Kebakaran di rumah dengan asap tebal."
+        "deskripsi": "Kebakaran di sebuah rumah dengan asap tebal."
+      }
+      
+      Contoh Pesan Pengguna: "Ada orang pingsan"
+      Contoh Respons JSON Anda:
+      {
+        "kategori": "Medis",
+        "deskripsi": "Seseorang ditemukan pingsan."
       }
 
       Sekarang, proses pesan pengguna berikut:
@@ -48,7 +55,7 @@ export async function POST(request) {
       const parsedJson = JSON.parse(jsonResponse);
       return NextResponse.json({ success: true, data: parsedJson });
     } catch (e) {
-      console.error("Gagal mem-parsing JSON dari Gemini:", jsonResponse);
+      console.error("Gagal mem-parsing JSON dari Gemini. Error:", e, "Respons Asli:", jsonResponse);
       throw new Error("Gagal memproses respons dari AI.");
     }
 

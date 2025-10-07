@@ -1,11 +1,10 @@
 import Link from 'next/link';
-import { AlertTriangle, BookOpen, Map, Package, List, Megaphone, Trophy, ClipboardList, ClipboardCheck } from 'lucide-react';
+import { AlertTriangle, BookOpen, Map, Package, List, Trophy, ClipboardList, ClipboardCheck } from 'lucide-react';
 import { verifyAuth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import WeatherWidget from "@/components/WeatherWidget";
 import dbConnect from '@/lib/dbConnect';
 import Report from '@/models/Report';
-import User from '@/models/User';
 import Checklist from '@/models/Checklist'; 
 import { checklistItems } from '@/lib/checklistItems';
 

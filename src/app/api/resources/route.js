@@ -1,18 +1,16 @@
+import { NextResponse } from 'next/server';
 import dbConnect from "@/lib/dbConnect";
 import Resource from "@/models/Resource";
 import SystemSetting from "@/models/SystemSetting";
 import User from "@/models/User";
 import { verifyAuth } from "@/lib/auth";
-import { NextResponse } from "next/server";
 import cloudinary from 'cloudinary';
-
 
 cloudinary.v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
 
 async function uploadImage(file) {
     const fileBuffer = await file.arrayBuffer();
@@ -52,6 +50,8 @@ export async function GET() {
     return NextResponse.json({ success: true, data: userResources, isEmergency: isEmergency });
 
   } catch (error) {
+
+    console.error("Gagal mengambil data sumber daya:", error);
     return NextResponse.json({ success: false, message: "Server Error" }, { status: 500 });
   }
 }

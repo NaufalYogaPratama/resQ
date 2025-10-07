@@ -2,21 +2,35 @@ import { verifyAuth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import dbConnect from "@/lib/dbConnect";
 import Resource from "@/models/Resource";
-import User from "@/models/User";
 import Link from "next/link";
 import { ArrowLeft, Package, Wrench } from "lucide-react";
-import EditResourceModal from "@/components/EditResourceModal"; // Kita gunakan kembali modal yang sudah ada
+import EditResourceModal from "@/components/EditResourceModal"; 
+import Image from 'next/image';
 
-// Fungsi ini berjalan di server untuk mengambil data
-async function getResourceForAdmin(id: string) {
+interface ResourceDetailType {
+    _id: string;
+    namaSumberDaya: string;
+    tipe: 'Aset' | 'Keahlian';
+    deskripsi?: string;
+    gambarUrl?: string;
+    pemilik: {
+        namaLengkap: string;
+    } | null; 
+}
+
+async function getResourceForAdmin(id: string): Promise<ResourceDetailType | null> {
     await dbConnect();
     try {
-        // Admin bisa lihat resource siapa saja, jadi tidak perlu cek 'pemilik'
         const resource = await Resource.findById(id).populate('pemilik', 'namaLengkap');
-        if (!resource) notFound();
+        if (!resource) {
+            notFound();
+            return null;
+        }
         return JSON.parse(JSON.stringify(resource));
     } catch (error) {
+        console.error("Gagal mengambil data sumber daya:", error);
         notFound();
+        return null; 
     }
 }
 
@@ -25,6 +39,10 @@ export default async function ResourceDetailPageAdmin({ params }: { params: { id
     if (!user || user.peran !== 'Admin') redirect("/login");
 
     const resource = await getResourceForAdmin(params.id);
+
+    if (!resource) {
+        return null; 
+    }
 
     return (
         <div className="bg-slate-50 min-h-screen p-4 sm:p-8 font-sans">
@@ -38,7 +56,13 @@ export default async function ResourceDetailPageAdmin({ params }: { params: { id
 
                 <div className="bg-white border border-slate-200 rounded-2xl shadow-lg overflow-hidden">
                     {resource.gambarUrl ? (
-                        <img src={resource.gambarUrl} alt={resource.namaSumberDaya} className="w-full h-80 object-cover" />
+                        <Image 
+                            src={resource.gambarUrl} 
+                            alt={resource.namaSumberDaya}
+                            width={1200}
+                            height={800} 
+                            className="w-full h-80 object-cover" 
+                        />
                     ) : (
                         <div className="w-full h-80 bg-indigo-50 flex items-center justify-center">
                             {resource.tipe === "Aset" ? <Package className="w-24 h-24 text-indigo-200"/> : <Wrench className="w-24 h-24 text-indigo-200"/>}
@@ -49,10 +73,14 @@ export default async function ResourceDetailPageAdmin({ params }: { params: { id
                             <div>
                                 <span className="inline-block bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-semibold">{resource.tipe}</span>
                                 <h1 className="text-4xl font-extrabold text-slate-900 mt-4">{resource.namaSumberDaya}</h1>
-                                <p className="mt-2 text-sm text-slate-500">Pemilik: <strong>{resource.pemilik.namaLengkap}</strong></p>
+                        
+                                <p className="mt-2 text-sm text-slate-500">
+                                    Pemilik: <strong>{resource.pemilik?.namaLengkap ?? 'Pengguna Dihapus'}</strong>
+                                </p>
+                                
                                 {resource.deskripsi && <p className="mt-4 text-lg text-slate-600">{resource.deskripsi}</p>}
                             </div>
-        
+                
                             <EditResourceModal resource={resource} />
                         </div>
                     </div>

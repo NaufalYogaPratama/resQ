@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L, { Map } from 'leaflet';
+import Image from 'next/image';
 
 // Tipe Data
 interface ReportType {
@@ -12,8 +13,8 @@ interface ReportType {
   kategori: string;
   status: 'Menunggu' | 'Ditangani' | 'Selesai';
   lokasi: { coordinates: [number, number]; alamat?: string };
-  pelapor: { _id: string; namaLengkap: string };
-  penolong?: { _id: string; namaLengkap: string };
+  pelapor: { _id: string; namaLengkap: string } | null;
+  penolong?: { _id: string; namaLengkap: string } | null;
 }
 
 interface VolunteerType {
@@ -27,15 +28,17 @@ interface MapComponentProps {
   volunteers?: VolunteerType[];
 }
 
-// FIX untuk ikon default Leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+// --- PERBAIKAN DI SINI: Ganti 'as any' ---
+delete ((L.Icon.Default.prototype as unknown) as Record<string, unknown>)._getIconUrl;
+
+
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
-// Fungsi untuk menentukan warna pin
+
 const getIconByStatus = (status: ReportType['status']) => {
     let color = '#10b981'; // Selesai (Hijau)
     if (status === 'Menunggu') color = '#dc2626'; // Menunggu (Merah)
@@ -59,22 +62,24 @@ export default function MapComponent({ userId, userRole, volunteers = [] }: MapC
   const [selectedStatus, setSelectedStatus] = useState('Semua');
   const [isSubmitting, setIsSubmitting] = useState<string | null>(null);
   const mapRef = useRef<Map | null>(null);
+  const [error, setError] = useState('');
 
-  // --- SEMUA FUNGSI HANDLER DI DEKLARASIKAN DI SINI ---
-
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     try {
-      const res = await fetch('/api/reports');
+      const apiUrl = userRole === 'Admin' ? '/api/reports/all' : '/api/reports';
+      const res = await fetch(apiUrl);
       const data = await res.json();
       if (data.success) {
         setReports(data.data);
+      } else {
+        throw new Error(data.message || "Gagal memuat data");
       }
-    } catch (error) {
-      console.error("Gagal mengambil data laporan:", error);
+    } catch (err) {
+        if (err instanceof Error) setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [userRole]);
 
   const handleClaim = async (reportId: string) => {
     if (!confirm('Apakah Anda yakin ingin menangani laporan ini?')) return;
@@ -85,8 +90,8 @@ export default function MapComponent({ userId, userRole, volunteers = [] }: MapC
       if (!res.ok) throw new Error(data.message || 'Gagal mengklaim laporan.');
       alert('Laporan berhasil diklaim!');
       fetchReports(); 
-    } catch (err: any) {
-      alert(`Error: ${err.message}`);
+    } catch (err) {
+        if (err instanceof Error) alert(`Error: ${err.message}`);
     } finally {
       setIsSubmitting(null);
     }
@@ -101,8 +106,8 @@ export default function MapComponent({ userId, userRole, volunteers = [] }: MapC
       if (!res.ok) throw new Error(data.message || 'Gagal menyelesaikan laporan.');
       alert('Terima kasih! Laporan telah diselesaikan.');
       fetchReports();
-    } catch (err: any) {
-      alert(`Error: ${err.message}`);
+    } catch (err) {
+        if (err instanceof Error) alert(`Error: ${err.message}`);
     } finally {
       setIsSubmitting(null);
     }
@@ -120,8 +125,8 @@ export default function MapComponent({ userId, userRole, volunteers = [] }: MapC
         if (!res.ok) throw new Error(data.message);
         alert('Status berhasil diperbarui!');
         fetchReports();
-    } catch (err: any) {
-        alert(`Error: ${err.message}`);
+    } catch (err) {
+        if (err instanceof Error) alert(`Error: ${err.message}`);
     } finally {
         setIsSubmitting(null);
     }
@@ -140,8 +145,8 @@ export default function MapComponent({ userId, userRole, volunteers = [] }: MapC
         if (!res.ok) throw new Error(data.message);
         alert('Relawan berhasil ditugaskan!');
         fetchReports();
-    } catch (err: any) {
-        alert(`Error: ${err.message}`);
+    } catch (err) {
+        if (err instanceof Error) alert(`Error: ${err.message}`);
     } finally {
         setIsSubmitting(null);
     }
@@ -156,8 +161,8 @@ export default function MapComponent({ userId, userRole, volunteers = [] }: MapC
           if (!res.ok) throw new Error(data.message);
           alert('Laporan berhasil dihapus.');
           fetchReports();
-      } catch (err: any) {
-          alert(`Error: ${err.message}`);
+      } catch (err) {
+          if (err instanceof Error) alert(`Error: ${err.message}`);
       } finally {
           setIsSubmitting(null);
       }
@@ -165,30 +170,28 @@ export default function MapComponent({ userId, userRole, volunteers = [] }: MapC
 
   useEffect(() => {
     fetchReports();
-  }, []);
+  }, [fetchReports]);
   
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       if (mapRef.current) {
         mapRef.current.invalidateSize();
       }
     }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Filter laporan berdasarkan role
   const filteredReports = reports.filter(report => {
     const categoryMatch = selectedCategory === 'Semua' || report.kategori === selectedCategory;
     if (userRole === 'Admin') {
         const statusMatch = selectedStatus === 'Semua' || report.status === selectedStatus;
         return categoryMatch && statusMatch;
     }
-    // Warga dan Relawan hanya melihat yang belum selesai
     return categoryMatch && report.status !== 'Selesai';
   });
 
-  if (loading) {
-    return <div className="flex justify-center items-center h-full bg-slate-50"><p className="text-slate-500">Memuat data laporan...</p></div>;
-  }
+  if (loading) return <div className="flex justify-center items-center h-full bg-slate-50"><p className="text-slate-500">Memuat data laporan...</p></div>;
+  if (error) return <div className="p-4 text-center text-red-500 bg-red-50 border border-red-200 rounded-lg">{error}</div>;
 
   return (
     <div className="relative h-full">
@@ -219,16 +222,20 @@ export default function MapComponent({ userId, userRole, volunteers = [] }: MapC
                     <Popup>
                         <div className="w-72">
                             <h2 className={`text-lg font-bold ${report.status === 'Menunggu' ? 'text-red-700' : 'text-teal-800'}`}>{report.kategori} ({report.status})</h2>
-                            {report.gambarUrl && <img src={report.gambarUrl} alt="Kejadian" className="w-full h-32 object-cover rounded-lg my-2"/>}
-                            <p className="text-slate-700 text-sm mt-2">{report.deskripsi}</p>
-                            <p className="text-xs text-slate-500 mt-2 border-t pt-2">
-                                Pelapor: {report.pelapor?.namaLengkap ?? 'Pengguna Dihapus'}
-                            </p>
-                            {report.penolong && (
-                                <p className="text-xs text-slate-500">
-                                    Ditangani oleh: {report.penolong?.namaLengkap ?? 'Relawan Dihapus'}
-                                </p>
+                            
+                            {report.gambarUrl && (
+                                <Image 
+                                    src={report.gambarUrl} 
+                                    alt="Kejadian" 
+                                    width={288}
+                                    height={128}
+                                    className="w-full h-32 object-cover rounded-lg my-2"
+                                />
                             )}
+                            
+                            <p className="text-slate-700 text-sm mt-2">{report.deskripsi}</p>
+                            <p className="text-xs text-slate-500 mt-2 border-t pt-2">Pelapor: {report.pelapor?.namaLengkap ?? 'Pengguna Dihapus'}</p>
+                            {report.penolong && <p className="text-xs text-slate-500">Ditangani oleh: {report.penolong?.namaLengkap ?? 'Relawan Dihapus'}</p>}
                             
                             {/* Tombol untuk Relawan */}
                             {userRole === 'Relawan' && report.status === 'Menunggu' && (

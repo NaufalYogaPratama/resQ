@@ -2,7 +2,6 @@ import { verifyAuth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import dbConnect from "@/lib/dbConnect";
 import Report from "@/models/Report";
-import User from "@/models/User";
 import Link from "next/link";
 import { ArrowLeft, BarChart3 } from "lucide-react";
 

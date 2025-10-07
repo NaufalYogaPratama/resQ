@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Package, Wrench, Trash2, Camera, Trophy, X } from "lucide-react";
+import { Package, Wrench, Trash2, Camera, Trophy, X, Loader2 } from "lucide-react";
 import Link from "next/link";
+import Image from 'next/image';
 
 interface ResourceType {
   _id: string;
@@ -33,9 +34,13 @@ export default function SumberDayaPage() {
       const data = await res.json();
       if (data.success) {
         setMyResources(data.data);
+      } else {
+        throw new Error(data.message || "Gagal memuat sumber daya.");
       }
-    } catch (error) {
-      console.error("Gagal mengambil data sumber daya:", error);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -66,15 +71,10 @@ export default function SumberDayaPage() {
         throw new Error(data.message || "Gagal menambahkan sumber daya.");
       }
 
-
-      if (data.rewardAwarded) {
-        setRewardName(data.rewardName);
-        setShowRewardModal(true);
-      } else {
-  
-      }
+    
+      setMyResources(prev => [data.data, ...prev]);
       
-      fetchMyResources(); 
+    
       setNamaSumberDaya("");
       setTipe("Aset");
       setDeskripsi("");
@@ -82,23 +82,38 @@ export default function SumberDayaPage() {
       const fileInput = document.getElementById('gambar-sumber') as HTMLInputElement;
       if (fileInput) fileInput.value = "";
 
-    } catch (err: any) {
-      setError(err.message);
+      if (data.rewardAwarded) {
+        setRewardName(data.rewardName);
+        setShowRewardModal(true);
+      }
+
+    } catch (err) {
+        if (err instanceof Error) {
+            setError(err.message); 
+        } else {
+            setError("Terjadi kesalahan yang tidak diketahui.");
+        }
     } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   const handleDelete = async (id: string) => {
     if (confirm("Apakah Anda yakin ingin menghapus sumber daya ini?")) {
+      const originalResources = [...myResources];
+      setMyResources(prev => prev.filter(res => res._id !== id));
+
       try {
         const res = await fetch(`/api/resources/${id}`, { method: "DELETE" });
         if (!res.ok) {
-          throw new Error("Gagal menghapus sumber daya.");
+          const data = await res.json();
+          throw new Error(data.message || "Gagal menghapus sumber daya.");
         }
-        fetchMyResources();
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+          setMyResources(originalResources); 
+          if (err instanceof Error) {
+            setError(err.message);
+          }
       }
     }
   };
@@ -107,33 +122,23 @@ export default function SumberDayaPage() {
     <div className="bg-slate-50 min-h-screen text-slate-800 p-4 sm:p-8 font-sans">
       <div className="max-w-5xl mx-auto">
         <div data-aos="fade-down" className="mb-10 text-center">
-          <h1 className="text-4xl font-bold text-slate-900">
-            Bank Sumber Daya Komunitas
-          </h1>
-          <p className="mt-2 text-lg text-slate-600">
-            Daftarkan aset atau keahlian yang dapat Anda kontribusikan saat darurat.
-          </p>
+          <h1 className="text-4xl font-bold text-slate-900">Bank Sumber Daya Komunitas</h1>
+          <p className="mt-2 text-lg text-slate-600">Daftarkan aset atau keahlian yang dapat Anda kontribusikan saat darurat.</p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white border border-slate-200 rounded-2xl shadow-md p-6 sm:p-8"
-          data-aos="fade-up"
-        >
-          <h2 className="text-2xl font-bold mb-6 text-slate-900">
-            Daftarkan Sumber Daya Baru
-          </h2>
+        <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-2xl shadow-md p-6 sm:p-8" data-aos="fade-up">
+          <h2 className="text-2xl font-bold mb-6 text-slate-900">Daftarkan Sumber Daya Baru</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label htmlFor="nama-sumber" className="block text-sm font-semibold text-slate-700 mb-2">Nama Aset/Keahlian</label>
               <input id="nama-sumber" type="text" value={namaSumberDaya} onChange={(e) => setNamaSumberDaya(e.target.value)} required 
-                className="w-full py-3 px-4 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#4B5EAA]" 
+                className="w-full py-3 px-4 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600" 
                 placeholder="Contoh: Genset Portabel"/>
             </div>
             <div>
               <label htmlFor="tipe-sumber" className="block text-sm font-semibold text-slate-700 mb-2">Tipe</label>
               <select id="tipe-sumber" value={tipe} onChange={(e) => setTipe(e.target.value as "Aset" | "Keahlian")}
-                className="w-full py-3 px-4 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#4B5EAA]">
+                className="w-full py-3 px-4 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600">
                 <option value="Aset">Aset (Barang)</option>
                 <option value="Keahlian">Keahlian (Jasa)</option>
               </select>
@@ -142,7 +147,7 @@ export default function SumberDayaPage() {
           <div className="mt-6">
             <label htmlFor="deskripsi-sumber" className="block text-sm font-semibold text-slate-700 mb-2">Deskripsi Singkat (Opsional)</label>
             <textarea id="deskripsi-sumber" value={deskripsi} onChange={(e) => setDeskripsi(e.target.value)} rows={3}
-              className="w-full py-3 px-4 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#4B5EAA]"
+              className="w-full py-3 px-4 bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600"
               placeholder="Contoh: Genset 2200 watt, cukup untuk 1 rumah"></textarea>
           </div>
           <div className="mt-6">
@@ -150,37 +155,32 @@ export default function SumberDayaPage() {
             <div className="mt-1 flex items-center border border-slate-300 rounded-lg p-2">
                 <Camera className="w-5 h-5 text-slate-500"/>
                 <input id="gambar-sumber" type="file" accept="image/*" onChange={(e) => setGambar(e.target.files ? e.target.files[0] : null)}
-                    className="ml-4 text-sm text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-[#4B5EAA] hover:file:bg-indigo-100"
+                    className="ml-4 text-sm text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100"
                 />
             </div>
           </div>
 
-          {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="mt-6 w-full md:w-auto bg-[#4B5EAA] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#3A4D89] disabled:bg-slate-400 transition-colors shadow-md"
-          >
+          {error && <p className="text-red-500 text-sm mt-4 font-semibold">{error}</p>}
+          <button type="submit" disabled={isSubmitting}
+            className="mt-6 w-full md:w-auto bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-slate-400 transition-colors shadow-md flex items-center justify-center gap-2">
+             {isSubmitting && <Loader2 className="w-5 h-5 animate-spin" />}
             {isSubmitting ? "Menambahkan..." : "Tambahkan Sumber Daya"}
           </button>
         </form>
 
         <div className="mt-12" data-aos="fade-up" data-aos-delay="100">
-          <h2 className="text-2xl font-bold mb-6 text-slate-900">
-            Sumber Daya Milik Anda
-          </h2>
-          {isLoading ? <p className="text-slate-500">Memuat data...</p> : (
+          <h2 className="text-2xl font-bold mb-6 text-slate-900">Sumber Daya Milik Anda</h2>
+          {isLoading ? <p className="text-slate-500 text-center py-10">Memuat data...</p> : (
             <div className="space-y-4">
               {myResources.length > 0 ? (
                 myResources.map((res: ResourceType) => (
                   <li key={res._id} className="list-none bg-white border border-slate-200 rounded-xl p-4 flex justify-between items-center shadow hover:shadow-md transition-shadow">
- 
                     <Link href={`/warga/sumber-daya/${res._id}`} className="flex items-center gap-4 flex-grow">
                       {res.gambarUrl ? (
-                        <img src={res.gambarUrl} alt={res.namaSumberDaya} className="w-16 h-16 rounded-lg object-cover" />
+                        <Image src={res.gambarUrl} alt={res.namaSumberDaya} width={64} height={64} className="w-16 h-16 rounded-lg object-cover" />
                       ) : (
                         <div className="w-16 h-16 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
-                          {res.tipe === "Aset" ? ( <Package className="w-8 h-8 text-[#4B5EAA]" /> ) : ( <Wrench className="w-8 h-8 text-[#4B5EAA]" /> )}
+                          {res.tipe === "Aset" ? ( <Package className="w-8 h-8 text-indigo-600" /> ) : ( <Wrench className="w-8 h-8 text-indigo-600" /> )}
                         </div>
                       )}
                       <div>
@@ -188,13 +188,9 @@ export default function SumberDayaPage() {
                         <p className="text-sm text-slate-500">{res.tipe}</p>
                       </div>
                     </Link>
-                    
                     <div className="flex items-center flex-shrink-0">
-                      <button
-                        onClick={() => handleDelete(res._id)}
-                        className="text-red-500 hover:text-red-400 p-2 rounded-full hover:bg-red-100 transition-colors"
-                        title="Hapus"
-                      >
+                      <button onClick={() => handleDelete(res._id)}
+                        className="text-red-500 hover:text-red-400 p-2 rounded-full hover:bg-red-100 transition-colors" title="Hapus">
                         <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
@@ -208,6 +204,7 @@ export default function SumberDayaPage() {
             </div>
           )}
         </div>
+        
         {showRewardModal && (
             <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
                 <div className="bg-white rounded-2xl shadow-xl max-w-sm text-center p-8 relative" data-aos="zoom-in">

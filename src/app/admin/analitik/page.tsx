@@ -8,9 +8,6 @@ import ReportsByCategoryChart from '@/components/charts/ReportsByCategoryChart';
 import ReportsByStatusChart from '@/components/charts/ReportsByStatusChart';
 import TopVolunteers from '@/components/charts/TopVolunteers';
 
-// --- FUNGSI PENGOLAHAN DATA DI SERVER ---
-
-// 1. Mengambil data laporan per kategori
 async function getReportsByCategory() {
     await dbConnect();
     const data = await Report.aggregate([
@@ -21,7 +18,7 @@ async function getReportsByCategory() {
     return data;
 }
 
-// 2. Mengambil data laporan per status
+
 async function getReportsByStatus() {
     await dbConnect();
     const data = await Report.aggregate([
@@ -31,21 +28,18 @@ async function getReportsByStatus() {
     return data;
 }
 
-// 3. Mengambil data relawan paling aktif
 async function getTopVolunteers() {
     await dbConnect();
     const data = await User.find({ peran: 'Relawan' }).sort({ poin: -1 }).limit(5).select('namaLengkap poin');
     return JSON.parse(JSON.stringify(data));
 }
 
-// --- KOMPONEN HALAMAN UTAMA ---
 export default async function AnalyticsPage() {
   const user = await verifyAuth();
   if (!user || user.peran !== 'Admin') {
     redirect('/login');
   }
 
-  // Ambil semua data analitik secara paralel
   const [byCategoryData, byStatusData, topVolunteersData] = await Promise.all([
     getReportsByCategory(),
     getReportsByStatus(),
@@ -63,8 +57,7 @@ export default async function AnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-        
-        {/* Kolom Kiri: Grafik Utama */}
+  
         <div className="lg:col-span-3 space-y-8">
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-md" data-aos="fade-up">
                 <h2 className="text-2xl font-bold text-slate-900 flex items-center mb-4">
@@ -85,7 +78,6 @@ export default async function AnalyticsPage() {
             </div>
         </div>
 
-        {/* Kolom Kanan: Papan Peringkat */}
         <div className="lg:col-span-2" data-aos="fade-left" data-aos-delay="100">
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-md">
                 <h2 className="text-2xl font-bold text-slate-900 flex items-center mb-4">

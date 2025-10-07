@@ -2,10 +2,9 @@ import { NextResponse } from 'next/server';
 import { verifyAuth } from '@/lib/auth';
 import dbConnect from '@/lib/dbConnect';
 import Resource from '@/models/Resource';
-import User from '@/models/User';
 
-// FUNGSI GET: Mengambil SEMUA sumber daya (hanya Admin)
-export async function GET(request) {
+
+export async function GET() {
     const user = await verifyAuth();
     if (!user || user.peran !== 'Admin') {
         return NextResponse.json({ success: false, message: 'Akses ditolak.' }, { status: 403 });
@@ -19,6 +18,7 @@ export async function GET(request) {
             
         return NextResponse.json({ success: true, data: resources });
     } catch (error) {
+        console.error("Gagal mengambil semua sumber daya:", error);
         return NextResponse.json({ success: false, message: 'Server Error' }, { status: 500 });
     }
 }

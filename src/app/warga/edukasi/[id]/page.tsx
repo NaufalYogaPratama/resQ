@@ -4,8 +4,9 @@ import dbConnect from '@/lib/dbConnect';
 import Article from '@/models/Article';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, User, Calendar } from 'lucide-react';
+import Image from 'next/image';
 
-// Definisikan tipe data untuk sebuah artikel
+
 interface ArticleType {
   _id: string;
   judul: string;
@@ -73,7 +74,7 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
   
           {article.gambarUrl && (
             <figure className="mb-8" data-aos="fade-up" data-aos-delay="100">
-              <img 
+              <Image
                 src={article.gambarUrl} 
                 alt={`Gambar untuk ${article.judul}`} 
                 className="w-full h-auto max-h-[500px] object-cover rounded-xl shadow-md border border-slate-200"

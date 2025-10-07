@@ -36,9 +36,15 @@ export default function AdminHeader() {
         alert(`Mode Darurat sekarang: ${data.isEmergency ? "AKTIF" : "NONAKTIF"}`);
         router.refresh();
       }
-    } catch (error: any) {
-      alert(`Gagal mengubah mode darurat: ${error.message}`);
-    }
+    } catch (error) {
+      if (error instanceof Error) {
+          alert(`Gagal mengubah mode darurat: ${error.message}`);
+      } else {
+          alert("Gagal mengubah mode darurat karena kesalahan tidak dikenal.");
+      }
+  } finally {
+      setIsLoading(false);
+  }
   };
 
   return (

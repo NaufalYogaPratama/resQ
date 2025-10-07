@@ -1,10 +1,8 @@
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 
-
 export async function verifyAuth() {
- 
-  const cookieStore = await cookies();
+  const cookieStore = cookies(); 
   const token = cookieStore.get('token')?.value;
 
   if (!token) {
@@ -14,7 +12,7 @@ export async function verifyAuth() {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     return decoded;
-  } catch (error) {
+  } catch { 
     return null;
   }
 }

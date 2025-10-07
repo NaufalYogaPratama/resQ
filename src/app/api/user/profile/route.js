@@ -3,7 +3,7 @@ import { verifyAuth } from '@/lib/auth';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 
-// FUNGSI PUT UNTUK UPDATE PROFIL
+
 export async function PUT(request) {
     const user = await verifyAuth();
     if (!user) {
@@ -33,6 +33,8 @@ export async function PUT(request) {
         return NextResponse.json({ success: true, data: updatedUser });
 
     } catch (error) {
+    
+        console.error("Gagal update profil pengguna:", error);
         return NextResponse.json({ success: false, message: 'Terjadi kesalahan pada server.' }, { status: 500 });
     }
 }

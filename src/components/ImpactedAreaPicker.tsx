@@ -5,12 +5,16 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Fix ikon default
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+
+const iconProto = L.Icon.Default.prototype as unknown as {
+  _getIconUrl?: () => string;
+};
+delete iconProto._getIconUrl;
+
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
 
 interface PickerProps {
@@ -29,27 +33,23 @@ function MapEventsHandler({ onMapClick }: { onMapClick: (latlng: L.LatLng) => vo
 
 export default function ImpactedAreaPicker({ initialPoints, onPointsChange }: PickerProps) {
   const [points, setPoints] = useState<[number, number][]>(initialPoints);
-  const defaultCenter: [number, number] = [-6.9929, 110.4232]; // Center of Semarang
+  const defaultCenter: [number, number] = [-6.9929, 110.4232]; // Semarang
 
   useEffect(() => {
     onPointsChange(points);
   }, [points, onPointsChange]);
 
   const addPoint = (latlng: L.LatLng) => {
-    setPoints(prevPoints => [...prevPoints, [latlng.lng, latlng.lat]]);
+    setPoints((prevPoints) => [...prevPoints, [latlng.lng, latlng.lat]]);
   };
 
   const removePoint = (indexToRemove: number) => {
-    setPoints(prevPoints => prevPoints.filter((_, index) => index !== indexToRemove));
+    setPoints((prevPoints) => prevPoints.filter((_, index) => index !== indexToRemove));
   };
 
   return (
     <div className="h-80 rounded-lg overflow-hidden z-0 border border-slate-300 relative">
-      <MapContainer
-        center={defaultCenter}
-        zoom={12}
-        style={{ height: "100%", width: "100%" }}
-      >
+      <MapContainer center={defaultCenter} zoom={12} style={{ height: "100%", width: "100%" }}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; OpenStreetMap contributors'
@@ -58,7 +58,7 @@ export default function ImpactedAreaPicker({ initialPoints, onPointsChange }: Pi
         {points.map((point, index) => (
           <Marker
             key={index}
-            position={[point[1], point[0]]} // Leaflet uses [lat, lng]
+            position={[point[1], point[0]]} 
             eventHandlers={{
               click: () => {
                 removePoint(index);
@@ -67,6 +67,7 @@ export default function ImpactedAreaPicker({ initialPoints, onPointsChange }: Pi
           />
         ))}
       </MapContainer>
+
       <div className="absolute top-2 right-2 bg-white/80 p-2 rounded-md shadow-md text-xs text-slate-700 z-[1000]">
         Klik pada peta untuk menambah titik. Klik titik untuk menghapus.
       </div>

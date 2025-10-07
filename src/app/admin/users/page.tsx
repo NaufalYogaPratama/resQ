@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Users as UsersIcon, Shield, Search, CheckCircle } from 'lucide-react';
+import { Users as UsersIcon, Search, CheckCircle } from 'lucide-react';
 
-// Tipe data untuk pengguna, pastikan 'statusRelawan' ada
 interface UserType {
   _id: string;
   namaLengkap: string;
@@ -21,11 +20,11 @@ export default function ManageUsersPage() {
     useEffect(() => {
         const fetchUsers = async () => {
             setIsLoading(true);
+            setError(''); 
             try {
                 const res = await fetch('/api/users');
                 const data = await res.json();
                 if (data.success) {
-                    // Urutkan agar pengajuan muncul di paling atas
                     const sortedUsers = data.data.sort((a: UserType, b: UserType) => {
                         if (a.statusRelawan === 'Diajukan' && b.statusRelawan !== 'Diajukan') return -1;
                         if (a.statusRelawan !== 'Diajukan' && b.statusRelawan === 'Diajukan') return 1;
@@ -35,8 +34,15 @@ export default function ManageUsersPage() {
                 } else {
                     throw new Error(data.message || "Gagal mengambil data pengguna.");
                 }
-            } catch (err: any) { setError(err.message); } 
-            finally { setIsLoading(false); }
+            } catch (err) {
+                if (err instanceof Error) {
+                    setError(err.message); 
+                } else {
+                    setError("Terjadi kesalahan yang tidak diketahui.");
+                }
+            } finally {
+                setIsLoading(false);
+            }
         };
         fetchUsers();
     }, []);
@@ -54,19 +60,21 @@ export default function ManageUsersPage() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);
 
-            // Perbarui state secara lokal untuk UI yang responsif
             setUsers(currentUsers => 
                 currentUsers.map(u => 
                     u._id === userId ? { ...u, peran: data.data.peran, statusRelawan: data.data.statusRelawan } : u
                 )
             );
             alert("Peran pengguna berhasil diperbarui.");
-        } catch (err: any) {
-            alert(`Error: ${err.message}`);
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message); 
+            } else {
+                setError("Terjadi kesalahan yang tidak diketahui.");
+            }
         }
     };
-    
-    // Filter pengguna berdasarkan input pencarian
+
     const filteredUsers = users.filter(user => 
         user.namaLengkap.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -81,6 +89,13 @@ export default function ManageUsersPage() {
                 </h1>
                 <p className="mt-2 text-lg text-slate-600">Verifikasi relawan dan kelola semua pengguna terdaftar.</p>
             </div>
+
+            {error && (
+                <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md" role="alert">
+                    <p className="font-bold">Terjadi Kesalahan</p>
+                    <p>{error}</p>
+                </div>
+            )}
 
             <div className="bg-white border border-slate-200 rounded-2xl shadow-md" data-aos="fade-up">
                 <div className="p-6 border-b flex flex-col sm:flex-row justify-between items-center gap-4">

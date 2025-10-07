@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { X } from "lucide-react";
 import { HistoricEvent } from "@/types";
-import ImpactedAreaPicker from "./ImpactedAreaPicker";
 
 interface ModalProps {
   event: HistoricEvent | null;
@@ -13,7 +12,6 @@ interface ModalProps {
 }
 
 export default function HistoricEventModal({ event, onClose, onSave }: ModalProps) {
-  // Gunakan dynamic import di dalam komponen
   const ImpactedAreaPickerWithNoSSR = useMemo(() => dynamic(
     () => import('@/components/ImpactedAreaPicker'),
     { 
@@ -22,7 +20,7 @@ export default function HistoricEventModal({ event, onClose, onSave }: ModalProp
     }
   ), []);
 
-  // Definisikan state formData
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -84,11 +82,15 @@ export default function HistoricEventModal({ event, onClose, onSave }: ModalProp
       onClose();
       alert(`Data histori berhasil ${event?._id ? 'diperbarui' : 'ditambahkan'}!`);
 
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsSubmitting(false);
-    }
+    } catch (err) {
+      if (err instanceof Error) {
+          setError(err.message);
+      } else {
+          setError("Terjadi kesalahan yang tidak diketahui.");
+      }
+  } finally {
+    setIsSubmitting(false);
+  }
   };
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

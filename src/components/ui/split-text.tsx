@@ -14,7 +14,8 @@ export default function SplitText({
   const root = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    let ctx = gsap.context(() => {
+
+    const ctx = gsap.context(() => {
       gsap.fromTo(
         ".char",
         { opacity: 0, y: 20 },

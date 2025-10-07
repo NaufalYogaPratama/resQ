@@ -18,9 +18,14 @@ export default function ManageHistoricEventsPage() {
             const data = await res.json();
             if (data.success) {
                 setEvents(data.data);
+            } else {
+                throw new Error(data.message || "Gagal mengambil data histori.");
             }
-        } catch (err) { console.error("Gagal mengambil data histori:", err); }
-        finally { setIsLoading(false); }
+        } catch (err) { 
+            console.error("Gagal mengambil data histori:", err); 
+        } finally { 
+            setIsLoading(false); 
+        }
     };
 
     useEffect(() => {
@@ -31,11 +36,20 @@ export default function ManageHistoricEventsPage() {
         if (!confirm("Anda yakin ingin menghapus data histori ini?")) return;
         
         try {
-            await fetch(`/api/historic-events/${eventId}`, { method: 'DELETE' });
-            fetchEvents();
+            const res = await fetch(`/api/historic-events/${eventId}`, { method: 'DELETE' });
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.message || "Gagal menghapus data.");
+            }
+
+            setEvents(prevEvents => prevEvents.filter(event => event._id !== eventId));
             alert("Data berhasil dihapus.");
         } catch (err) {
-            alert("Gagal menghapus data.");
+            if (err instanceof Error) {
+                alert(`Gagal menghapus data: ${err.message}`);
+            } else {
+                alert("Gagal menghapus data karena kesalahan tidak dikenal.");
+            }
         }
     };
 
@@ -46,7 +60,8 @@ export default function ManageHistoricEventsPage() {
                     <Clock className="w-10 h-10 mr-4 text-indigo-600"/>
                     Manajemen Histori Bencana
                 </h1>
-                <p className="mt-2 text-lg text-slate-600">Kelola data untuk modul interaktif "Belajar dari Krisis Lalu".</p>
+
+                <p className="mt-2 text-lg text-slate-600">Kelola data untuk modul interaktif &apos;Belajar dari Krisis Lalu&apos;.</p>
             </div>
 
             <div className="bg-white border border-slate-200 rounded-2xl shadow-md" data-aos="fade-up">
@@ -80,10 +95,10 @@ export default function ManageHistoricEventsPage() {
                                     <td className="px-6 py-4 text-right text-sm font-medium space-x-2">
                                         <button 
                                           onClick={() => { setSelectedEvent(event); setIsModalOpen(true); }} 
-                                          className="text-indigo-600 hover:text-indigo-800" title="Edit">
+                                          className="text-indigo-600 hover:text-indigo-800 p-2 rounded-full hover:bg-indigo-100" title="Edit">
                                             <Edit className="w-4 h-4" />
                                         </button>
-                                        <button onClick={() => handleDelete(event._id)} className="text-red-600 hover:text-red-800" title="Hapus">
+                                        <button onClick={() => handleDelete(event._id)} className="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-100" title="Hapus">
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </td>
@@ -104,3 +119,4 @@ export default function ManageHistoricEventsPage() {
         </div>
     );
 }
+

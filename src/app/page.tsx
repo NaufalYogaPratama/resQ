@@ -5,8 +5,8 @@ import Link from "next/link"
 import { MessageCircle, Map, Users, BookOpen, HandHeart, ShieldCheck, ArrowRight } from "lucide-react"
 import AOS from "aos"
 import "aos/dist/aos.css"
+import Image from 'next/image';
 
-// Komponen baru untuk galeri foto di hero section
 const HeroImageGallery = () => {
   const images = [
     "https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/radarsemarang/2021/02/SIMPANG-LIMA.jpg",
@@ -21,33 +21,17 @@ const HeroImageGallery = () => {
       <div className="absolute top-10 left-10 w-72 h-72 bg-violet-300/35 rounded-full blur-3xl"></div>
       <div className="absolute bottom-10 right-10 w-72 h-72 bg-indigo-300/30 rounded-full blur-3xl"></div>
 
-      <div
-        className="absolute top-0 right-1/4 w-48 h-72 rounded-2xl shadow-2xl overflow-hidden transform -rotate-6 transition-transform hover:scale-105 hover:rotate-0"
-        data-aos="zoom-in"
-        data-aos-delay="200"
-      >
-        <img src={images[0] || "/placeholder.svg"} alt="Gallery image 1" className="w-full h-full object-cover" />
+      <div className="absolute top-0 right-1/4 w-48 h-72 rounded-2xl shadow-2xl overflow-hidden transform -rotate-6 transition-transform hover:scale-105 hover:rotate-0" data-aos="zoom-in" data-aos-delay="200">
+        <Image src={images[0] || "/placeholder.svg"} alt="Galeri ResQ 1" fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 33vw"/>
       </div>
-      <div
-        className="absolute top-1/4 left-0 w-56 h-80 rounded-2xl shadow-2xl overflow-hidden transform rotate-3 transition-transform hover:scale-105 hover:rotate-0"
-        data-aos="zoom-in"
-        data-aos-delay="100"
-      >
-        <img src={images[1] || "/placeholder.svg"} alt="Gallery image 2" className="w-full h-full object-cover" />
+      <div className="absolute top-1/4 left-0 w-56 h-80 rounded-2xl shadow-2xl overflow-hidden transform rotate-3 transition-transform hover:scale-105 hover:rotate-0" data-aos="zoom-in" data-aos-delay="100">
+        <Image src={images[1] || "/placeholder.svg"} alt="Galeri ResQ 2" fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 33vw"/>
       </div>
-      <div
-        className="absolute bottom-0 left-1/4 w-48 h-64 rounded-2xl shadow-2xl overflow-hidden transform rotate-6 transition-transform hover:scale-105 hover:rotate-0"
-        data-aos="zoom-in"
-        data-aos-delay="300"
-      >
-        <img src={images[2] || "/placeholder.svg"} alt="Gallery image 3" className="w-full h-full object-cover" />
+      <div className="absolute bottom-0 left-1/4 w-48 h-64 rounded-2xl shadow-2xl overflow-hidden transform rotate-6 transition-transform hover:scale-105 hover:rotate-0" data-aos="zoom-in" data-aos-delay="300">
+        <Image src={images[2] || "/placeholder.svg"} alt="Galeri ResQ 3" fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 33vw"/>
       </div>
-      <div
-        className="absolute bottom-10 right-0 w-52 h-72 rounded-2xl shadow-2xl overflow-hidden transform -rotate-3 transition-transform hover:scale-105 hover:rotate-0"
-        data-aos="zoom-in"
-        data-aos-delay="400"
-      >
-        <img src={images[3] || "/placeholder.svg"} alt="Gallery image 4" className="w-full h-full object-cover" />
+      <div className="absolute bottom-10 right-0 w-52 h-72 rounded-2xl shadow-2xl overflow-hidden transform -rotate-3 transition-transform hover:scale-105 hover:rotate-0" data-aos="zoom-in" data-aos-delay="400">
+        <Image src={images[3] || "/placeholder.svg"} alt="Galeri ResQ 4" fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 33vw"/>
       </div>
     </div>
   )
@@ -137,10 +121,13 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-3">
-              <img
-                src="/ResQlogo.png"
+            <Image
+                src="/ResQ.png"
                 alt="ResQ Logo"
-                className={`h-10 transition-transform duration-300 ${isScrolled ? "scale-90" : "scale-100"}`}
+                width={40} 
+                height={40}
+                className={`h-10 w-auto transition-transform duration-300 ${isScrolled ? "scale-90" : "scale-100"}`}
+                priority 
               />
             </div>
             <div className="hidden md:flex items-center space-x-8">

@@ -23,8 +23,13 @@ export default function ApplyVolunteerButton({ totalResources, currentStatus }: 
             }
             setStatus('Diajukan');
             alert("Pengajuan berhasil! Admin akan segera meninjau permohonan Anda.");
-        } catch (err: any) {
-            alert(`Error: ${err.message}`);
+        } catch (err) {
+    
+            if (err instanceof Error) {
+                alert(`Error: ${err.message}`);
+            } else {
+                alert("Terjadi kesalahan yang tidak diketahui.");
+            }
         } finally {
             setIsLoading(false);
         }

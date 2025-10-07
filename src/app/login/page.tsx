@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
+
 // Ilustrasi untuk panel kiri
 const LoginIllustration = () => (
   <div className="w-full h-full bg-[#4B5EAA] text-white flex flex-col justify-center px-10 py-12 rounded-r-[4rem]">
@@ -96,31 +97,34 @@ export default function LoginPage() {
         router.push('/');
       }
 
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
+    } catch (err) {
+      if (err instanceof Error) {
+          setError(err.message); 
+      } else {
+          setError("Terjadi kesalahan yang tidak diketahui.");
+      }
+  } finally {
       setIsLoading(false);
-    }
-  };
+  }
+};
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-slate-100 p-4 font-sans">
       <div className="w-full max-w-5xl mx-auto grid md:grid-cols-2 bg-white rounded-2xl shadow-2xl overflow-hidden">
         
-        {/* Left Section (Illustration) - Hidden on mobile */}
         <div className="hidden md:flex items-center justify-center bg-[#4B5EAA] rounded-r-[4rem]">
           <LoginIllustration />
         </div>
 
-        {/* Right Section (Login Form) */}
         <div className="w-full p-8 sm:p-12 lg:p-16 flex flex-col justify-center relative">
-        <a
+        <Link
             href="/"
             className="absolute top-6 left-6 flex items-center gap-2 text-[#4B5EAA] hover:text-[#3A4D89] transition font-semibold"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Kembali ke Beranda</span>
-          </a>
+          </Link>
           
           <h2 className="text-3xl font-bold text-slate-900 mb-2">
             Masuk ke Akun Anda

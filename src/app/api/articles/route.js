@@ -4,40 +4,36 @@ import dbConnect from '@/lib/dbConnect';
 import Article from '@/models/Article';
 import cloudinary from 'cloudinary';
 
-// Konfigurasi Cloudinary (wajib ada)
 cloudinary.v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Fungsi bantuan untuk mengubah file menjadi format yang bisa diupload
 async function uploadImage(file) {
     const fileBuffer = await file.arrayBuffer();
     const mime = file.type;
     const encoding = 'base64';
     const base64Data = Buffer.from(fileBuffer).toString('base64');
     const fileUri = 'data:' + mime + ';' + encoding + ',' + base64Data;
-    
-    // Upload ke Cloudinary
+
     const result = await cloudinary.v2.uploader.upload(fileUri, {
-        folder: 'resq_articles' // Simpan di dalam folder 'resq_articles'
+        folder: 'resq_articles' 
     });
     return result;
 }
 
-// FUNGSI GET: Mengambil semua artikel
-export async function GET(request) {
+export async function GET() {
     await dbConnect();
     try {
         const articles = await Article.find({}).sort({ createdAt: -1 });
         return NextResponse.json({ success: true, data: articles });
     } catch (error) {
+        console.error("Gagal mengambil artikel:", error);
         return NextResponse.json({ success: false, message: "Server Error" }, { status: 500 });
     }
 }
 
-// FUNGSI POST: Membuat artikel baru
 export async function POST(request) {
     const user = await verifyAuth();
     if (!user || user.peran !== 'Admin') {
@@ -66,12 +62,13 @@ export async function POST(request) {
         if (gambar && gambar.size > 0) {
             const uploadResult = await uploadImage(gambar);
             newArticleData.gambarUrl = uploadResult.secure_url;
-            newArticleData.gambarPublicId = uploadResult.public_id; // Simpan public_id untuk bisa menghapus
+            newArticleData.gambarPublicId = uploadResult.public_id;
         }
         
         const newArticle = await Article.create(newArticleData);
         return NextResponse.json({ success: true, data: newArticle }, { status: 201 });
     } catch (error) {
+        console.error("Gagal membuat artikel baru:", error);
         return NextResponse.json({ success: false, message: error.message || "Terjadi kesalahan pada server." }, { status: 500 });
     }
 }

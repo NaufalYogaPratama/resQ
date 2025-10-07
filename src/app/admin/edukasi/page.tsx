@@ -1,4 +1,4 @@
-// File: src/app/admin/edukasi/page.tsx (Dengan Tata Letak Horizontal)
+
 
 "use client";
 
@@ -37,8 +37,12 @@ export default function EdukasiPage() {
             } else {
                 throw new Error(data.message || "Gagal mengambil data");
             }
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message); 
+            } else {
+                setError("Terjadi kesalahan yang tidak diketahui.");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -75,8 +79,12 @@ export default function EdukasiPage() {
             const fileInput = document.getElementById('gambar') as HTMLInputElement;
             if (fileInput) fileInput.value = "";
 
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("Gagal menyimpan artikel.");
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -91,8 +99,12 @@ export default function EdukasiPage() {
                 
                 setArticles(prevArticles => prevArticles.filter(article => article._id !== id));
                 alert("Artikel berhasil dihapus!");
-            } catch (err: any) {
-                alert("Gagal menghapus artikel: " + err.message);
+            } catch (err) {
+                if (err instanceof Error) {
+                    alert("Gagal menghapus artikel: " + err.message);
+                } else {
+                    alert("Gagal menghapus artikel karena kesalahan tidak diketahui.");
+                }
             }
         }
     };
@@ -107,10 +119,10 @@ export default function EdukasiPage() {
                 <p className="mt-2 text-lg text-slate-600">Buat, edit, dan kelola semua artikel edukasi untuk warga.</p>
             </div>
 
-            {/* --- Kunci Tata Letak Horizontal ada di baris ini --- */}
+
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
                 
-                {/* Kolom Form (mengambil 2 dari 5 kolom di layar besar) */}
+   
                 <div data-aos="fade-right" className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl shadow-md p-6 sm:p-8 h-fit">
                     <h2 className="text-2xl font-bold mb-6 text-slate-900 flex items-center">
                         <PlusCircle className="w-7 h-7 mr-3 text-indigo-600"/>
@@ -158,7 +170,7 @@ export default function EdukasiPage() {
                     </form>
                 </div>
 
-                {/* Kolom Tabel (mengambil 3 dari 5 kolom di layar besar) */}
+        
                 <div data-aos="fade-left" data-aos-delay="100" className="lg:col-span-3 bg-white border border-slate-200 rounded-2xl shadow-md h-fit">
                     <div className="p-6 border-b">
                         <h2 className="text-2xl font-bold text-slate-900">Daftar Artikel ({articles.length})</h2>

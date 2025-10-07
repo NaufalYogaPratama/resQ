@@ -1,4 +1,4 @@
-// File: src/app/admin/edukasi/[id]/page.tsx
+
 
 "use client";
 
@@ -7,6 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import Image from 'next/image';
 
 const TiptapEditor = dynamic(() => import("@/components/TiptapEditor"), { ssr: false });
 
@@ -39,8 +40,13 @@ export default function EditEdukasiPage() {
                     } else {
                         throw new Error(data.message);
                     }
-                } catch (err: any) {
-                    setError(err.message);
+                } catch (err) {
+                  
+                    if (err instanceof Error) {
+                        setError(err.message); 
+                    } else {
+                        setError("Terjadi kesalahan yang tidak diketahui.");
+                    }
                 } finally {
                     setIsLoading(false);
                 }
@@ -75,8 +81,12 @@ export default function EditEdukasiPage() {
             alert("Artikel berhasil diperbarui!");
             router.push("/admin/edukasi");
 
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("Gagal menyimpan artikel.");
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -121,7 +131,7 @@ export default function EditEdukasiPage() {
                                 className="text-sm text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
                         </div>
                         {gambar && <p className="text-xs text-green-600 mt-1">✓ Foto baru terpilih: {gambar.name}</p>}
-                        {!gambar && gambarUrl && <img src={gambarUrl} alt="Gambar saat ini" className="w-32 h-auto mt-2 rounded-md"/>}
+                        {!gambar && gambarUrl && <Image src={gambarUrl} alt="Gambar saat ini" className="w-32 h-auto mt-2 rounded-md"/>}
                     </div>
                 </div>
 

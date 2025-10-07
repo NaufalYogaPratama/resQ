@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { Send } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Send, Loader2 } from 'lucide-react';
 
 interface Message {
   _id: string;
   sender: {
     _id: string;
     namaLengkap: string;
+    peran: 'Warga' | 'Relawan' | 'Admin';
   };
   content: string;
   createdAt: string;
@@ -23,32 +24,44 @@ export default function ChatBox({ reportId, currentUserId }: ChatBoxProps) {
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
       const res = await fetch(`/api/chat/${reportId}/messages`);
-      if (!res.ok) throw new Error('Gagal memuat pesan.');
+      if (!res.ok) {
+        const data = await res.json();
+   
+        if (res.status !== 404) {
+            throw new Error(data.message || 'Gagal memuat pesan.');
+        }
+        setMessages([]); 
+        return;
+      }
       const data = await res.json();
       if (data.success) {
         setMessages(data.data);
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) { 
+        if (err instanceof Error) {
+            setError(err.message);
+        }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [reportId]);
 
   useEffect(() => {
     fetchMessages();
-    const intervalId = setInterval(fetchMessages, 3000); // Polling setiap 3 detik
-    return () => clearInterval(intervalId); // Membersihkan interval
-  }, [reportId]);
+    const intervalId = setInterval(fetchMessages, 5000); 
+    return () => clearInterval(intervalId);
+
+  }, [fetchMessages]);
 
   useEffect(() => {
     scrollToBottom();
@@ -56,7 +69,10 @@ export default function ChatBox({ reportId, currentUserId }: ChatBoxProps) {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || isSending) return;
+
+    setIsSending(true);
+    setError('');
 
     try {
       const res = await fetch(`/api/chat/${reportId}/messages`, {
@@ -66,11 +82,15 @@ export default function ChatBox({ reportId, currentUserId }: ChatBoxProps) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Gagal mengirim pesan.');
-      
+   
       setMessages(prev => [...prev, data.data]);
       setNewMessage('');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+        if (err instanceof Error) {
+            setError(err.message);
+        }
+    } finally {
+        setIsSending(false);
     }
   };
 
@@ -79,27 +99,25 @@ export default function ChatBox({ reportId, currentUserId }: ChatBoxProps) {
   }
   
   if (error) {
-    return <div className="p-4 text-center text-red-500">{error}</div>;
+    return <div className="p-4 text-center text-red-500 bg-red-50 border border-red-200 rounded-lg">{error}</div>;
   }
 
   return (
     <div className="flex flex-col h-96 bg-white border border-slate-200 rounded-lg shadow-inner">
-      {/* Header Chat */}
       <div className="p-3 border-b border-slate-200">
         <h3 className="font-bold text-slate-800">Kanal Koordinasi</h3>
       </div>
       
-      {/* Area Pesan */}
       <div className="flex-grow p-4 overflow-y-auto bg-slate-50">
         {messages.length === 0 ? (
-          <p className="text-center text-sm text-slate-400">Belum ada pesan. Mulai percakapan!</p>
+          <p className="text-center text-sm text-slate-400">Belum ada pesan. Mulai percakapan untuk berkoordinasi!</p>
         ) : (
           messages.map(msg => (
             <div key={msg._id} className={`flex my-2 ${msg.sender._id === currentUserId ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-xs md:max-w-md p-3 rounded-xl ${msg.sender._id === currentUserId ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-800'}`}>
-                <p className="text-xs font-bold mb-1 opacity-80">{msg.sender.namaLengkap}</p>
-                <p className="text-sm">{msg.content}</p>
-                <p className="text-xs text-right mt-1 opacity-60">
+              <div className={`max-w-xs md:max-w-md p-3 rounded-xl shadow-sm ${msg.sender._id === currentUserId ? 'bg-indigo-600 text-white' : 'bg-white text-slate-800 border'}`}>
+                <p className={`text-xs font-bold mb-1 ${msg.sender._id === currentUserId ? 'text-indigo-200' : 'text-indigo-600'}`}>{msg.sender.namaLengkap} ({msg.sender.peran})</p>
+                <p className="text-sm break-words">{msg.content}</p>
+                <p className={`text-xs text-right mt-1 ${msg.sender._id === currentUserId ? 'text-indigo-300' : 'text-slate-400'}`}>
                   {new Date(msg.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
@@ -109,7 +127,6 @@ export default function ChatBox({ reportId, currentUserId }: ChatBoxProps) {
         <div ref={messagesEndRef} />
       </div>
       
-      {/* Input Pesan */}
       <div className="p-3 border-t border-slate-200">
         <form onSubmit={handleSendMessage} className="flex items-center gap-2">
           <input
@@ -117,10 +134,11 @@ export default function ChatBox({ reportId, currentUserId }: ChatBoxProps) {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Ketik pesan koordinasi..."
-            className="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            disabled={isSending}
+            className="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100"
           />
-          <button type="submit" className="bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 flex-shrink-0">
-            <Send className="w-5 h-5" />
+          <button type="submit" disabled={isSending} className="bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 flex-shrink-0 disabled:bg-indigo-400">
+            {isSending ? <Loader2 className="w-5 h-5 animate-spin"/> : <Send className="w-5 h-5" />}
           </button>
         </form>
       </div>

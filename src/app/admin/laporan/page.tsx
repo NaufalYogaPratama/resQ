@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { ListChecks, Search, Trash2, Edit } from 'lucide-react';
 import Link from 'next/link';
 
-// Tipe data untuk laporan
 interface ReportType {
   _id: string;
   deskripsi: string;
@@ -14,7 +13,7 @@ interface ReportType {
   penolong?: { namaLengkap: string; };
   pelapor: {
     namaLengkap: string;
-} | null; 
+  } | null; 
 }
 
 export default function ManageReportsPage() {
@@ -26,16 +25,24 @@ export default function ManageReportsPage() {
 
     const fetchReports = async () => {
         setIsLoading(true);
+        setError(''); 
         try {
-            const res = await fetch('/api/reports/all'); // Panggil API baru
+            const res = await fetch('/api/reports/all'); 
             const data = await res.json();
             if (data.success) {
                 setReports(data.data);
             } else {
                 throw new Error(data.message || 'Gagal mengambil data laporan.');
             }
-        } catch (err: any) { setError(err.message); } 
-        finally { setIsLoading(false); }
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message); 
+            } else {
+                setError("Terjadi kesalahan yang tidak diketahui.");
+            }
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -47,13 +54,19 @@ export default function ManageReportsPage() {
         
         try {
             const res = await fetch(`/api/reports/${reportId}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error("Gagal menghapus laporan.");
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.message || "Gagal menghapus laporan.");
+            }
             
-            // Hapus dari state untuk update UI instan
             setReports(prev => prev.filter(r => r._id !== reportId));
             alert("Laporan berhasil dihapus.");
-        } catch (err: any) {
-            alert(`Error: ${err.message}`);
+        } catch (err) {
+            if (err instanceof Error) {
+                alert(`Error: ${err.message}`);
+            } else {
+                alert("Terjadi kesalahan tidak dikenal.");
+            }
         }
     };
 
@@ -67,7 +80,7 @@ export default function ManageReportsPage() {
         return matchesStatus && matchesSearch;
     });
 
-    const statusColors = {
+    const statusColors: { [key: string]: string } = {
         Menunggu: "bg-red-100 text-red-800",
         Ditangani: "bg-orange-100 text-orange-800",
         Selesai: "bg-green-100 text-green-800",
@@ -82,6 +95,14 @@ export default function ManageReportsPage() {
                 </h1>
                 <p className="mt-2 text-lg text-slate-600">Lihat, kelola, dan moderasi semua laporan yang masuk ke sistem.</p>
             </div>
+            
+       
+            {error && (
+                <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md" role="alert">
+                    <p className="font-bold">Terjadi Kesalahan</p>
+                    <p>{error}</p>
+                </div>
+            )}
 
             <div className="bg-white border border-slate-200 rounded-2xl shadow-md" data-aos="fade-up">
                 <div className="p-6 border-b flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -120,7 +141,7 @@ export default function ManageReportsPage() {
                         <tbody className="bg-white divide-y divide-slate-200">
                             {isLoading ? (
                                 <tr><td colSpan={6} className="p-6 text-center text-slate-500">Memuat data laporan...</td></tr>
-                            ) : filteredReports.map(report => (
+                            ) : filteredReports.map((report: ReportType) => (
                                 <tr key={report._id} className="hover:bg-slate-50">
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[report.status] || 'bg-gray-100'}`}>
@@ -134,11 +155,12 @@ export default function ManageReportsPage() {
                                     <td className="px-6 py-4 text-sm text-slate-500">{report.penolong?.namaLengkap || '-'}</td>
                                     <td className="px-6 py-4 text-sm text-slate-500">{new Date(report.createdAt).toLocaleDateString('id-ID')}</td>
                                     <td className="px-6 py-4 text-right text-sm font-medium space-x-2">
-                                        <Link href={`/admin/laporan/${report._id}`} className="text-indigo-600 hover:text-indigo-800" title="Lihat Detail">Detail</Link>
-                                        {report.status === 'Selesai' && (
-                                            <Link href={`/admin/analitik/${report._id}`} className="text-green-600 hover:text-green-800" title="Lihat Analitik">Analitik</Link>
-                                        )}
-                                        <button onClick={() => handleDelete(report._id)} className="text-red-600 hover:text-red-800" title="Hapus Laporan">Hapus</button>
+                                        <Link href={`/admin/laporan/${report._id}`} className="p-2 inline-flex items-center text-indigo-600 hover:text-indigo-800" title="Lihat Detail">
+                                            <Edit className="w-4 h-4" />
+                                        </Link>
+                                        <button onClick={() => handleDelete(report._id)} className="p-2 inline-flex items-center text-red-600 hover:text-red-800" title="Hapus Laporan">
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
                                     </td>
                                 </tr>
                             ))}

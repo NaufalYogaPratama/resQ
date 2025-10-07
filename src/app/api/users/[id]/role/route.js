@@ -25,11 +25,12 @@ export async function PUT(request, { params }) {
             updateData.statusRelawan = 'Diterima';
         }
 
+  
         if (peran === 'Warga') {
             updateData.statusRelawan = 'None';
         }
 
-        const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true }).select('-kataSandi');
+        const updatedUser = await User.findByIdAndUpdate(id, { $set: updateData }, { new: true }).select('-kataSandi');
 
         if (!updatedUser) {
             return NextResponse.json({ success: false, message: 'Pengguna tidak ditemukan.' }, { status: 404 });
@@ -38,6 +39,7 @@ export async function PUT(request, { params }) {
         return NextResponse.json({ success: true, data: updatedUser });
 
     } catch (error) {
+        console.error("Gagal mengubah peran pengguna:", error);
         return NextResponse.json({ success: false, message: 'Server Error' }, { status: 500 });
     }
 }

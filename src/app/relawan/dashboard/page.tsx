@@ -1,4 +1,4 @@
-// File: src/app/relawan/dashboard/page.tsx (Disesuaikan dengan Tema Navbar Biru Modern)
+
 
 import Link from 'next/link';
 import { verifyAuth } from '@/lib/auth';
@@ -9,9 +9,6 @@ import Report from '@/models/Report';
 import User from '@/models/User';
 import Badges from '@/components/Badges';
 
-// ========================
-// Tipe Data
-// ========================
 interface TaskType {
   _id: string;
   deskripsi: string;
@@ -25,9 +22,6 @@ interface UserDataType {
   lencana: string[];
 }
 
-// ========================
-// Mengambil data ringkasan laporan
-// ========================
 async function getReportSummary() {
   await dbConnect();
   try {
@@ -40,9 +34,6 @@ async function getReportSummary() {
   }
 }
 
-// ========================
-// Mengambil tugas aktif relawan
-// ========================
 async function getMyTasks(userId: string): Promise<TaskType[]> {
   await dbConnect();
   try {
@@ -56,9 +47,7 @@ async function getMyTasks(userId: string): Promise<TaskType[]> {
   }
 }
 
-// ========================
-// Mengambil data user
-// ========================
+
 async function getUserData(userId: string): Promise<UserDataType | null> {
   await dbConnect();
   try {
@@ -71,9 +60,7 @@ async function getUserData(userId: string): Promise<UserDataType | null> {
   }
 }
 
-// ========================
-// Komponen Utama
-// ========================
+
 export default async function DashboardRelawanPage() {
   const session = await verifyAuth();
   if (!session || session.peran !== 'Relawan') redirect('/login');
@@ -86,7 +73,7 @@ export default async function DashboardRelawanPage() {
   return (
     <div className="bg-white min-h-screen p-4 sm:p-8 font-sans text-slate-900">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+  
         <div className="mb-10" data-aos="fade-down">
           <h1 className="text-4xl font-extrabold text-[#1E1E3A]">
             Dashboard Relawan Siaga
@@ -96,7 +83,6 @@ export default async function DashboardRelawanPage() {
           </p>
         </div>
 
-        {/* Statistik */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div
             className="bg-white border border-slate-200 rounded-2xl p-6 flex items-center gap-4 shadow-md hover:shadow-lg transition-all"
@@ -153,9 +139,9 @@ export default async function DashboardRelawanPage() {
           </div>
         </div>
 
-        {/* Konten utama */}
+       
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Kolom kiri - Tugas Aktif */}
+
           <div
             data-aos="fade-up"
             data-aos-delay="400"
@@ -211,7 +197,7 @@ export default async function DashboardRelawanPage() {
             </div>
           </div>
 
-          {/* Kolom kanan */}
+       
           <div className="space-y-8">
             <div data-aos="fade-left" data-aos-delay="500">
               <Badges points={userData.poin || 0} />

@@ -1,7 +1,7 @@
-import dbConnect from "@/lib/dbConnect";
-import HistoricEvent from "@/models/HistoricEvent";
-import { verifyAuth } from "@/lib/auth";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import { verifyAuth } from '@/lib/auth';
+import dbConnect from '@/lib/dbConnect';
+import HistoricEvent from '@/models/HistoricEvent';
 
 export async function GET(request, { params }) {
   await dbConnect();
@@ -12,6 +12,8 @@ export async function GET(request, { params }) {
     }
     return NextResponse.json({ success: true, data: event });
   } catch (error) {
+   
+    console.error("Gagal mengambil data histori by ID:", error);
     return NextResponse.json({ success: false, message: "Server Error" }, { status: 500 });
   }
 }
@@ -33,6 +35,7 @@ export async function PUT(request, { params }) {
     }
     return NextResponse.json({ success: true, data: updatedEvent });
   } catch (error) {
+    console.error("Gagal memperbarui data histori:", error);
     return NextResponse.json({ success: false, message: error.message }, { status: 400 });
   }
 }
@@ -51,6 +54,7 @@ export async function DELETE(request, { params }) {
       }
       return NextResponse.json({ success: true, data: {} });
     } catch (error) {
+      console.error("Gagal menghapus data histori:", error);
       return NextResponse.json({ success: false, message: "Server Error" }, { status: 500 });
     }
 }

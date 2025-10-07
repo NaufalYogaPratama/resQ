@@ -2,8 +2,6 @@ import { verifyAuth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
-import Resource from '@/models/Resource';
-import Report from '@/models/Report';
 import mongoose from 'mongoose';
 import EditProfileModal from '@/components/EditProfileModal';
 import { 
@@ -11,6 +9,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import ApplyVolunteerButton from '@/components/ApplyVolunteerButton'; 
+import Image from 'next/image';
 
 
 interface ResourceListItem {
@@ -125,7 +124,7 @@ export default async function ProfilWargaPage() {
                             <div className="flex flex-wrap gap-4">
                                 {user.lencana && user.lencana.length > 0 ? (
                                     user.lencana.map((badge: string) => (
-                                        // Menggunakan warna dinamis dari palet
+                                   
                                         <div key={badge} className={`font-semibold px-4 py-2 rounded-full flex items-center gap-2 border ${badgeColors[badge] || defaultBadgeColor}`}>
                                             <Trophy className="w-5 h-5"/> {badge}
                                         </div>
@@ -176,9 +175,9 @@ export default async function ProfilWargaPage() {
                                 {user.resourceList && user.resourceList.length > 0 ? (
                                     user.resourceList.map((res: ResourceListItem) => (
                                         <div key={res._id} className="flex items-center gap-4 p-3 bg-slate-50 rounded-lg">
-                                            {/* --- PERBAIKAN 3: Menampilkan gambar jika ada --- */}
+                                          
                                             {res.gambarUrl ? (
-                                                <img src={res.gambarUrl} alt={res.namaSumberDaya} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                                                <Image src={res.gambarUrl} alt={res.namaSumberDaya} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
                                             ) : (
                                                 <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                                     {res.tipe === 'Aset' ? <Package className="w-6 h-6 text-indigo-600" /> : <Wrench className="w-6 h-6 text-indigo-600" />}

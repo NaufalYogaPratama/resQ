@@ -1,11 +1,9 @@
+import { NextResponse } from 'next/server';
 import dbConnect from "@/lib/dbConnect";
 import SystemSetting from "@/models/SystemSetting";
 import { verifyAuth } from "@/lib/auth";
-import { NextResponse } from "next/server";
-
 
 export const dynamic = 'force-dynamic';
-
 
 export async function GET() {
   await dbConnect();
@@ -13,11 +11,12 @@ export async function GET() {
     const setting = await SystemSetting.findOne({});
     return NextResponse.json({ success: true, isEmergency: setting ? setting.modeDarurat : false });
   } catch (error) {
+    console.error("Gagal mengambil status mode darurat:", error);
     return NextResponse.json({ success: false, message: "Server Error" }, { status: 500 });
   }
 }
 
-export async function POST(request) {
+export async function POST() {
   const user = await verifyAuth();
   if (!user || user.peran !== 'Admin') {
     return NextResponse.json({ success: false, message: "Akses ditolak." }, { status: 403 });
@@ -26,13 +25,14 @@ export async function POST(request) {
   try {
     let setting = await SystemSetting.findOne({});
     if (!setting) {
-        setting = await SystemSetting.create({ modeDarurat: true });
+        setting = await SystemSetting.create({ name: 'global', modeDarurat: true });
     } else {
         setting.modeDarurat = !setting.modeDarurat; 
         await setting.save();
     }
     return NextResponse.json({ success: true, isEmergency: setting.modeDarurat });
   } catch (error) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    console.error("Gagal mengubah mode darurat:", error);
+    return NextResponse.json({ success: false, message: error.message || "Gagal mengubah mode darurat." }, { status: 500 });
   }
 }

@@ -1,15 +1,13 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Package, Search, Trash2, ArrowRight } from 'lucide-react'; // Tambah ArrowRight
+import { Package, Search, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-
-// Tipe data untuk sumber daya
 interface ResourceType {
   _id: string;
   namaSumberDaya: string;
   tipe: 'Aset' | 'Keahlian';
-  pemilik: { namaLengkap: string; };
+  pemilik: { namaLengkap: string; } | null; 
   createdAt: string;
 }
 
@@ -18,18 +16,29 @@ export default function ManageResourcesPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterType, setFilterType] = useState('Semua');
+    const [filterType, setFilterType] = useState<'Semua' | 'Aset' | 'Keahlian'>('Semua');
 
     useEffect(() => {
         const fetchAllResources = async () => {
             setIsLoading(true);
+            setError(''); 
             try {
                 const res = await fetch('/api/resources/all');
                 const data = await res.json();
-                if (data.success) setResources(data.data);
-                else throw new Error(data.message);
-            } catch (err: any) { setError(err.message); } 
-            finally { setIsLoading(false); }
+                if (data.success) {
+                    setResources(data.data);
+                } else {
+                    throw new Error(data.message || 'Gagal mengambil data.');
+                }
+            } catch (err) {
+                if (err instanceof Error) {
+                    setError(err.message);
+                } else {
+                    setError('Terjadi kesalahan tidak dikenal.');
+                }
+            } finally {
+                setIsLoading(false);
+            }
         };
         fetchAllResources();
     }, []);
@@ -38,18 +47,26 @@ export default function ManageResourcesPage() {
         if (!confirm("Anda yakin ingin menghapus sumber daya ini?")) return;
         try {
             const res = await fetch(`/api/resources/${resourceId}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error("Gagal menghapus sumber daya.");
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.message || "Gagal menghapus sumber daya.");
+            }
             setResources(prev => prev.filter(r => r._id !== resourceId));
             alert("Sumber daya berhasil dihapus.");
-        } catch (err: any) {
-            alert(`Error: ${err.message}`);
+        } catch (err) {
+            if (err instanceof Error) {
+
+                setError(err.message);
+            } else {
+                setError("Terjadi kesalahan yang tidak diketahui saat menghapus.");
+            }
         }
     };
 
     const filteredResources = resources.filter(res => {
         const matchesType = filterType === 'Semua' || res.tipe === filterType;
         const matchesSearch = res.namaSumberDaya.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                              (res.pemilik && res.pemilik.namaLengkap.toLowerCase().includes(searchTerm.toLowerCase()));
+                              (res.pemilik ? res.pemilik.namaLengkap.toLowerCase().includes(searchTerm.toLowerCase()) : false);
         return matchesType && matchesSearch;
     });
 
@@ -62,6 +79,14 @@ export default function ManageResourcesPage() {
                 </h1>
                 <p className="mt-2 text-lg text-slate-600">Lihat semua aset dan keahlian yang terdaftar di komunitas.</p>
             </div>
+
+
+            {error && (
+                <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md" role="alert">
+                    <p className="font-bold">Terjadi Kesalahan</p>
+                    <p>{error}</p>
+                </div>
+            )}
 
             <div className="bg-white border border-slate-200 rounded-2xl shadow-md" data-aos="fade-up">
                 <div className="p-6 border-b flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -93,7 +118,7 @@ export default function ManageResourcesPage() {
                         <tbody className="bg-white divide-y divide-slate-200">
                             {isLoading ? (
                                 <tr><td colSpan={4} className="p-6 text-center text-slate-500">Memuat data...</td></tr>
-                            ) : filteredResources.map(res => (
+                            ) : filteredResources.map((res: ResourceType) => (
                                 <tr key={res._id} className="hover:bg-slate-50">
                                     <td className="px-6 py-4 font-medium text-slate-900">{res.namaSumberDaya}</td>
                                     <td className="px-6 py-4">
@@ -101,7 +126,7 @@ export default function ManageResourcesPage() {
                                             res.tipe === 'Aset' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
                                         }`}>{res.tipe}</span>
                                     </td>
-                                    <td className="px-6 py-4 text-slate-500">{res.pemilik?.namaLengkap || 'N/A'}</td>
+                                    <td className="px-6 py-4 text-slate-500">{res.pemilik?.namaLengkap ?? 'Pengguna Dihapus'}</td>
                                     <td className="px-6 py-4 text-right text-sm font-medium flex justify-end items-center gap-2">
                                         <Link href={`/admin/sumber-daya/${res._id}`} className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-semibold" title="Lihat Detail & Edit">
                                             Detail
@@ -119,3 +144,4 @@ export default function ManageResourcesPage() {
         </div>
     );
 }
+

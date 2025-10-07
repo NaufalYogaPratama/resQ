@@ -2,12 +2,12 @@
 
 import dbConnect from "@/lib/dbConnect";
 import Report from "@/models/Report";
-import User from "@/models/User";
 import { verifyAuth } from "@/lib/auth";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, User as UserIcon, Calendar, MapPin, Tag, Shield, Phone, CheckCircle, MessageSquare } from "lucide-react"; // Tambah ikon
 import ChatBox from "@/components/ChatBox";
+import Image from 'next/image';
 
 interface ReportDetailType {
   _id: string;
@@ -81,7 +81,7 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
 
         <div className="bg-white border border-slate-200 rounded-2xl shadow-lg overflow-hidden">
           {report.gambarUrl && (
-            <img src={report.gambarUrl} alt={`Gambar untuk laporan ${report.kategori}`} className="w-full h-80 object-cover" />
+            <Image src={report.gambarUrl} alt={`Gambar untuk laporan ${report.kategori}`} className="w-full h-80 object-cover" />
           )}
           <div className="p-8 space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">

@@ -45,8 +45,12 @@ export default function EditProfileModal({ user }: { user: UserData }) {
             router.refresh(); 
             alert("Profil berhasil diperbarui!");
 
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("Terjadi kesalahan yang tidak diketahui.");
+            }
         } finally {
             setIsSubmitting(false);
         }

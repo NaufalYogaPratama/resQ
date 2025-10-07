@@ -8,6 +8,7 @@ export async function GET() {
     const events = await HistoricEvent.find({}).sort({ date: -1 });
     return NextResponse.json({ success: true, data: events });
   } catch (error) {
+    console.error("Gagal mengambil data histori kejadian:", error);
     return NextResponse.json({ success: false, message: "Server Error" }, { status: 500 });
   }
 }

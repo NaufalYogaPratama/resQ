@@ -2,11 +2,10 @@ import { verifyAuth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import dbConnect from "@/lib/dbConnect";
 import Report from "@/models/Report";
-import User from "@/models/User";
 import Link from "next/link";
-import { ArrowLeft, MapPin, User as UserIcon, Calendar, Shield, CheckCircle, Tag } from "lucide-react";
+import { ArrowLeft, MapPin, User as UserIcon,  Shield, CheckCircle, Tag } from "lucide-react";
 import ReportActionsAdmin from "@/components/ReportActionsAdmin";
-// Import loader baru, bukan 'dynamic'
+import Image from 'next/image';
 import StaticMapLoader from "@/components/StaticMapLoader";
 
 interface ReportDetailType {
@@ -16,7 +15,7 @@ interface ReportDetailType {
     penolong?: { _id: string; namaLengkap: string; };
 }
 
-// Hapus 'dynamic' import dari sini
+
 
 async function getReport(id: string): Promise<ReportDetailType | null> {
     await dbConnect();
@@ -25,6 +24,7 @@ async function getReport(id: string): Promise<ReportDetailType | null> {
         if (!report) return null;
         return JSON.parse(JSON.stringify(report));
     } catch (error) {
+        console.error("Gagal mengambil detail laporan:", error);
         return null;
     }
 }
@@ -57,7 +57,7 @@ export default async function ReportDetailPageAdmin({ params }: { params: { id: 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-1 space-y-6">
                         {report.gambarUrl && (
-                             <img src={report.gambarUrl} alt="Foto laporan" className="w-full h-64 object-cover rounded-2xl shadow-md border" />
+                             <Image src={report.gambarUrl} alt="Foto laporan" className="w-full h-64 object-cover rounded-2xl shadow-md border" />
                         )}
                         <div className="h-80 rounded-2xl overflow-hidden shadow-md border">
                             <StaticMapLoader position={[report.lokasi.coordinates[1], report.lokasi.coordinates[0]]} />

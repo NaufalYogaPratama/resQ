@@ -2,13 +2,13 @@ import { verifyAuth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import dbConnect from "@/lib/dbConnect";
 import Report from "@/models/Report";
-import User from "@/models/User";
 import Link from "next/link";
-import { ArrowLeft, MapPin, User as UserIcon, Calendar, Shield, CheckCircle, Phone, Tag } from "lucide-react";
+import { ArrowLeft, MapPin, User as UserIcon, Calendar, Shield, CheckCircle, Tag } from "lucide-react";
 import CompleteReportButton from "@/components/CompleteReportButton";
 import ChatBox from "@/components/ChatBox";
+import Image from 'next/image';
 
-// --- PERBAIKAN 1: Update Tipe Data ---
+
 interface ReportDetailType {
   _id: string;
   deskripsi: string;
@@ -19,7 +19,7 @@ interface ReportDetailType {
   createdAt: string;
   penolong?: { _id: string; namaLengkap: string; } | null;
   pelapor: {
-    _id: string; // <-- Tambahkan _id
+    _id: string;
     namaLengkap: string;
     noWa?: string;
   } | null;
@@ -34,6 +34,7 @@ async function getReport(id: string): Promise<ReportDetailType | null> {
         if (!report) return null;
         return JSON.parse(JSON.stringify(report));
     } catch (error) {
+        console.error("Gagal mengambil detail laporan:", error);
         return null;
     }
 }
@@ -50,7 +51,7 @@ export default async function ReportDetailPageWarga({ params }: { params: { id: 
         notFound();
     }
 
-    // --- PERBAIKAN 2: Tambahkan optional chaining (?.) ---
+  
     if (report.pelapor?._id.toString() !== user.id && user.peran !== 'Admin') {
         redirect("/warga/dashboard?error=unauthorized");
     }
@@ -73,7 +74,7 @@ export default async function ReportDetailPageWarga({ params }: { params: { id: 
 
                 <div className="bg-white border border-slate-200 rounded-2xl shadow-lg overflow-hidden">
                     {report.gambarUrl && (
-                        <img src={report.gambarUrl} alt={`Gambar untuk laporan ${report.kategori}`} className="w-full h-80 object-cover" />
+                        <Image src={report.gambarUrl} alt={`Gambar untuk laporan ${report.kategori}`} className="w-full h-80 object-cover" />
                     )}
                     <div className="p-8 space-y-6">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">

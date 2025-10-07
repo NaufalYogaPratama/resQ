@@ -23,11 +23,15 @@ export default function CompleteReportButton({ reportId }: { reportId: string })
       }
       alert('Terima kasih! Laporan telah diselesaikan.');
       router.refresh();
-    } catch (err: any) {
-      alert(`Error: ${err.message}`);
-    } finally {
-      setIsSubmitting(false);
-    }
+    } catch (err) {
+      if (err instanceof Error) {
+          alert(`Error: ${err.message}`);
+      } else {
+          alert("Terjadi kesalahan yang tidak diketahui.");
+      }
+  } finally {
+    setIsSubmitting(false);
+  }
   };
 
   return (

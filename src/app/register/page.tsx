@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import Link from 'next/link'; 
 
 // Ilustrasi untuk panel kiri
 const RegisterIllustration = () => (
@@ -65,7 +66,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  // const router = useRouter(); // Removed for compatibility
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -87,12 +88,16 @@ export default function RegisterPage() {
       
       window.location.href = '/login?status=success';
 
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
+    } catch (err) {
+      if (err instanceof Error) {
+          setError(err.message); 
+      } else {
+          setError("Terjadi kesalahan yang tidak diketahui.");
+      }
+  } finally {
       setIsLoading(false);
-    }
-  };
+  }
+};
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-slate-100 p-4 font-sans">
@@ -104,13 +109,13 @@ export default function RegisterPage() {
         </div>
 
         <div className="w-full p-8 sm:p-12 lg:p-16 flex flex-col justify-center relative">
-        <a
+        <Link
             href="/"
             className="absolute top-6 left-6 flex items-center gap-2 text-[#4B5EAA] hover:text-[#3A4D89] transition font-semibold"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Kembali ke Beranda</span>
-          </a>
+          </Link>
 
           <h2 className="text-3xl font-bold text-slate-900 mb-2">
             Buat Akun Baru

@@ -1,8 +1,8 @@
-import dbConnect from "@/lib/dbConnect";
-import Report from "@/models/Report";
-import { verifyAuth } from "@/lib/auth";
-import { NextResponse } from "next/server";
-import cloudinary from "cloudinary";
+import { NextResponse } from 'next/server';
+import { verifyAuth } from '@/lib/auth';
+import dbConnect from '@/lib/dbConnect';
+import Report from '@/models/Report';
+import cloudinary from 'cloudinary';
 
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -16,7 +16,6 @@ async function uploadImage(file) {
   const base64Data = Buffer.from(fileBuffer).toString("base64");
   const fileUri = `data:${mime};base64,${base64Data}`;
 
-  // Menggunakan try-catch di sini untuk memberikan pesan error yang lebih spesifik
   try {
     const result = await cloudinary.v2.uploader.upload(fileUri, {
       folder: "resq_reports",
@@ -28,9 +27,7 @@ async function uploadImage(file) {
   }
 }
 
-// =============================
-// GET -> Ambil semua laporan aktif
-// =============================
+
 export async function GET() {
   try {
     const user = await verifyAuth();
@@ -63,9 +60,7 @@ export async function GET() {
   }
 }
 
-// =============================
-// POST -> Buat laporan baru
-// =============================
+
 export async function POST(request) {
   try {
     const user = await verifyAuth();
@@ -104,6 +99,8 @@ export async function POST(request) {
         alamat: parsed.alamat || "",
       };
     } catch (e) {
+
+      console.error("Gagal parsing data lokasi:", e);
       return NextResponse.json(
         { success: false, message: "Format data lokasi tidak valid." },
         { status: 400 }
