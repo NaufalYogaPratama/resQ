@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation'; 
 import { 
   LayoutDashboard, 
@@ -11,8 +12,8 @@ import {
   BookOpen, 
   User, 
   LogOut,
-  Menu, // Ikon untuk hamburger
-  X     // Ikon untuk tombol close
+  Menu,
+  X 
 } from 'lucide-react';
 
 type UserData = {
@@ -50,9 +51,25 @@ export default function NavbarWarga({ user }: { user: UserData }) {
           
           {/* Logo & Navigasi Desktop */}
           <div className="flex items-center space-x-6">
-            <Link href="/warga/dashboard" className="text-3xl font-bold text-white">
-              ResQ
-            </Link>
+            <div className="flex items-center space-x-6">
+              {/* Semua props (href, className) dimasukkan ke dalam tag Link */}
+              <Link 
+                href="/relawan/dashboard"
+                className="flex items-center gap-3"
+              >
+                <Image
+                  src="/ResQLogoPutih.png"
+                  alt="ResQ Logo"
+                  width={70}
+                  height={70}
+                  className="h-7 w-auto transition-transform duration-300"
+                  priority
+                />                
+                <span className="text-xs font-bold bg-indigo-500 px-2 py-0.5 rounded-full text-white shadow-md">
+                  WARGA
+                </span>
+              </Link>
+            </div>
             <div className="hidden md:flex items-center space-x-1">
               {navLinks.map((link) => (
                 <Link 

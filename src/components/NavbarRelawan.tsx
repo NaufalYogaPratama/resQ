@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Map, List, Package, User, LogOut,
@@ -45,17 +46,29 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
 
           {/* Logo */}
           <div className="flex items-center space-x-6">
-            <Link
-              href="/relawan/dashboard"
-              className="flex items-center gap-3 text-3xl font-bold text-white tracking-wide"
-            >
-              <span className="drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]">
-                ResQ
-              </span>
-              <span className="text-xs font-bold bg-gradient-to-r from-cyan-400 to-violet-500 px-2 py-0.5 rounded-full text-white shadow-md">
-                RELAWAN
-              </span>
-            </Link>
+            <div className="flex items-center space-x-6">
+              {/* Semua props (href, className) dimasukkan ke dalam tag Link */}
+              <Link 
+                href="/relawan/dashboard"
+                className="flex items-center gap-3"
+              >
+                <Image
+                  src="/ResQLogoPutih.png"
+                  alt="ResQ Logo"
+                  width={70}
+                  height={70}
+                  className="h-7 w-auto transition-transform duration-300"
+                  priority
+                />
+                
+                {/* Teks "ResQ" sudah dihapus, ini sudah benar */}
+
+                {/* Jika Anda ingin mempertahankan badge RELAWAN, uncomment kode di bawah */}
+                <span className="text-xs font-bold bg-gradient-to-r from-cyan-400 to-violet-500 px-2 py-0.5 rounded-full text-white shadow-md">
+                  RELAWAN
+                </span>
+              </Link>
+            </div>
 
             {/* Menu Desktop */}
             <div className="hidden md:flex items-center space-x-1">
