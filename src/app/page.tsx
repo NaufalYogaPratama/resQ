@@ -122,10 +122,10 @@ export default function HomePage() {
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-3">
             <Image
-                src="/ResQ.png"
+                src="/ResQlogo.png"
                 alt="ResQ Logo"
-                width={40} 
-                height={40}
+                width={100} 
+                height={100}
                 className={`h-10 w-auto transition-transform duration-300 ${isScrolled ? "scale-90" : "scale-100"}`}
                 priority 
               />
