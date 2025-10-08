@@ -59,8 +59,8 @@ export default async function ReportDetailPageAdmin({ params }: { params: { id: 
                         {report.gambarUrl && (
                              <Image src={report.gambarUrl} 
                              alt="Foto laporan" 
-                             width={100} 
-                             height={100} 
+                             width={1000} 
+                             height={1000} 
                              className="w-full h-64 object-cover rounded-2xl shadow-md border" 
                              />
                         )}
