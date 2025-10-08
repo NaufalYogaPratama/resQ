@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Bot, User, X, Send, Loader2 } from "lucide-react";
 
 interface WaraResult {
@@ -27,7 +27,17 @@ export default function WaraChatbot({ onComplete, onClose }: WaraChatbotProps) {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(""); // <-- PERBAIKAN 1: Tambahkan state 'error'
+  const messagesEndRef = useRef<HTMLDivElement>(null); // <-- PERBAIKAN 2: Tambahkan ref untuk auto-scroll
 
+  // --- PERBAIKAN 2 (lanjutan): Fungsi untuk auto-scroll ---
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isLoading]); // Auto-scroll setiap ada pesan baru atau loading
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +47,7 @@ export default function WaraChatbot({ onComplete, onClose }: WaraChatbotProps) {
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
+    setError(""); // Reset error setiap kali mengirim pesan
 
     try {
       const res = await fetch("/api/wara", {
@@ -54,8 +65,9 @@ export default function WaraChatbot({ onComplete, onClose }: WaraChatbotProps) {
 
       const botResponse: Message = {
         sender: "bot",
-        text: `Baik, laporan Anda sudah saya catat:\n- Kategori: ${kategori || "?"}\n- Deskripsi: ${deskripsi || "?"}\n\nSekarang, untuk lokasi yang akurat, silakan klik tombol "Gunakan Lokasi Saat Ini" di peta.`,
+        text: `Baik, laporan Anda sudah saya catat:\n- Kategori: ${kategori || "?"}\n- Deskripsi: ${deskripsi || "?"}\n\nSilakan lengkapi detail lokasi di peta dan kirim laporan.`,
       };
+      // Jangan tampilkan ulang userMessage di sini karena sudah ditambahkan di awal
       setMessages((prev) => [...prev, botResponse]);
 
       onComplete(data.data);
@@ -63,10 +75,14 @@ export default function WaraChatbot({ onComplete, onClose }: WaraChatbotProps) {
       let errorMessage = "Maaf, terjadi kesalahan.";
       if (err instanceof Error) {
         errorMessage = `Maaf, terjadi kesalahan: ${err.message}`;
+        setError(err.message); // Set state error
+      } else {
+        setError(errorMessage);
       }
 
       const errorResponse: Message = { sender: "bot", text: errorMessage };
-      setMessages((prev) => [...prev, userMessage, errorResponse]);
+      // Jangan tampilkan ulang userMessage di sini
+      setMessages((prev) => [...prev, errorResponse]);
     } finally {
       setIsLoading(false);
     }
@@ -77,55 +93,37 @@ export default function WaraChatbot({ onComplete, onClose }: WaraChatbotProps) {
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col h-[70vh]">
         {/* Header */}
         <div className="p-4 flex justify-between items-center border-b bg-slate-50 rounded-t-2xl">
-          <div className="flex items-center gap-3">
-            <div className="bg-indigo-600 p-2 rounded-full">
-              <Bot className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-3">
+                <div className="bg-indigo-600 p-2 rounded-full">
+                    <Bot className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                    <h2 className="text-lg font-bold text-slate-900">Asisten Laporan WARA</h2>
+                    <p className="text-sm text-slate-500">Laporkan dengan cepat pakai kalimat biasa</p>
+                </div>
             </div>
-            <div>
-              <h2 className="text-lg font-bold text-slate-900">
-                Asisten Laporan WARA
-              </h2>
-              <p className="text-sm text-slate-500">
-                Laporkan dengan cepat pakai kalimat biasa
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-slate-500 hover:text-slate-800"
-          >
-            <X className="w-6 h-6" />
-          </button>
+            <button onClick={onClose} className="text-slate-500 hover:text-slate-800">
+                <X className="w-6 h-6" />
+            </button>
         </div>
 
         {/* Chat body */}
         <div className="flex-grow p-4 overflow-y-auto space-y-4">
           {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`flex items-start gap-3 ${
-                msg.sender === "user" ? "justify-end" : ""
-              }`}
-            >
-              {msg.sender === "bot" && (
-                <div className="bg-slate-200 p-2 rounded-full">
-                  <Bot className="w-5 h-5 text-slate-600" />
+            <div key={index} className={`flex items-start gap-3 ${msg.sender === "user" ? "justify-end" : ""}`}>
+                {msg.sender === "bot" && (
+                    <div className="bg-slate-200 p-2 rounded-full">
+                        <Bot className="w-5 h-5 text-slate-600" />
+                    </div>
+                )}
+                <div className={`max-w-xs md:max-w-md p-3 rounded-xl whitespace-pre-wrap ${msg.sender === "user" ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-800"}`}>
+                    <p className="text-sm">{msg.text}</p>
                 </div>
-              )}
-              <div
-                className={`max-w-xs md:max-w-md p-3 rounded-xl whitespace-pre-wrap ${
-                  msg.sender === "user"
-                    ? "bg-indigo-600 text-white"
-                    : "bg-slate-100 text-slate-800"
-                }`}
-              >
-                <p className="text-sm">{msg.text}</p>
-              </div>
-              {msg.sender === "user" && (
-                <div className="bg-slate-200 p-2 rounded-full">
-                  <User className="w-5 h-5 text-slate-600" />
-                </div>
-              )}
+                {msg.sender === "user" && (
+                    <div className="bg-slate-200 p-2 rounded-full">
+                        <User className="w-5 h-5 text-slate-600" />
+                    </div>
+                )}
             </div>
           ))}
 
@@ -139,10 +137,13 @@ export default function WaraChatbot({ onComplete, onClose }: WaraChatbotProps) {
               </div>
             </div>
           )}
+     
+          <div ref={messagesEndRef} />
         </div>
 
-        {/* Input area */}
         <div className="p-4 border-t">
+
+          {error && <p className="text-xs text-red-500 mb-2 text-center">{error}</p>}
           <form onSubmit={handleSendMessage} className="flex items-center gap-2">
             <input
               type="text"

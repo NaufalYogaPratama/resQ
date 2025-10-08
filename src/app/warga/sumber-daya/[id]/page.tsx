@@ -61,6 +61,8 @@ export default async function ResourceDetailPage({ params }: { params: { id: str
                         <Image 
                             src={resource.gambarUrl} 
                             alt={resource.namaSumberDaya}
+                            width={1000}  
+                            height={1000} 
                             className="w-full h-80 object-cover"
                             priority 
                         />

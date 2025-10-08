@@ -78,6 +78,8 @@ export default async function EdukasiPage() {
                     <Image
                       src={article.gambarUrl}
                       alt={article.judul}
+                      width={1000}  
+                      height={1000} 
                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   )}

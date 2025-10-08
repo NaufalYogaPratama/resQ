@@ -102,7 +102,7 @@ export default function SumberDayaRelawanPage() {
                 filteredResources.map((res: ResourceType) => (
                   <div key={res._id} className="bg-white border border-slate-200 rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden flex flex-col">
                     {res.gambarUrl ? (
-                        <Image src={res.gambarUrl} alt={res.namaSumberDaya} width={400} height={200} className="w-full h-40 object-cover" />
+                        <Image src={res.gambarUrl} alt={res.namaSumberDaya} width={1000} height={1000} className="w-full h-40 object-cover" />
                     ) : (
                         <div className="w-full h-40 bg-slate-100 flex items-center justify-center">
                            {res.tipe === "Aset" ? <Package className="w-16 h-16 text-slate-300" /> : <Wrench className="w-16 h-16 text-slate-300" />}

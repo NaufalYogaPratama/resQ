@@ -77,6 +77,8 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
               <Image
                 src={article.gambarUrl} 
                 alt={`Gambar untuk ${article.judul}`} 
+                width={1000}  
+                height={1000} 
                 className="w-full h-auto max-h-[500px] object-cover rounded-xl shadow-md border border-slate-200"
               />
             </figure>

@@ -57,7 +57,12 @@ export default async function ReportDetailPageAdmin({ params }: { params: { id: 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-1 space-y-6">
                         {report.gambarUrl && (
-                             <Image src={report.gambarUrl} alt="Foto laporan" className="w-full h-64 object-cover rounded-2xl shadow-md border" />
+                             <Image src={report.gambarUrl} 
+                             alt="Foto laporan" 
+                             width={100} 
+                             height={100} 
+                             className="w-full h-64 object-cover rounded-2xl shadow-md border" 
+                             />
                         )}
                         <div className="h-80 rounded-2xl overflow-hidden shadow-md border">
                             <StaticMapLoader position={[report.lokasi.coordinates[1], report.lokasi.coordinates[0]]} />

@@ -177,7 +177,13 @@ export default async function ProfilWargaPage() {
                                         <div key={res._id} className="flex items-center gap-4 p-3 bg-slate-50 rounded-lg">
                                           
                                             {res.gambarUrl ? (
-                                                <Image src={res.gambarUrl} alt={res.namaSumberDaya} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                                                <Image 
+                                                src={res.gambarUrl} 
+                                                alt={res.namaSumberDaya}                             
+                                                width={1000}  
+                                                height={1000} 
+                                                className="w-12 h-12 rounded-lg object-cover flex-shrink-0" 
+                                                />
                                             ) : (
                                                 <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                                     {res.tipe === 'Aset' ? <Package className="w-6 h-6 text-indigo-600" /> : <Wrench className="w-6 h-6 text-indigo-600" />}

@@ -131,7 +131,8 @@ export default function EditEdukasiPage() {
                                 className="text-sm text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
                         </div>
                         {gambar && <p className="text-xs text-green-600 mt-1">✓ Foto baru terpilih: {gambar.name}</p>}
-                        {!gambar && gambarUrl && <Image src={gambarUrl} alt="Gambar saat ini" className="w-32 h-auto mt-2 rounded-md"/>}
+                        {!gambar && gambarUrl && <Image src={gambarUrl} alt="Gambar saat ini" width={1000}  
+                height={1000} className="w-32 h-auto mt-2 rounded-md"/>}
                     </div>
                 </div>
 

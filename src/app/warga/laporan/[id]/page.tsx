@@ -74,7 +74,12 @@ export default async function ReportDetailPageWarga({ params }: { params: { id: 
 
                 <div className="bg-white border border-slate-200 rounded-2xl shadow-lg overflow-hidden">
                     {report.gambarUrl && (
-                        <Image src={report.gambarUrl} alt={`Gambar untuk laporan ${report.kategori}`} className="w-full h-80 object-cover" />
+                        <Image 
+                            src={report.gambarUrl} 
+                            alt={`Gambar untuk laporan ${report.kategori}`}    
+                            width={1000}  
+                            height={1000} 
+                            className="w-full h-80 object-cover" />
                     )}
                     <div className="p-8 space-y-6">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
