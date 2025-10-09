@@ -11,7 +11,7 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'Pesan tidak boleh kosong.' }, { status: 400 });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const prompt = `
       Anda adalah WARA, asisten chatbot untuk aplikasi pelaporan darurat ResQ.
