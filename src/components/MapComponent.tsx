@@ -15,6 +15,8 @@ interface ReportType {
   lokasi: { coordinates: [number, number]; alamat?: string };
   pelapor: { _id: string; namaLengkap: string } | null;
   penolong?: { _id: string; namaLengkap: string } | null;
+  // Tambahkan field baru yang sudah kita buat di model
+  namaPelapor?: string;
 }
 
 interface VolunteerType {
@@ -39,10 +41,15 @@ L.Icon.Default.mergeOptions({
 });
 
 
-const getIconByStatus = (status: ReportType['status']) => {
+// --- MODIFIKASI FUNGSI ICON ---
+const getIconByReport = (report: ReportType) => {
     let color = '#10b981'; // Selesai (Hijau)
-    if (status === 'Menunggu') color = '#dc2626'; // Menunggu (Merah)
-    else if (status === 'Ditangani') color = '#f97316'; // Ditangani (Oranye)
+    if (report.status === 'Ditangani') {
+        color = '#f97316'; // Ditangani (Oranye)
+    } else if (report.status === 'Menunggu') {
+        // Jika pelapor tidak ada (laporan anonim), beri warna abu-abu
+        color = report.pelapor ? '#dc2626' : '#6b7280'; // Merah untuk terdaftar, Abu-abu untuk anonim
+    }
     
     return L.divIcon({
         className: `custom-div-icon`,
@@ -218,7 +225,7 @@ export default function MapComponent({ userId, userRole, volunteers = [] }: MapC
             <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" attribution='&copy; CARTO' />
             
             {filteredReports.map((report) => (
-                <Marker key={report._id} position={[report.lokasi.coordinates[1], report.lokasi.coordinates[0]]} icon={getIconByStatus(report.status)}>
+                <Marker key={report._id} position={[report.lokasi.coordinates[1], report.lokasi.coordinates[0]]} icon={getIconByReport(report)}>
                     <Popup>
                         <div className="w-72">
                             <h2 className={`text-lg font-bold ${report.status === 'Menunggu' ? 'text-red-700' : 'text-teal-800'}`}>{report.kategori} ({report.status})</h2>
@@ -234,7 +241,8 @@ export default function MapComponent({ userId, userRole, volunteers = [] }: MapC
                             )}
                             
                             <p className="text-slate-700 text-sm mt-2">{report.deskripsi}</p>
-                            <p className="text-xs text-slate-500 mt-2 border-t pt-2">Pelapor: {report.pelapor?.namaLengkap ?? 'Pengguna Dihapus'}</p>
+                            {/* --- MODIFIKASI TAMPILAN NAMA PELAPOR --- */}
+                            <p className="text-xs text-slate-500 mt-2 border-t pt-2">Pelapor: {report.namaPelapor || (report.pelapor ? report.pelapor.namaLengkap : 'Laporan Anonim')}</p>
                             {report.penolong && <p className="text-xs text-slate-500">Ditangani oleh: {report.penolong?.namaLengkap ?? 'Relawan Dihapus'}</p>}
                             
                             {/* Tombol untuk Relawan */}

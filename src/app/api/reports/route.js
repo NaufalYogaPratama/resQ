@@ -44,6 +44,8 @@ export async function GET() {
       status: { $in: ["Menunggu", "Ditangani"] },
     })
       .populate("pelapor", "namaLengkap _id")
+      // --- PERBAIKAN DI SINI ---
+      .populate("penolong", "namaLengkap") // Tambahkan baris ini untuk mengambil data penolong
       .sort({ createdAt: -1 });
 
     return NextResponse.json({ success: true, data: activeReports });
@@ -63,14 +65,6 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    const user = await verifyAuth();
-    if (!user) {
-      return NextResponse.json(
-        { success: false, message: "Akses ditolak." },
-        { status: 401 }
-      );
-    }
-
     await dbConnect();
 
     const formData = await request.formData();
@@ -78,6 +72,9 @@ export async function POST(request) {
     const deskripsi = formData.get("deskripsi");
     const lokasiRaw = formData.get("lokasi");
     const gambar = formData.get("gambar");
+    const namaPelapor = formData.get("namaPelapor"); // Field baru untuk nama
+    const noWaPelapor = formData.get("noWaPelapor"); // Field baru untuk No WA
+    const user = await verifyAuth(); // Coba verifikasi, tapi jangan blokir
 
     if (!kategori || !deskripsi || !lokasiRaw) {
       return NextResponse.json(
@@ -107,12 +104,18 @@ export async function POST(request) {
       );
     }
 
-    let reportData = {
-      pelapor: user.id,
+    const reportData = {
       kategori,
       deskripsi,
       lokasi,
+      // Jika login, pakai nama user. Jika tidak, pakai dari form.
+      namaPelapor: user ? user.nama : namaPelapor, 
+      noWaPelapor: user ? user.noWa : noWaPelapor,
     };
+
+    if (user) {
+      reportData.pelapor = user.id; // Hanya isi jika user login
+    }
 
     if (gambar && gambar.size > 0) {
       const uploadResult = await uploadImage(gambar);

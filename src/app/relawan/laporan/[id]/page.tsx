@@ -1,11 +1,9 @@
-
-
 import dbConnect from "@/lib/dbConnect";
 import Report from "@/models/Report";
 import { verifyAuth } from "@/lib/auth";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, User as UserIcon, Calendar, MapPin, Tag, Shield, Phone, CheckCircle, MessageSquare } from "lucide-react"; // Tambah ikon
+import { ArrowLeft, User as UserIcon, Calendar, MapPin, Tag, Shield, Phone, CheckCircle, MessageSquare } from "lucide-react";
 import ChatBox from "@/components/ChatBox";
 import Image from 'next/image';
 
@@ -18,6 +16,7 @@ interface ReportDetailType {
     coordinates: [number, number];
     alamat?: string;
   };
+  // Modifikasi tipe agar bisa menerima null
   pelapor: {
     _id: string;
     namaLengkap: string;
@@ -27,6 +26,9 @@ interface ReportDetailType {
     _id: string;
     namaLengkap: string;
   } | null;
+  // Tambahkan field baru
+  namaPelapor?: string; 
+  noWaPelapor?: string;
   gambarUrl?: string;
   createdAt: string;
 }
@@ -60,7 +62,9 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
     notFound(); 
   }
 
-  const isParticipant = user.id === report.pelapor?._id.toString() || user.id === report.penolong?._id.toString();
+  // Cek partisipasi: jika pelapor ada DAN ID-nya sama, atau jika penolong ada DAN ID-nya sama.
+  const isParticipant = (report.pelapor && user.id === report.pelapor._id.toString()) || 
+                        (report.penolong && user.id === report.penolong._id.toString());
 
 
   const statusInfo = {
@@ -68,6 +72,10 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
     Ditangani: { color: "bg-orange-100 text-orange-800", icon: <UserIcon className="w-5 h-5 mr-2" />, text: "Sedang Ditangani" },
     Selesai: { color: "bg-green-100 text-green-800", icon: <CheckCircle className="w-5 h-5 mr-2" />, text: "Selesai" },
   };
+
+  // Ambil nama dan no WA yang benar untuk ditampilkan
+  const finalNamaPelapor = report.pelapor?.namaLengkap || report.namaPelapor || 'Laporan Anonim';
+  const finalNoWaPelapor = report.pelapor?.noWa || report.noWaPelapor;
 
   return (
     <div className="bg-slate-50 min-h-screen p-4 sm:p-8 font-sans">
@@ -112,13 +120,15 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
               <div>
                 <h3 className="font-bold text-slate-800 mb-2">Informasi Pihak Terkait</h3>
                 <ul className="space-y-2 text-slate-600">
+                  {/* --- PERBAIKAN 1: Tampilkan nama pelapor yang benar --- */}
                   <li className="flex items-center gap-3">
                     <UserIcon className="w-5 h-5 text-teal-500"/> 
-                    <strong>Pelapor:</strong> {report.pelapor?.namaLengkap ?? 'Pengguna Dihapus'}
+                    <strong>Pelapor:</strong> {finalNamaPelapor}
                   </li>
-                  {report.pelapor?.noWa && (
+                  {/* Tampilkan tombol WA jika nomornya ada */}
+                  {finalNoWaPelapor && (
                      <li className="flex items-center gap-3">
-                     <a href={`https://wa.me/${report.pelapor.noWa.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-teal-600 font-semibold hover:underline">
+                     <a href={`https://wa.me/${finalNoWaPelapor.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-teal-600 font-semibold hover:underline">
                        <Phone className="w-4 h-4"/> Hubungi Pelapor
                      </a>
                    </li>
@@ -133,7 +143,8 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
           </div>
         </div>
 
-        {(report.status === 'Ditangani' || report.status === 'Selesai') && (
+        {/* --- PERBAIKAN 2: Hanya tampilkan chat jika ada pelapor terdaftar --- */}
+        {(report.status === 'Ditangani' || report.status === 'Selesai') && report.pelapor && (
             isParticipant ? (
                 <div className="mt-8">
                     <ChatBox reportId={report._id} currentUserId={user.id} />

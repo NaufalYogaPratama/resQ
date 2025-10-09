@@ -4,7 +4,16 @@ const ReportSchema = new mongoose.Schema({
   pelapor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'ID pelapor wajib diisi.'],
+  },
+
+  namaPelapor: {
+    type: String,
+    trim: true,
+  },
+  
+  noWaPelapor: {
+    type: String,
+    trim: true,
   },
   
   kategori: {

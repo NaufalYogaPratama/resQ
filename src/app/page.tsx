@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { MessageCircle, Map, Users, BookOpen, HandHeart, ShieldCheck, ArrowRight } from "lucide-react"
+import { MessageCircle, Map, Users, BookOpen, HandHeart, ShieldCheck, ArrowRight, Siren } from "lucide-react"
 import AOS from "aos"
 import "aos/dist/aos.css"
 import Image from 'next/image';
@@ -186,7 +186,7 @@ export default function HomePage() {
         <section
           className={"relative bg-gradient-to-br from-violet-50 via-white to-indigo-50 text-slate-900 overflow-hidden"}
         >
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-30 pb-32">
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-40 pb-32">
             <div className="grid lg:grid-cols-2 gap-20 items-center">
               <div className="text-left" data-aos="fade-right">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-5">
@@ -239,7 +239,7 @@ export default function HomePage() {
               {features.map((feature, index) => (
                 <div key={feature.title} data-aos="fade-up" data-aos-delay={index * 100}>
                
-                  <div className="h-full rounded-2xl border border-white/60 bg-white/55 backdrop-blur-xl shadow-lg ring-1 ring-black/5 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 p-8">
+                  <div className="h-full rounded-2xl border border-white/60 bg-gray-50/80 backdrop-blur-xl shadow-lg ring-1 ring-black/5 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 p-8">
                     
                     <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 bg-gradient-to-br from-violet-100/80 via-white/60 to-indigo-100/80 border border-white/60 backdrop-blur-sm shadow-sm">
                       {feature.icon}
@@ -292,7 +292,7 @@ export default function HomePage() {
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="p-8 rounded-2xl border border-white/60 bg-white/55 backdrop-blur-md shadow-lg ring-1 ring-black/5">
+              <div className="p-8 rounded-2xl border border-white/60 bg-gray-50/30 backdrop-blur-md shadow-lg ring-1 ring-black/5">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="bg-[#4B5EAA] text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl">
                     1
@@ -303,7 +303,7 @@ export default function HomePage() {
                   Warga melapor via AI Chatbot. Detail otomatis disusun agar mudah dipahami semua pihak.
                 </p>
               </div>
-              <div className="p-8 rounded-2xl border border-white/60 bg-white/55 backdrop-blur-md shadow-lg ring-1 ring-black/5">
+              <div className="p-8 rounded-2xl border border-white/60 bg-gray-50/30 backdrop-blur-md shadow-lg ring-1 ring-black/5">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="bg-[#4B5EAA] text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl">
                     2
@@ -314,7 +314,7 @@ export default function HomePage() {
                   Laporan muncul di peta real-time dengan prioritas. Tim fokus ke titik paling kritis.
                 </p>
               </div>
-              <div className="p-8 rounded-2xl border border-white/60 bg-white/55 backdrop-blur-md shadow-lg ring-1 ring-black/5">
+              <div className="p-8 rounded-2xl border border-white/60 bg-gray-50/30 backdrop-blur-md shadow-lg ring-1 ring-black/5">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="bg-[#4B5EAA] text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl">
                     3
@@ -329,20 +329,47 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* --- SECTION GABUNGAN: LAPOR CEPAT & AMBIL PERAN --- */}
         <section className={"py-24 bg-gradient-to-r from-violet-50 via-white to-indigo-50"}>
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-[#1E293B] mb-6">Ambil Peran Anda</h2>
-            <p className="text-xl text-[#475569] mb-10">
-              Setiap kontribusi berarti. Jadi pelapor, relawan, semua punya peran.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="/register"
-                className="inline-flex items-center gap-2 bg-[#4B5EAA] text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-[#3A4D89] transition-all hover:shadow-2xl hover:-translate-y-1"
-              >
-                Daftar Sekarang, Gratis!
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-8 items-stretch">
+
+              {/* Kolom Kiri: Lapor Cepat */}
+              <div data-aos="fade-right" className="relative text-center bg-gray-50/50 border border-slate-200 rounded-2xl shadow-xl p-8 sm:p-12 overflow-hidden flex flex-col justify-center">
+                  <div className="absolute -top-10 -left-10 w-40 h-40 bg-violet-100/80 rounded-full blur-3xl"></div>
+                  <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-violet-100/80 rounded-full blur-3xl"></div>
+                  <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
+                      Lihat Keadaan Darurat?
+                  </h2>
+                  <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
+                      Jangan tunda, setiap detik berharga. Laporkan segera tanpa perlu login untuk ditindaklanjuti.
+                  </p>
+                  <Link
+                      href="/lapor-cepat"
+                      className="inline-flex items-center justify-center gap-3 bg-red-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-red-700 shadow-lg shadow-red-500/30 transition-all hover:-translate-y-1"
+                  >
+                      <Siren className="w-6 h-6" />
+                      Buat Laporan Cepat
+                  </Link>
+              </div>
+
+              {/* Kolom Kanan: Ambil Peran */}
+              <div data-aos="fade-left" className="relative text-center bg-[#4B5EAA] text-white rounded-2xl shadow-xl p-8 sm:p-12 overflow-hidden flex flex-col justify-center">
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-violet-100/40 rounded-full blur-3xl"></div>
+                  <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-violet-100/40 rounded-full blur-3xl"></div>
+                <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Ambil Peran Anda</h2>
+                <p className="text-lg text-white/90 max-w-2xl mx-auto mb-8">
+                  Setiap kontribusi berarti. Daftarkan diri Anda menjadi bagian dari komunitas yang siap membantu sesama.
+                </p>
+                <Link
+                  href="/register"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-[#4B5EAA] px-8 py-4 rounded-xl text-lg font-bold hover:bg-slate-100 transition-all hover:shadow-2xl hover:-translate-y-1"
+                >
+                  Daftar Sekarang, Gratis!
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
+
             </div>
           </div>
         </section>
