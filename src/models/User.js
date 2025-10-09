@@ -42,6 +42,12 @@ const UserSchema = new mongoose.Schema({
     enum: ['None', 'Diajukan', 'Diterima'],
     default: 'None',
   },
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordExpire: {
+    type: Date,
+  }
 }, {
   timestamps: true,
 });
