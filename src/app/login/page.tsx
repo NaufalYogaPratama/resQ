@@ -110,8 +110,8 @@ export default function LoginPage() {
 
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-100 p-4 font-sans">
-      <div className="w-full max-w-5xl mx-auto grid md:grid-cols-2 bg-white rounded-2xl shadow-2xl overflow-hidden">
+    <div className="flex items-center justify-center min-h-screen bg-white md:bg-slate-100 md:p-4 font-sans">
+      <div className="w-full md:max-w-5xl mx-auto grid md:grid-cols-2 md:bg-white md:rounded-2xl md:shadow-2xl md:overflow-hidden">
         
         <div className="hidden md:flex items-center justify-center bg-[#4B5EAA] rounded-r-[4rem]">
           <LoginIllustration />
@@ -120,16 +120,19 @@ export default function LoginPage() {
         <div className="w-full p-8 sm:p-12 lg:p-16 flex flex-col justify-center relative">
         <Link
             href="/"
-            className="absolute top-6 left-6 flex items-center gap-2 text-[#4B5EAA] hover:text-[#3A4D89] transition font-semibold"
+            className="absolute top-6 left-6 flex items-center gap-2 text-[#4B5EAA] hover:text-[#3A4D89] transition font-semibold z-10"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Kembali ke Beranda</span>
           </Link>
           
-          <h2 className="text-3xl font-bold text-slate-900 mb-2">
-            Masuk ke Akun Anda
-          </h2>
-          <p className="text-slate-600 mb-8">Selamat datang kembali! Silakan masukkan detail Anda.</p>
+          {/* --- PERUBAHAN DI SINI --- */}
+          <div className="mt-12 md:mt-0">
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">
+              Masuk ke Akun Anda
+            </h2>
+            <p className="text-slate-600 mb-8">Selamat datang kembali! Silakan masukkan detail Anda.</p>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>

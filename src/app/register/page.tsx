@@ -7,7 +7,6 @@ import Link from 'next/link';
 
 // Ilustrasi untuk panel kiri
 const RegisterIllustration = () => (
-
   <div className="w-full h-full bg-[#4B5EAA] text-white flex flex-col justify-center px-10 py-12 rounded-r-[4rem]">
     <h1 className="text-3xl font-bold mb-6">Selamat Datang di ResQ</h1>
     <p className="text-white/90 mb-10 max-w-md">
@@ -33,7 +32,7 @@ const RegisterIllustration = () => (
           desc: "Tingkatkan kesiapan Anda melalui panduan terkurasi.",
         },
       ].map((item, idx) => (
-        <div key={idx} className="flex items- gap-3">
+        <div key={idx} className="flex items-start gap-3">
           <div className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-xl">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -100,8 +99,8 @@ export default function RegisterPage() {
 };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-100 p-4 font-sans">
-      <div className="w-full max-w-5xl mx-auto grid md:grid-cols-2 bg-white rounded-2xl shadow-2xl overflow-hidden min-h-[650px]">
+    <div className="flex items-center justify-center min-h-screen bg-white md:bg-slate-100 md:p-4 font-sans">
+      <div className="w-full md:max-w-5xl mx-auto grid md:grid-cols-2 md:bg-white md:rounded-2xl md:shadow-2xl md:overflow-hidden">
         
         {/* KIRI: Ilustrasi (dengan kurva di kanan) */}
         <div className="hidden md:flex items-center justify-center bg-[#4B5EAA] rounded-r-[4rem]">
@@ -111,16 +110,19 @@ export default function RegisterPage() {
         <div className="w-full p-8 sm:p-12 lg:p-16 flex flex-col justify-center relative">
         <Link
             href="/"
-            className="absolute top-6 left-6 flex items-center gap-2 text-[#4B5EAA] hover:text-[#3A4D89] transition font-semibold"
+            className="absolute top-6 left-6 flex items-center gap-2 text-[#4B5EAA] hover:text-[#3A4D89] transition font-semibold z-10"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Kembali ke Beranda</span>
           </Link>
 
-          <h2 className="text-3xl font-bold text-slate-900 mb-2">
-            Buat Akun Baru
-          </h2>
-          <p className="text-slate-600 mb-8">Bergabunglah dengan komunitas ResQ untuk mulai berkontribusi.</p>
+          {/* --- PERUBAHAN DI SINI --- */}
+          <div className="mt-12 md:mt-0">
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">
+              Buat Akun Baru
+            </h2>
+            <p className="text-slate-600 mb-8">Bergabunglah dengan komunitas ResQ untuk mulai berkontribusi.</p>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -208,4 +210,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-

@@ -9,10 +9,10 @@ import Image from 'next/image';
 
 const HeroImageGallery = () => {
   const images = [
-    "https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/radarsemarang/2021/02/SIMPANG-LIMA.jpg",
-    "https://www.teachforindonesia.org/wp-content/uploads/2020/01/WhatsApp-Image-2020-01-03-at-09.47.41.jpeg",
-    "https://pmikotasemarang.or.id/wp-content/uploads/2023/03/WhatsApp-Image-2023-03-20-at-07.54.36-1-1024x768.jpeg",
-    "https://asset.kompas.com/crops/m05jVt_LhrSi7wDTXuwm_HkymWs=/0x0:0x0/1200x800/data/photo/2024/03/14/65f2cc5c82060.jpg",
+    "/hero1.jpg",
+    "/hero2.jpg",
+    "/hero3.jpeg",
+    "/hero4.jpg",
   ]
 
   return (
@@ -21,16 +21,16 @@ const HeroImageGallery = () => {
       <div className="absolute top-10 left-10 w-72 h-72 bg-violet-300/35 rounded-full blur-3xl"></div>
       <div className="absolute bottom-10 right-10 w-72 h-72 bg-indigo-300/30 rounded-full blur-3xl"></div>
 
-      <div className="absolute top-0 right-1/4 w-48 h-72 rounded-2xl shadow-2xl overflow-hidden transform -rotate-6 transition-transform hover:scale-105 hover:rotate-0" data-aos="zoom-in" data-aos-delay="200">
+      <div className="absolute top-0 right-1/4 w-72 h-48 rounded-2xl shadow-2xl overflow-hidden transform -rotate-6 transition-transform hover:scale-105 hover:rotate-0" data-aos="zoom-in" data-aos-delay="200">
         <Image src={images[0] || "/placeholder.svg"} alt="Galeri ResQ 1" fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 33vw"/>
       </div>
-      <div className="absolute top-1/4 left-0 w-56 h-80 rounded-2xl shadow-2xl overflow-hidden transform rotate-3 transition-transform hover:scale-105 hover:rotate-0" data-aos="zoom-in" data-aos-delay="100">
+      <div className="absolute top-1/4 left-0 w-80 h-56 rounded-2xl shadow-2xl overflow-hidden transform rotate-3 transition-transform hover:scale-105 hover:rotate-0" data-aos="zoom-in" data-aos-delay="100">
         <Image src={images[1] || "/placeholder.svg"} alt="Galeri ResQ 2" fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 33vw"/>
       </div>
-      <div className="absolute bottom-0 left-1/4 w-48 h-64 rounded-2xl shadow-2xl overflow-hidden transform rotate-6 transition-transform hover:scale-105 hover:rotate-0" data-aos="zoom-in" data-aos-delay="300">
+      <div className="absolute bottom-0 left-1/4 w-64 h-48 rounded-2xl shadow-2xl overflow-hidden transform rotate-6 transition-transform hover:scale-105 hover:rotate-0" data-aos="zoom-in" data-aos-delay="300">
         <Image src={images[2] || "/placeholder.svg"} alt="Galeri ResQ 3" fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 33vw"/>
       </div>
-      <div className="absolute bottom-10 right-0 w-52 h-72 rounded-2xl shadow-2xl overflow-hidden transform -rotate-3 transition-transform hover:scale-105 hover:rotate-0" data-aos="zoom-in" data-aos-delay="400">
+      <div className="absolute bottom-10 right-0 w-72 h-52 rounded-2xl shadow-2xl overflow-hidden transform -rotate-3 transition-transform hover:scale-105 hover:rotate-0" data-aos="zoom-in" data-aos-delay="400">
         <Image src={images[3] || "/placeholder.svg"} alt="Galeri ResQ 4" fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 33vw"/>
       </div>
     </div>
