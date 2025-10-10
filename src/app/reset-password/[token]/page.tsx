@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import Link from 'next/link';
-import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function ResetPasswordPage() {
   const router = useRouter();

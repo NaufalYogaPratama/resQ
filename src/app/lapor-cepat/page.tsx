@@ -7,11 +7,11 @@ import { Mic, MicOff, LocateFixed, Camera, Bot, Loader2, User, Phone, ArrowLeft 
 import WaraChatbot from "@/components/WaraChatbot";
 import Link from "next/link";
 
-declare global {
-  interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
-  }
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+}
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
 }
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
@@ -47,7 +47,7 @@ export default function LaporCepatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   const [showWara, setShowWara] = useState(false);
 
@@ -115,6 +115,7 @@ export default function LaporCepatPage() {
       setDeskripsi(prev => prev ? `${prev} ${transcript}` : transcript);
     };
     recognition.start();
+
   };
 
   useEffect(() => {
@@ -150,7 +151,11 @@ export default function LaporCepatPage() {
       alert("Laporan berhasil dikirim! Terima kasih atas partisipasi Anda.");
       router.push("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Terjadi kesalahan.");
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Terjadi kesalahan yang tidak dikenal.");
+      }
     } finally {
       setIsLoading(false);
     }

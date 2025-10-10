@@ -1,19 +1,19 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Mic, MicOff, LocateFixed, Camera, Bot, Loader2 } from "lucide-react";
 import WaraChatbot from "@/components/WaraChatbot";
 
-// --- PERBAIKAN 1: Deklarasikan tipe data global & SpeechRecognition ---
-declare global {
-  interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
-  }
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
 }
-// Definisikan tipe event secara manual untuk SpeechRecognition
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+}
+
+
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
 }
@@ -47,7 +47,7 @@ export default function LaporPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   const [showWara, setShowWara] = useState(false);
 
