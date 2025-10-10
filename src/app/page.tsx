@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { MessageCircle, Map, Users, BookOpen, HandHeart, ShieldCheck, ArrowRight, Siren } from "lucide-react"
+import { MessageCircle, Map, Users, BookOpen, HandHeart, ShieldCheck, ArrowRight, Siren, Menu, X } from "lucide-react"
 import AOS from "aos"
 import "aos/dist/aos.css"
 import Image from 'next/image';
@@ -39,6 +39,7 @@ const HeroImageGallery = () => {
 
 export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     AOS.init({
@@ -102,85 +103,67 @@ export default function HomePage() {
   ]
 
   return (
-    <div className={"font-sans text-[#1E293B] bg-gradient-to-b from-white via-indigo-50/25 to-white"}>
+    <div className={"overflow-hidden font-sans text-[#1E293B] bg-gradient-to-b from-white via-indigo-50/25 to-white"}>
 
-      <div className="fixed inset-0 -z-10 pointer-events-none">
-        <div className="absolute -top-56 -left-56 w-[40rem] h-[40rem] bg-gradient-to-br from-[#7DA0FF] via-[#4B5EAA] to-[#1E2A78] opacity-40 blur-[120px] rounded-full"></div>
-        <div className="absolute -bottom-56 -right-56 w-[48rem] h-[48rem] bg-gradient-to-tr from-[#A0B8FF] via-[#CFE0FF] to-[#EAF4FF] opacity-30 blur-[140px] rounded-full"></div>
+    <div className="fixed inset-0 -z-10 pointer-events-none">
+      <div className="absolute -top-56 -left-56 w-[40rem] h-[40rem] bg-gradient-to-br from-[#7DA0FF] via-[#4B5EAA] to-[#1E2A78] opacity-40 blur-[120px] rounded-full"></div>
+      <div className="absolute -bottom-56 -right-56 w-[48rem] h-[48rem] bg-gradient-to-tr from-[#A0B8FF] via-[#CFE0FF] to-[#EAF4FF] opacity-30 blur-[140px] rounded-full"></div>
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-30 mix-blend-soft-light"></div>
+    </div>
 
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-30 mix-blend-soft-light"></div>
-      </div>
-
-      <nav
-        className={`transition-all duration-300 ease-in-out top-0 left-0 right-0 z-50 ${
-          isScrolled
-            ? "fixed bg-gradient-to-b from-white/85 via-white/60 to-white/50 backdrop-blur-md border-b border-white/30 shadow-md"
-            : "absolute bg-transparent"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-3">
+    <nav
+      className={`transition-all duration-300 ease-in-out top-0 left-0 right-0 z-50 ${
+        isScrolled
+          ? "fixed bg-gradient-to-b from-white/85 via-white/60 to-white/50 backdrop-blur-md border-b border-white/30 shadow-md"
+          : "absolute bg-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
+          <div className="flex items-center gap-3">
             <Image
-                src="/ResQlogo.png"
-                alt="ResQ Logo"
-                width={100} 
-                height={100}
-                className={`h-10 w-auto transition-transform duration-300 ${isScrolled ? "scale-90" : "scale-100"}`}
-                priority 
-              />
-            </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <a
-                href="#fitur"
-                className={`font-medium transition-colors ${
-                  isScrolled ? "text-slate-600 hover:text-[#3A4D89]" : "text-slate-700 hover:text-slate-900"
-                }`}
-              >
-                Fitur
-              </a>
-              <a
-                href="#tentang"
-                className={`font-medium transition-colors ${
-                  isScrolled ? "text-slate-600 hover:text-[#3A4D89]" : "text-slate-700 hover:text-slate-900"
-                }`}
-              >
-                Tentang
-              </a>
-              <a
-                href="#cara-kerja"
-                className={`font-medium transition-colors ${
-                  isScrolled ? "text-slate-600 hover:text-[#3A4D89]" : "text-slate-700 hover:text-slate-900"
-                }`}
-              >
-                Cara Kerja
-              </a>
-            </div>
-            <div className="hidden md:flex items-center space-x-3">
-              <Link
-                href="/login"
-                className={`px-5 py-2 rounded-lg font-semibold transition-colors ${
-                  isScrolled
-                    ? "text-slate-700 hover:bg-white/60 hover:backdrop-blur-sm"
-                    : "text-slate-700 hover:bg-slate-100"
-                }`}
-              >
-                Masuk
-              </Link>
-              <Link
-                href="/register"
-                className={`px-6 py-2 rounded-lg font-semibold transition-all shadow-md ${
-                  isScrolled
-                    ? "bg-[#4B5EAA] text-white hover:bg-[#3A4D89]"
-                    : "bg-[#4B5EAA] text-white hover:bg-[#3A4D89]"
-                }`}
-              >
-                Gabung Komunitas
-              </Link>
-            </div>
+              src="/ResQlogo.png"
+              alt="ResQ Logo"
+              width={100}
+              height={100}
+              className={`h-10 w-auto transition-transform duration-300 ${isScrolled ? "scale-90" : "scale-100"}`}
+              priority
+            />
+          </div>
+          {/* Navigasi Desktop */}
+          <div className="hidden md:flex items-center space-x-8">
+            <a href="#fitur" className={`font-medium transition-colors ${isScrolled ? "text-slate-600 hover:text-[#3A4D89]" : "text-slate-700 hover:text-slate-900"}`}>Fitur</a>
+            <a href="#tentang" className={`font-medium transition-colors ${isScrolled ? "text-slate-600 hover:text-[#3A4D89]" : "text-slate-700 hover:text-slate-900"}`}>Tentang</a>
+            <a href="#cara-kerja" className={`font-medium transition-colors ${isScrolled ? "text-slate-600 hover:text-[#3A4D89]" : "text-slate-700 hover:text-slate-900"}`}>Cara Kerja</a>
+          </div>
+          <div className="hidden md:flex items-center space-x-3">
+            <Link href="/login" className={`px-5 py-2 rounded-lg font-semibold transition-colors ${isScrolled ? "text-slate-700 hover:bg-white/60 hover:backdrop-blur-sm" : "text-slate-700 hover:bg-slate-100"}`}>Masuk</Link>
+            <Link href="/register" className={`px-6 py-2 rounded-lg font-semibold transition-all shadow-md bg-[#4B5EAA] text-white hover:bg-[#3A4D89]`}>Gabung Komunitas</Link>
+          </div>
+          
+        
+          <div className="md:hidden flex items-center">
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100/50">
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
         </div>
-      </nav>
+      </div>
+
+      {/* --- PERBAIKAN 1: Menu Mobile --- */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-white/90 backdrop-blur-lg shadow-lg absolute top-20 left-0 right-0">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 flex flex-col items-center">
+            <a href="#fitur" onClick={() => setIsMenuOpen(false)} className="block w-full text-center px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:bg-slate-200">Fitur</a>
+            <a href="#tentang" onClick={() => setIsMenuOpen(false)} className="block w-full text-center px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:bg-slate-200">Tentang</a>
+            <a href="#cara-kerja" onClick={() => setIsMenuOpen(false)} className="block w-full text-center px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:bg-slate-200">Cara Kerja</a>
+            <div className="border-t border-slate-200 w-full my-3"></div>
+            <Link href="/login" onClick={() => setIsMenuOpen(false)} className="block w-full text-center px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:bg-slate-200">Masuk</Link>
+            <Link href="/register" onClick={() => setIsMenuOpen(false)} className="block w-full text-center mt-2 px-6 py-3 rounded-lg font-semibold bg-[#4B5EAA] text-white hover:bg-[#3A4D89]">Gabung Komunitas</Link>
+          </div>
+        </div>
+      )}
+    </nav>
 
       <main>
         <section
