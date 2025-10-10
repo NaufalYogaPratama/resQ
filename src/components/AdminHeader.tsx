@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ToggleRight, Loader2 } from "lucide-react";
+import Image from "next/image";
 
 export default function AdminHeader() {
   const [isEmergency, setIsEmergency] = useState(false);
@@ -51,7 +52,14 @@ export default function AdminHeader() {
     <header className="w-full bg-white border-b border-slate-200 shadow-md fixed top-0 left-0 z-50">
       <div className="max-w-screen-2xl mx-auto flex items-center justify-between h-20 px-8">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-extrabold text-slate-900">ResQ</h1>
+        <Image
+            src="/ResQlogo.png"
+            alt="ResQ Logo"
+            width={200}
+            height={200}
+            className="h-7 w-auto transition-transform duration-300"
+            priority
+          />
           <span className="text-sm bg-blue-600 text-white px-2 py-0.5 rounded-md font-semibold">
             Admin
           </span>

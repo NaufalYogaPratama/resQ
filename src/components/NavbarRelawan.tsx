@@ -44,10 +44,10 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
 
-          {/* Logo */}
+   
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-6">
-              {/* Semua props (href, className) dimasukkan ke dalam tag Link */}
+      
               <Link 
                 href="/relawan/dashboard"
                 className="flex items-center gap-3"
@@ -60,17 +60,13 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
                   className="h-7 w-auto transition-transform duration-300"
                   priority
                 />
-                
-                {/* Teks "ResQ" sudah dihapus, ini sudah benar */}
-
-                {/* Jika Anda ingin mempertahankan badge RELAWAN, uncomment kode di bawah */}
+            
                 <span className="text-xs font-bold bg-gradient-to-r from-cyan-400 to-violet-500 px-2 py-0.5 rounded-full text-white shadow-md">
                   RELAWAN
                 </span>
               </Link>
             </div>
 
-            {/* Menu Desktop */}
             <div className="hidden md:flex items-center space-x-1">
               {navLinks.map((link) => (
                 <Link
@@ -89,7 +85,6 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
             </div>
           </div>
 
-          {/* Profile Desktop */}
           <div className="hidden md:flex items-center">
             <div className="relative">
               <button
@@ -122,7 +117,7 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
             </div>
           </div>
 
-          {/* Mobile Button */}
+  
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -134,7 +129,6 @@ export default function NavbarRelawan({ user }: { user: UserData }) {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-[#0F172A]/95 border-t border-white/10 backdrop-blur-md px-2 pt-2 pb-4 space-y-1 sm:px-3">
           {navLinks.map((link) => (
