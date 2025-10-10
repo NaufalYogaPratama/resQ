@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import '@/models/User';
 
 const MessageSchema = new mongoose.Schema({
   chatRoomId: {
