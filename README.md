@@ -1,9 +1,9 @@
 <div align="center">
-<img src="https://i.imgur.com/K1nJmQd.png" alt="ResQ Banner" width="600"/>
+<img src="public/ResQlogo.png" alt="ResQ" width="600"/>
 
 
 
-<h1>ResQ: Platform Gotong Royong Digital</h1>
+<h1>ResQ: Teknologi Menghubungkan Warga Menggerakan</h1>
 <p>
 <strong>Sebuah platform gotong royong digital untuk manajemen bencana yang menghubungkan warga, relawan, dan admin dalam satu ekosistem responsif.</strong>
 </p>
