@@ -1,3 +1,22 @@
+<div align="center">
+<img src="https://i.imgur.com/K1nJmQd.png" alt="ResQ Banner" width="600"/>
+
+
+
+<h1>ResQ: Platform Gotong Royong Digital</h1>
+<p>
+<strong>Sebuah platform gotong royong digital untuk manajemen bencana yang menghubungkan warga, relawan, dan admin dalam satu ekosistem responsif.</strong>
+</p>
+
+
+
+<a href="https://res-q-neon-six.vercel.app/"><strong>Live Demo »</strong></a>
+
+
+
+</div>
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
