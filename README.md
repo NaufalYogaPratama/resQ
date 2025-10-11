@@ -12,18 +12,22 @@
 
 <a href="https://res-q-neon-six.vercel.app/"><strong>Live Demo »</strong></a>
 
-
-
 </div>
-
-
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 # 🚀 Demo & Akun Pengujian
 
 Akses aplikasi yang sudah di-deploy untuk melihat semua fitur secara langsung. Gunakan akun di bawah ini untuk menguji setiap peran.
 
 Link Demo: https://res-q-neon-six.vercel.app/
+
+## Alur Pengujian Utama: Dari Warga Menjadi Relawan
+
+Skenario ini menunjukkan alur inti dari aplikasi ResQ
+- Registrasi sebagai Warga: Buat akun baru melalui halaman registrasi. Anda akan masuk ke Dashboard Warga.
+- Kontribusi Aset: Untuk bisa menjadi relawan, Anda harus berkontribusi terlebih dahulu. Masuk ke menu Sumber Daya dan tambahkan minimal 3 aset (contoh: tenda, genset, dll).
+- Pengajuan Diri: Setelah 3 aset ditambahkan, tombol pengajuan akan aktif di halaman Profil. Klik untuk mengajukan diri.
+- Verifikasi oleh Admin: Login sebagai Admin menggunakan akun demo email: resq@gmail.com pw: resq123. Temukan pengguna di menu Users dan setujui pengajuannya.
+- Selamat! Anda adalah Relawan: Login kembali dengan akun pertama. Anda sekarang akan masuk Dashboard Relawan.
 
 # ✨ Fitur Utama
 
@@ -60,45 +64,37 @@ Link Demo: https://res-q-neon-six.vercel.app/
   </tr>
 </table>
 
+# 🛠️ Panduan Instalasi Lokal
 
+Ikuti langkah-langkah di bawah ini untuk menjalankan proyek ResQ di komputer lokal Anda.
 
+## Prasyarat
+- Node.js: Versi 18.x atau yang lebih baru.
+- Git: Untuk melakukan clone repositori.
+- MongoDB: Anda memerlukan URL koneksi ke database MongoDB.
 
+##  Instalasi & Konfigurasi
+### Clone repositori:
+```bash
+git clone https://github.com/NaufalYogaPratama/resQ.git
+cd resQ
+```
+### Install dependency:
+```bash
+git clone npm install
+```
+### Setup Environment Variables:
+Salin file .env
+### PENTING: 
+Buka file .env dan isi nilainya. Karena alasan keamanan, nilai untuk variabel env tidak disertakan. Silakan hubungi pemilik repositori untuk mendapatkan nilai yang diperlukan.
 
-
-
-
-
-## Getting Started
-
-First, run the development server:
-
+### Jalankan Aplikasi:
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+Aplikasi akan berjalan di http://localhost:3000.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
