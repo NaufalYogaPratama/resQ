@@ -1,5 +1,5 @@
 <div align="center">
-<img src="public/ResQlogo.png" alt="ResQ" width="600"/>
+<img src="public/ResQLogoPutih.png" alt="ResQ" width="600"/>
 
 
 
